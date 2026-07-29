@@ -45,6 +45,9 @@ function SettingsPage() {
   const [code, setCode] = useState("");
   const [sentCode, setSentCode] = useState<string | null>(null);
   const [idDoc, setIdDoc] = useState<File | null>(null);
+  const [fullName, setFullName] = useState("");
+  const [idType, setIdType] = useState("National ID");
+  const [idNumber, setIdNumber] = useState("");
 
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["profile", userId] });
 
