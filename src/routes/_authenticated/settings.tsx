@@ -285,6 +285,20 @@ function SettingsPage() {
         <p className="text-xs text-muted-foreground">
           Upload a national ID or passport. Documents are stored privately and only reviewed by the store team.
         </p>
+        <div>
+          <Label htmlFor="fullname">Full legal name</Label>
+          <Input id="fullname" value={fullName} maxLength={80} onChange={(e) => setFullName(e.target.value)} />
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <Label htmlFor="idtype">Document type</Label>
+            <Input id="idtype" value={idType} onChange={(e) => setIdType(e.target.value)} />
+          </div>
+          <div>
+            <Label htmlFor="idnumber">Document number</Label>
+            <Input id="idnumber" value={idNumber} maxLength={40} onChange={(e) => setIdNumber(e.target.value)} />
+          </div>
+        </div>
         <Input type="file" accept="image/*,application/pdf" onChange={(e) => setIdDoc(e.target.files?.[0] ?? null)} />
         <Button size="sm" disabled={submitKyc.isPending} onClick={() => submitKyc.mutate()}>
           Submit for verification
