@@ -14,16 +14,357 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      install_events: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "install_events_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      kyc_submissions: {
+        Row: {
+          created_at: string
+          document_url: string | null
+          full_name: string
+          id: string
+          id_number: string
+          id_type: string
+          notes: string | null
+          selfie_url: string | null
+          status: Database["public"]["Enums"]["kyc_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          document_url?: string | null
+          full_name: string
+          id?: string
+          id_number: string
+          id_type: string
+          notes?: string | null
+          selfie_url?: string | null
+          status?: Database["public"]["Enums"]["kyc_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          document_url?: string | null
+          full_name?: string
+          id?: string
+          id_number?: string
+          id_type?: string
+          notes?: string | null
+          selfie_url?: string | null
+          status?: Database["public"]["Enums"]["kyc_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      listing_versions: {
+        Row: {
+          changelog: string | null
+          created_at: string
+          file_url: string | null
+          id: string
+          listing_id: string
+          size_bytes: number | null
+          version: string
+        }
+        Insert: {
+          changelog?: string | null
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          listing_id: string
+          size_bytes?: number | null
+          version: string
+        }
+        Update: {
+          changelog?: string | null
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          listing_id?: string
+          size_bytes?: number | null
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_versions_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listings: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          developer_id: string
+          downloads: number
+          icon_url: string | null
+          id: string
+          kind: Database["public"]["Enums"]["listing_kind"]
+          name: string
+          price_mwk: number
+          rating_avg: number
+          rating_count: number
+          screenshots: string[]
+          slug: string
+          status: Database["public"]["Enums"]["listing_status"]
+          tagline: string | null
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          developer_id: string
+          downloads?: number
+          icon_url?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["listing_kind"]
+          name: string
+          price_mwk?: number
+          rating_avg?: number
+          rating_count?: number
+          screenshots?: string[]
+          slug: string
+          status?: Database["public"]["Enums"]["listing_status"]
+          tagline?: string | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          developer_id?: string
+          downloads?: number
+          icon_url?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["listing_kind"]
+          name?: string
+          price_mwk?: number
+          rating_avg?: number
+          rating_count?: number
+          screenshots?: string[]
+          slug?: string
+          status?: Database["public"]["Enums"]["listing_status"]
+          tagline?: string | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      phone_verifications: {
+        Row: {
+          code: string
+          created_at: string
+          expires_at: string
+          id: string
+          phone: string
+          user_id: string
+          verified: boolean
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          phone: string
+          user_id: string
+          verified?: boolean
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          phone?: string
+          user_id?: string
+          verified?: boolean
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          developer_name: string | null
+          display_name: string | null
+          id: string
+          is_developer: boolean
+          kyc_status: Database["public"]["Enums"]["kyc_status"]
+          phone: string | null
+          phone_verified: boolean
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          developer_name?: string | null
+          display_name?: string | null
+          id: string
+          is_developer?: boolean
+          kyc_status?: Database["public"]["Enums"]["kyc_status"]
+          phone?: string | null
+          phone_verified?: boolean
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          developer_name?: string | null
+          display_name?: string | null
+          id?: string
+          is_developer?: boolean
+          kyc_status?: Database["public"]["Enums"]["kyc_status"]
+          phone?: string | null
+          phone_verified?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          listing_id: string
+          rating: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          listing_id: string
+          rating: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          listing_id?: string
+          rating?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscriptions: {
+        Row: {
+          amount_mwk: number
+          created_at: string
+          current_period_end: string | null
+          id: string
+          plan: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_mwk?: number
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          plan?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_mwk?: number
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          plan?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
+      kyc_status: "none" | "pending" | "approved" | "rejected"
+      listing_kind: "app" | "website"
+      listing_status: "draft" | "pending" | "published" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +491,11 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+      kyc_status: ["none", "pending", "approved", "rejected"],
+      listing_kind: ["app", "website"],
+      listing_status: ["draft", "pending", "published", "rejected"],
+    },
   },
 } as const
