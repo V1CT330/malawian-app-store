@@ -131,10 +131,17 @@ function SettingsPage() {
   const submitKyc = useMutation({
     mutationFn: async () => {
       if (!idDoc) throw new Error("Attach a national ID or passport photo.");
+      if (fullName.trim().length < 3) throw new Error("Enter your full legal name.");
+      if (idNumber.trim().length < 4) throw new Error("Enter your ID number.");
       const path = await uploadAsset(userId!, idDoc, "kyc", "kyc-docs");
-      const { error } = await supabase
-        .from("kyc_submissions")
-        .insert({ user_id: userId!, document_url: path, status: "pending" });
+      const { error } = await supabase.from("kyc_submissions").insert({
+        user_id: userId!,
+        full_name: fullName.trim(),
+        id_type: idType,
+        id_number: idNumber.trim(),
+        document_url: path,
+        status: "pending",
+      });
       if (error) throw error;
       await supabase.from("profiles").update({ kyc_status: "pending" }).eq("id", userId!);
     },
@@ -145,6 +152,7 @@ function SettingsPage() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
 
   const startSubscription = useMutation({
     mutationFn: async () => {
