@@ -1,45 +1,62 @@
-import { Link, useRouterState } from "@tanstack/react-router";
-import { Compass, LayoutDashboard, Settings, Upload } from "lucide-react";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { Gamepad2, LayoutDashboard, Search, Upload, User } from "lucide-react";
 import type { ReactNode } from "react";
 
+import { useProfile } from "@/hooks/useSession";
 import { SOCIAL_LINKS } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { to: "/", label: "Store", icon: Compass },
+  { to: "/", label: "Apps", icon: Gamepad2 },
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/upload", label: "Upload", icon: Upload },
-  { to: "/settings", label: "Settings", icon: Settings },
+  { to: "/settings", label: "Account", icon: User },
 ] as const;
 
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({
+  children,
+  search,
+  onSearchChange,
+}: {
+  children: ReactNode;
+  search?: string;
+  onSearchChange?: (value: string) => void;
+}) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
+  const { profile } = useProfile();
+  const initial = (profile?.display_name || profile?.developer_name || "U").slice(0, 1).toUpperCase();
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <header className="sticky top-0 z-30 border-b border-border bg-background/85 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-3">
-          <Link to="/" className="font-display text-base font-bold tracking-tight">
-            Malawian <span className="text-gradient-google">App Store</span>
-          </Link>
-          <nav className="hidden items-center gap-1 sm:flex">
-            {NAV.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={cn(
-                  "rounded-full px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary",
-                  pathname === item.to && "bg-accent text-accent-foreground",
-                )}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
+      <header className="sticky top-0 z-30 bg-background px-3 pb-2 pt-3">
+        <div className="mx-auto w-full max-w-5xl">
+          <div className="flex items-center gap-3 rounded-full bg-secondary px-4 py-2.5 shadow-soft">
+            <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <input
+              value={search ?? ""}
+              onChange={(e) =>
+                onSearchChange ? onSearchChange(e.target.value) : navigate({ to: "/" })
+              }
+              onFocus={() => {
+                if (!onSearchChange) navigate({ to: "/" });
+              }}
+              placeholder="Search apps & websites"
+              aria-label="Search apps and websites"
+              className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+            />
+            <Link
+              to="/settings"
+              aria-label="Account"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground"
+            >
+              {initial}
+            </Link>
+          </div>
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 pb-28 pt-4 sm:pb-12">{children}</main>
+      <main className="mx-auto w-full max-w-5xl flex-1 px-3 pb-28 pt-1 sm:pb-12">{children}</main>
 
       <footer className="border-t border-border px-4 py-8 pb-28 sm:pb-8">
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-3 text-sm text-muted-foreground">
@@ -61,7 +78,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </footer>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur sm:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-stretch">
           {NAV.map((item) => {
             const Icon = item.icon;
@@ -70,13 +87,17 @@ export function AppShell({ children }: { children: ReactNode }) {
               <Link
                 key={item.to}
                 to={item.to}
-                className={cn(
-                  "flex flex-1 flex-col items-center gap-1 py-2.5 text-[11px] font-medium",
-                  active ? "text-primary" : "text-muted-foreground",
-                )}
+                className="flex flex-1 flex-col items-center gap-1 py-2 text-[11px] font-medium"
               >
-                <Icon className="h-5 w-5" />
-                {item.label}
+                <span
+                  className={cn(
+                    "flex h-7 w-16 items-center justify-center rounded-full transition-colors",
+                    active ? "bg-accent text-accent-foreground" : "text-muted-foreground",
+                  )}
+                >
+                  <Icon className="h-5 w-5" />
+                </span>
+                <span className={active ? "text-foreground" : "text-muted-foreground"}>{item.label}</span>
               </Link>
             );
           })}
