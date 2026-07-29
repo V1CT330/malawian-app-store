@@ -1,12 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Search, Sparkles } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
-import { ListingCard } from "@/components/ListingCard";
+import { ListingCard, ListingTile } from "@/components/ListingCard";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { CATEGORIES, type Listing } from "@/lib/store";
@@ -32,6 +31,40 @@ export const Route = createFileRoute("/")({
   }),
   component: StorePage,
 });
+
+const TABS = [
+  { key: "all", label: "For you" },
+  { key: "app", label: "Apps" },
+  { key: "website", label: "Websites" },
+] as const;
+
+function Shelf({
+  title,
+  subtitle,
+  items,
+}: {
+  title: string;
+  subtitle?: string;
+  items: Listing[];
+}) {
+  if (items.length === 0) return null;
+  return (
+    <section className="mb-6">
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <div>
+          <h2 className="font-display text-[17px] font-semibold leading-tight">{title}</h2>
+          {subtitle ? <p className="text-xs text-muted-foreground">{subtitle}</p> : null}
+        </div>
+        <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
+      </div>
+      <div className="-mx-3 flex gap-4 overflow-x-auto px-3 pb-1">
+        {items.map((l) => (
+          <ListingTile key={l.id} listing={l} />
+        ))}
+      </div>
+    </section>
+  );
+}
 
 function StorePage() {
   const [search, setSearch] = useState("");
@@ -63,64 +96,44 @@ function StorePage() {
     return matchesSearch && matchesKind && matchesCategory;
   });
 
-  const featured = listings.slice(0, 3);
+  const browsing = search === "" && category === "All";
+  const topCharts = [...listings].sort((a, b) => b.downloads - a.downloads).slice(0, 8);
+  const topRated = [...listings]
+    .sort((a, b) => b.rating_avg * b.rating_count - a.rating_avg * a.rating_count)
+    .slice(0, 8);
+  const fresh = listings.slice(0, 8);
 
   return (
-    <AppShell>
-      <section className="surface-card mb-5 overflow-hidden p-5">
-        <p className="inline-flex items-center gap-1.5 rounded-full bg-accent px-2.5 py-1 text-xs font-medium text-accent-foreground">
-          <Sparkles className="h-3.5 w-3.5" /> Made in Malawi
-        </p>
-        <h1 className="mt-3 font-display text-2xl font-bold leading-tight">
-          Every Malawian <span className="text-gradient-google">app & website</span> in one store
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Install local apps, review them, and publish your own as a verified developer.
-        </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Button asChild>
-            <Link to="/upload">Publish your app</Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link to="/dashboard">Developer dashboard</Link>
-          </Button>
+    <AppShell search={search} onSearchChange={setSearch}>
+      <div className="sticky top-[64px] z-20 -mx-3 mb-3 bg-background px-3">
+        <div className="flex gap-6 border-b border-border">
+          {TABS.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setKind(t.key)}
+              className={cn(
+                "relative -mb-px pb-2.5 pt-1 text-sm font-medium transition-colors",
+                kind === t.key
+                  ? "text-primary after:absolute after:inset-x-0 after:bottom-0 after:h-[3px] after:rounded-full after:bg-primary"
+                  : "text-muted-foreground",
+              )}
+            >
+              {t.label}
+            </button>
+          ))}
         </div>
-      </section>
-
-      <div className="relative mb-3">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search apps and websites"
-          className="pl-9"
-          aria-label="Search apps and websites"
-        />
       </div>
 
-      <div className="mb-3 flex gap-2">
-        {(["all", "app", "website"] as const).map((k) => (
-          <button
-            key={k}
-            onClick={() => setKind(k)}
-            className={cn(
-              "rounded-full border border-border px-3 py-1.5 text-xs font-medium capitalize",
-              kind === k ? "bg-primary text-primary-foreground" : "text-muted-foreground",
-            )}
-          >
-            {k === "all" ? "Everything" : `${k}s`}
-          </button>
-        ))}
-      </div>
-
-      <div className="mb-5 -mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+      <div className="-mx-3 mb-5 flex gap-2 overflow-x-auto px-3 pb-1">
         {["All", ...CATEGORIES].map((c) => (
           <button
             key={c}
             onClick={() => setCategory(c)}
             className={cn(
-              "shrink-0 rounded-full border border-border px-3 py-1.5 text-xs font-medium",
-              category === c ? "bg-accent text-accent-foreground" : "text-muted-foreground",
+              "shrink-0 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors",
+              category === c
+                ? "border-primary bg-accent text-accent-foreground"
+                : "border-border text-muted-foreground",
             )}
           >
             {c}
@@ -129,38 +142,40 @@ function StorePage() {
       </div>
 
       {isLoading ? (
-        <div className="space-y-3">
+        <div className="flex gap-4 overflow-hidden">
           {[0, 1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-20 w-full rounded-2xl" />
+            <div key={i} className="w-[104px] shrink-0 space-y-2">
+              <Skeleton className="h-[104px] w-[104px] rounded-[22px]" />
+              <Skeleton className="h-3 w-20" />
+              <Skeleton className="h-3 w-12" />
+            </div>
           ))}
         </div>
       ) : listings.length === 0 ? (
-        <div className="surface-card p-8 text-center">
+        <div className="rounded-2xl border border-border p-8 text-center">
           <h2 className="font-display text-lg font-semibold">Nothing here yet</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Be the first developer to publish on the Malawian App Store.
           </p>
-          <Button asChild className="mt-4">
+          <Button asChild className="mt-4 rounded-full">
             <Link to="/upload">Upload a listing</Link>
           </Button>
         </div>
       ) : (
-        <div className="space-y-6">
-          {search === "" && category === "All" && kind === "all" && featured.length > 0 && (
-            <section>
-              <h2 className="mb-2 font-display text-base font-semibold">Fresh this week</h2>
-              <div className="space-y-3">
-                {featured.map((l) => (
-                  <ListingCard key={l.id} listing={l} />
-                ))}
-              </div>
-            </section>
-          )}
-          <section>
-            <h2 className="mb-2 font-display text-base font-semibold">
-              {listings.length} listing{listings.length === 1 ? "" : "s"}
+        <div>
+          {browsing ? (
+            <>
+              <Shelf title="Recommended for you" subtitle="Fresh from Malawian developers" items={fresh} />
+              <Shelf title="Top charts" subtitle="Most installed this week" items={topCharts} />
+              <Shelf title="Top rated" subtitle="Loved by reviewers" items={topRated} />
+            </>
+          ) : null}
+
+          <section className="mb-2">
+            <h2 className="mb-2 font-display text-[17px] font-semibold">
+              {browsing ? "All listings" : `${listings.length} result${listings.length === 1 ? "" : "s"}`}
             </h2>
-            <div className="space-y-3">
+            <div className="divide-y divide-border">
               {listings.map((l) => (
                 <ListingCard key={l.id} listing={l} />
               ))}

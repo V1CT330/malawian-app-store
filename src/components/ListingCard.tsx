@@ -32,28 +32,57 @@ export function AppIcon({
   );
 }
 
+/** Play Store style vertical tile used inside horizontal carousels. */
+export function ListingTile({ listing }: { listing: Listing }) {
+  return (
+    <Link
+      to="/apps/$slug"
+      params={{ slug: listing.slug }}
+      className="w-[104px] shrink-0 transition-transform active:scale-[0.97]"
+    >
+      <AppIcon path={listing.icon_url} name={listing.name} className="h-[104px] w-[104px] rounded-[22px] shadow-soft" />
+      <p className="mt-2 line-clamp-2 text-[13px] font-medium leading-tight">{listing.name}</p>
+      <p className="mt-0.5 flex items-center gap-0.5 text-[11px] text-muted-foreground">
+        {listing.rating_count ? (
+          <>
+            {listing.rating_avg.toFixed(1)}
+            <Star className="h-2.5 w-2.5 fill-muted-foreground text-muted-foreground" />
+          </>
+        ) : (
+          "New"
+        )}
+        <span className="mx-1" aria-hidden>
+          ·
+        </span>
+        {formatMwk(listing.price_mwk)}
+      </p>
+    </Link>
+  );
+}
+
+/** Play Store style list row. */
 export function ListingCard({ listing }: { listing: Listing }) {
   return (
     <Link
       to="/apps/$slug"
       params={{ slug: listing.slug }}
-      className="surface-card flex items-center gap-3 p-3 transition-transform active:scale-[0.99]"
+      className="flex items-center gap-4 rounded-2xl px-1 py-2 transition-colors hover:bg-secondary active:scale-[0.99]"
     >
-      <AppIcon path={listing.icon_url} name={listing.name} className="h-14 w-14" />
+      <AppIcon path={listing.icon_url} name={listing.name} className="h-16 w-16 rounded-[18px] shadow-soft" />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
-          <p className="truncate font-display text-sm font-semibold">{listing.name}</p>
+          <p className="truncate text-[15px] font-medium">{listing.name}</p>
           {listing.kind === "website" ? (
-            <Globe className="h-3.5 w-3.5 text-muted-foreground" />
+            <Globe className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
           ) : (
-            <Smartphone className="h-3.5 w-3.5 text-muted-foreground" />
+            <Smartphone className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
           )}
         </div>
         <p className="truncate text-xs text-muted-foreground">{listing.tagline || listing.category}</p>
         <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-0.5">
-            <Star className="h-3 w-3 fill-google-yellow text-google-yellow" />
             {listing.rating_count ? listing.rating_avg.toFixed(1) : "New"}
+            <Star className="h-3 w-3 fill-muted-foreground text-muted-foreground" />
           </span>
           <span aria-hidden>·</span>
           <span>{listing.downloads} installs</span>
@@ -74,7 +103,7 @@ export function Stars({ value, className }: { value: number; className?: string 
           key={i}
           className={cn(
             "h-4 w-4",
-            i <= Math.round(value) ? "fill-google-yellow text-google-yellow" : "text-border",
+            i <= Math.round(value) ? "fill-google-green text-google-green" : "text-border",
           )}
         />
       ))}
