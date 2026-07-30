@@ -37,6 +37,8 @@ export type Listing = {
   website_url: string | null;
   price_mwk: number;
   status: "draft" | "pending" | "published" | "rejected";
+  featured?: boolean;
+  rejection_reason?: string | null;
   downloads: number;
   rating_avg: number;
   rating_count: number;
