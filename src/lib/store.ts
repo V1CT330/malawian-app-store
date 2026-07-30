@@ -85,3 +85,46 @@ export async function uploadAsset(userId: string, file: File, folder: string, bu
   if (error) throw error;
   return path;
 }
+
+export const SOCIAL_FIELDS = [
+  { key: "website_url", label: "Website", placeholder: "https://example.mw" },
+  { key: "facebook_url", label: "Facebook", placeholder: "https://facebook.com/…" },
+  { key: "x_url", label: "X (Twitter)", placeholder: "https://x.com/…" },
+  { key: "linkedin_url", label: "LinkedIn", placeholder: "https://linkedin.com/in/…" },
+  { key: "instagram_url", label: "Instagram", placeholder: "https://instagram.com/…" },
+  { key: "youtube_url", label: "YouTube", placeholder: "https://youtube.com/@…" },
+  { key: "whatsapp_url", label: "WhatsApp", placeholder: "https://wa.me/265…" },
+] as const;
+
+export type SocialKey = (typeof SOCIAL_FIELDS)[number]["key"];
+
+/** Best-effort device + country tags used for developer analytics. */
+export function clientContext() {
+  if (typeof navigator === "undefined") return { device: null, country: null };
+  const ua = navigator.userAgent;
+  const device = /Android/i.test(ua)
+    ? "Android"
+    : /iPhone|iPad|iPod/i.test(ua)
+      ? "iOS"
+      : /Mobile/i.test(ua)
+        ? "Mobile"
+        : "Desktop";
+  let country: string | null = null;
+  try {
+    country = new Intl.Locale(navigator.language).maximize().region ?? null;
+  } catch {
+    country = null;
+  }
+  return { device, country };
+}
+
+export function listingUrl(slug: string) {
+  const origin = typeof window !== "undefined" ? window.location.origin : "https://malawianappstore.lovable.app";
+  return `${origin}/apps/${slug}`;
+}
+
+export function qrCodeUrl(value: string, size = 240) {
+  return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(value)}`;
+}
+
+export const REPORT_KINDS = ["Fake app", "Malware / security", "Copyright violation", "Bug", "Content policy", "Other"];
