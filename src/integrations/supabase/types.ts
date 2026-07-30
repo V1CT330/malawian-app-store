@@ -16,19 +16,25 @@ export type Database = {
     Tables: {
       install_events: {
         Row: {
+          country: string | null
           created_at: string
+          device: string | null
           id: string
           listing_id: string
           user_id: string | null
         }
         Insert: {
+          country?: string | null
           created_at?: string
+          device?: string | null
           id?: string
           listing_id: string
           user_id?: string | null
         }
         Update: {
+          country?: string | null
           created_at?: string
+          device?: string | null
           id?: string
           listing_id?: string
           user_id?: string | null
@@ -130,6 +136,7 @@ export type Database = {
           description: string | null
           developer_id: string
           downloads: number
+          featured: boolean
           icon_url: string | null
           id: string
           kind: Database["public"]["Enums"]["listing_kind"]
@@ -137,6 +144,7 @@ export type Database = {
           price_mwk: number
           rating_avg: number
           rating_count: number
+          rejection_reason: string | null
           screenshots: string[]
           slug: string
           status: Database["public"]["Enums"]["listing_status"]
@@ -150,6 +158,7 @@ export type Database = {
           description?: string | null
           developer_id: string
           downloads?: number
+          featured?: boolean
           icon_url?: string | null
           id?: string
           kind?: Database["public"]["Enums"]["listing_kind"]
@@ -157,6 +166,7 @@ export type Database = {
           price_mwk?: number
           rating_avg?: number
           rating_count?: number
+          rejection_reason?: string | null
           screenshots?: string[]
           slug: string
           status?: Database["public"]["Enums"]["listing_status"]
@@ -170,6 +180,7 @@ export type Database = {
           description?: string | null
           developer_id?: string
           downloads?: number
+          featured?: boolean
           icon_url?: string | null
           id?: string
           kind?: Database["public"]["Enums"]["listing_kind"]
@@ -177,12 +188,40 @@ export type Database = {
           price_mwk?: number
           rating_avg?: number
           rating_count?: number
+          rejection_reason?: string | null
           screenshots?: string[]
           slug?: string
           status?: Database["public"]["Enums"]["listing_status"]
           tagline?: string | null
           updated_at?: string
           website_url?: string | null
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          read: boolean
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          read?: boolean
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          read?: boolean
+          title?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -223,12 +262,21 @@ export type Database = {
           created_at: string
           developer_name: string | null
           display_name: string | null
+          facebook_url: string | null
           id: string
+          instagram_url: string | null
           is_developer: boolean
           kyc_status: Database["public"]["Enums"]["kyc_status"]
+          linkedin_url: string | null
+          mode: string
           phone: string | null
           phone_verified: boolean
+          suspended: boolean
           updated_at: string
+          website_url: string | null
+          whatsapp_url: string | null
+          x_url: string | null
+          youtube_url: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -236,12 +284,21 @@ export type Database = {
           created_at?: string
           developer_name?: string | null
           display_name?: string | null
+          facebook_url?: string | null
           id: string
+          instagram_url?: string | null
           is_developer?: boolean
           kyc_status?: Database["public"]["Enums"]["kyc_status"]
+          linkedin_url?: string | null
+          mode?: string
           phone?: string | null
           phone_verified?: boolean
+          suspended?: boolean
           updated_at?: string
+          website_url?: string | null
+          whatsapp_url?: string | null
+          x_url?: string | null
+          youtube_url?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -249,14 +306,64 @@ export type Database = {
           created_at?: string
           developer_name?: string | null
           display_name?: string | null
+          facebook_url?: string | null
           id?: string
+          instagram_url?: string | null
           is_developer?: boolean
           kyc_status?: Database["public"]["Enums"]["kyc_status"]
+          linkedin_url?: string | null
+          mode?: string
           phone?: string | null
           phone_verified?: boolean
+          suspended?: boolean
           updated_at?: string
+          website_url?: string | null
+          whatsapp_url?: string | null
+          x_url?: string | null
+          youtube_url?: string | null
         }
         Relationships: []
+      }
+      reports: {
+        Row: {
+          created_at: string
+          details: string | null
+          id: string
+          kind: string
+          listing_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          kind?: string
+          listing_id: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          kind?: string
+          listing_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reviews: {
         Row: {
@@ -347,11 +454,76 @@ export type Database = {
         }
         Relationships: []
       }
+      view_events: {
+        Row: {
+          country: string | null
+          created_at: string
+          device: string | null
+          id: string
+          listing_id: string
+          user_id: string | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          device?: string | null
+          id?: string
+          listing_id: string
+          user_id?: string | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          device?: string | null
+          id?: string
+          listing_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "view_events_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wishlist: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wishlist_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      claim_first_admin: { Args: never; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
