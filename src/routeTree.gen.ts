@@ -13,6 +13,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DevelopersIdRouteImport } from './routes/developers.$id'
 import { Route as AppsSlugRouteImport } from './routes/apps.$slug'
 import { Route as AuthenticatedUploadRouteImport } from './routes/_authenticated/upload'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
@@ -41,6 +42,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevelopersIdRoute = DevelopersIdRouteImport.update({
+  id: '/developers/$id',
+  path: '/developers/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppsSlugRoute = AppsSlugRouteImport.update({
@@ -108,6 +114,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/upload': typeof AuthenticatedUploadRoute
   '/apps/$slug': typeof AppsSlugRoute
+  '/developers/$id': typeof DevelopersIdRoute
   '/manage/$id': typeof AuthenticatedManageIdRoute
 }
 export interface FileRoutesByTo {
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/upload': typeof AuthenticatedUploadRoute
   '/apps/$slug': typeof AppsSlugRoute
+  '/developers/$id': typeof DevelopersIdRoute
   '/manage/$id': typeof AuthenticatedManageIdRoute
 }
 export interface FileRoutesById {
@@ -140,6 +148,7 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/upload': typeof AuthenticatedUploadRoute
   '/apps/$slug': typeof AppsSlugRoute
+  '/developers/$id': typeof DevelopersIdRoute
   '/_authenticated/manage/$id': typeof AuthenticatedManageIdRoute
 }
 export interface FileRouteTypes {
@@ -157,6 +166,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/upload'
     | '/apps/$slug'
+    | '/developers/$id'
     | '/manage/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -172,6 +182,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/upload'
     | '/apps/$slug'
+    | '/developers/$id'
     | '/manage/$id'
   id:
     | '__root__'
@@ -188,6 +199,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/upload'
     | '/apps/$slug'
+    | '/developers/$id'
     | '/_authenticated/manage/$id'
   fileRoutesById: FileRoutesById
 }
@@ -197,6 +209,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AppsSlugRoute: typeof AppsSlugRoute
+  DevelopersIdRoute: typeof DevelopersIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -227,6 +240,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/developers/$id': {
+      id: '/developers/$id'
+      path: '/developers/$id'
+      fullPath: '/developers/$id'
+      preLoaderRoute: typeof DevelopersIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/apps/$slug': {
@@ -335,6 +355,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AppsSlugRoute: AppsSlugRoute,
+  DevelopersIdRoute: DevelopersIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
