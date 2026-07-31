@@ -89,15 +89,6 @@ function SettingsPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const toggleDeveloper = useMutation({
-    mutationFn: async (next: boolean) => {
-      const { error } = await supabase.from("profiles").update({ is_developer: next }).eq("id", userId!);
-      if (error) throw error;
-    },
-    onSuccess: () => refresh(),
-    onError: (e: Error) => toast.error(e.message),
-  });
-
   const setMode = useMutation({
     mutationFn: async (next: "developer" | "user") => {
       const { error } = await supabase
