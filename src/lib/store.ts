@@ -36,6 +36,12 @@ export type Listing = {
   screenshots: string[];
   website_url: string | null;
   price_mwk: number;
+  monetization?: string;
+  price_month_mwk?: number;
+  price_year_mwk?: number;
+  allow_donations?: boolean;
+  crypto_address?: string | null;
+  sponsored?: boolean;
   status: "draft" | "pending" | "published" | "rejected";
   featured?: boolean;
   rejection_reason?: string | null;
@@ -59,6 +65,11 @@ export function slugify(value: string) {
 
 export function formatMwk(amount: number) {
   return amount === 0 ? "Free" : `MK${amount.toLocaleString("en-MW")}`;
+}
+
+/** Always shows the numeric amount (0 renders as MK0, not "Free"). */
+export function formatAmount(amount: number) {
+  return `MK${Math.round(amount).toLocaleString("en-MW")}`;
 }
 
 export function formatBytes(bytes: number | null | undefined) {
