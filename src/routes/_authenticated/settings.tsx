@@ -108,7 +108,10 @@ function SettingsPage() {
 
   const saveSocials = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("profiles").update(socials).eq("id", userId!);
+      const { error } = await supabase
+        .from("profiles")
+        .update(socials as Partial<Record<(typeof SOCIAL_FIELDS)[number]["key"], string>>)
+        .eq("id", userId!);
       if (error) throw error;
     },
     onSuccess: () => {
