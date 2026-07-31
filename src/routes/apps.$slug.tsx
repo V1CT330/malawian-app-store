@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
 import { AppIcon, Stars } from "@/components/ListingCard";
+import { BuyPanel } from "@/components/BuyPanel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -191,6 +192,10 @@ function ListingDetail() {
             </>
           )}
         </Button>
+
+        {userId ? (
+          <BuyPanel listing={listing} onPaid={() => queryClient.invalidateQueries({ queryKey: ["listing", slug] })} />
+        ) : null}
 
         {listing.description && (
           <section className="surface-card p-4">

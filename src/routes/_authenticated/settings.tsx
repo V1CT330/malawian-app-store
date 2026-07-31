@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { BadgeCheck, LogOut } from "lucide-react";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { BadgeCheck, LogOut, Moon, Shield } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -11,9 +11,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { useProfile } from "@/hooks/useSession";
+import { useIsAdmin, useMode, useProfile } from "@/hooks/useSession";
+import { useTheme } from "@/hooks/useTheme";
 import { supabase } from "@/integrations/supabase/client";
-import { SUBSCRIPTION_PRICE_MWK, formatMwk, uploadAsset } from "@/lib/store";
+import { SOCIAL_FIELDS, SUBSCRIPTION_PRICE_MWK, formatMwk, uploadAsset } from "@/lib/store";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -37,6 +38,10 @@ function SettingsPage() {
   const { userId, profile } = useProfile();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const mode = useMode();
+  const isAdmin = useIsAdmin();
+  const { dark, setTheme } = useTheme();
+  const [socials, setSocials] = useState<Record<string, string>>({});
 
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [developerName, setDeveloperName] = useState<string | null>(null);
@@ -84,12 +89,35 @@ function SettingsPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const toggleDeveloper = useMutation({
-    mutationFn: async (next: boolean) => {
-      const { error } = await supabase.from("profiles").update({ is_developer: next }).eq("id", userId!);
+  const setMode = useMutation({
+    mutationFn: async (next: "developer" | "user") => {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ mode: next, is_developer: next === "developer" ? true : profile?.is_developer ?? false })
+        .eq("id", userId!);
+      if (error) throw error;
+      return next;
+    },
+    onSuccess: async (next) => {
+      await queryClient.invalidateQueries({ queryKey: ["profile", userId] });
+      toast.success(next === "developer" ? "Developer workspace on" : "Back to the store");
+      navigate({ to: next === "developer" ? "/dashboard" : "/" });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const saveSocials = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase
+        .from("profiles")
+        .update(socials as Partial<Record<(typeof SOCIAL_FIELDS)[number]["key"], string>>)
+        .eq("id", userId!);
       if (error) throw error;
     },
-    onSuccess: () => refresh(),
+    onSuccess: () => {
+      toast.success("Social links saved");
+      refresh();
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -219,20 +247,86 @@ function SettingsPage() {
             <p className="text-xs text-muted-foreground">Switch between shopping and publishing.</p>
           </div>
           <Switch
-            checked={Boolean(profile?.is_developer)}
-            onCheckedChange={(v) => toggleDeveloper.mutate(v)}
+            aria-label="Switch between user and developer mode"
+            checked={mode === "developer"}
+            onCheckedChange={(v) => setMode.mutate(v ? "developer" : "user")}
           />
         </div>
         {profile?.is_developer && (
-          <div>
-            <Label htmlFor="devname">Developer / studio name</Label>
+          <>
+            <div>
+              <Label htmlFor="devname">Developer / studio name</Label>
+              <Input
+                id="devname"
+                value={developerName ?? profile?.developer_name ?? ""}
+                onChange={(e) => setDeveloperName(e.target.value)}
+              />
+              <Button
+                size="sm"
+                className="mt-2"
+                disabled={saveProfile.isPending}
+                onClick={() => saveProfile.mutate()}
+              >
+                Save
+              </Button>
+            </div>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {[
+                { to: "/dashboard", label: "Dashboard" },
+                { to: "/wallet", label: "Wallet" },
+                { to: "/business", label: "Business" },
+                { to: "/promote", label: "Promote" },
+              ].map((l) => (
+                <Button key={l.to} asChild size="sm" variant="outline">
+                  <Link to={l.to}>{l.label}</Link>
+                </Button>
+              ))}
+            </div>
+          </>
+        )}
+      </section>
+
+      <section className="surface-card mt-4 space-y-3 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <Moon className="h-4 w-4 text-muted-foreground" />
+            <div>
+              <h2 className="font-display text-base font-semibold">Dark theme</h2>
+              <p className="text-xs text-muted-foreground">Easier on the eyes at night.</p>
+            </div>
+          </div>
+          <Switch aria-label="Toggle dark theme" checked={dark} onCheckedChange={(v) => setTheme(v)} />
+        </div>
+      </section>
+
+      {isAdmin && (
+        <section className="surface-card mt-4 flex items-center justify-between gap-3 p-4">
+          <div className="flex items-center gap-2">
+            <Shield className="h-4 w-4 text-muted-foreground" />
+            <h2 className="font-display text-base font-semibold">Admin panel</h2>
+          </div>
+          <Button asChild size="sm" variant="outline">
+            <Link to="/admin">Open</Link>
+          </Button>
+        </section>
+      )}
+
+      <section className="surface-card mt-4 space-y-3 p-4">
+        <h2 className="font-display text-base font-semibold">Social media pages</h2>
+        {SOCIAL_FIELDS.map((f) => (
+          <div key={f.key}>
+            <Label htmlFor={f.key}>{f.label}</Label>
             <Input
-              id="devname"
-              value={developerName ?? profile?.developer_name ?? ""}
-              onChange={(e) => setDeveloperName(e.target.value)}
+              id={f.key}
+              placeholder={f.placeholder}
+              value={socials[f.key] ?? (profile?.[f.key] as string | null) ?? ""}
+              onChange={(e) => setSocials((prev) => ({ ...prev, [f.key]: e.target.value }))}
             />
           </div>
-        )}
+        ))}
+        <Button size="sm" disabled={saveSocials.isPending} onClick={() => saveSocials.mutate()}>
+          Save links
+        </Button>
       </section>
 
       <section className="surface-card mt-4 space-y-3 p-4">

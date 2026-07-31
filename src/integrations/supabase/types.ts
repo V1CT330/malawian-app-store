@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      coupons: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          listing_id: string
+          max_uses: number
+          owner_id: string
+          percent_off: number
+          uses: number
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          listing_id: string
+          max_uses?: number
+          owner_id: string
+          percent_off?: number
+          uses?: number
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          listing_id?: string
+          max_uses?: number
+          owner_id?: string
+          percent_off?: number
+          uses?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupons_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       install_events: {
         Row: {
           country: string | null
@@ -131,8 +178,10 @@ export type Database = {
       }
       listings: {
         Row: {
+          allow_donations: boolean
           category: string
           created_at: string
+          crypto_address: string | null
           description: string | null
           developer_id: string
           downloads: number
@@ -140,21 +189,27 @@ export type Database = {
           icon_url: string | null
           id: string
           kind: Database["public"]["Enums"]["listing_kind"]
+          monetization: string
           name: string
+          price_month_mwk: number
           price_mwk: number
+          price_year_mwk: number
           rating_avg: number
           rating_count: number
           rejection_reason: string | null
           screenshots: string[]
           slug: string
+          sponsored: boolean
           status: Database["public"]["Enums"]["listing_status"]
           tagline: string | null
           updated_at: string
           website_url: string | null
         }
         Insert: {
+          allow_donations?: boolean
           category?: string
           created_at?: string
+          crypto_address?: string | null
           description?: string | null
           developer_id: string
           downloads?: number
@@ -162,21 +217,27 @@ export type Database = {
           icon_url?: string | null
           id?: string
           kind?: Database["public"]["Enums"]["listing_kind"]
+          monetization?: string
           name: string
+          price_month_mwk?: number
           price_mwk?: number
+          price_year_mwk?: number
           rating_avg?: number
           rating_count?: number
           rejection_reason?: string | null
           screenshots?: string[]
           slug: string
+          sponsored?: boolean
           status?: Database["public"]["Enums"]["listing_status"]
           tagline?: string | null
           updated_at?: string
           website_url?: string | null
         }
         Update: {
+          allow_donations?: boolean
           category?: string
           created_at?: string
+          crypto_address?: string | null
           description?: string | null
           developer_id?: string
           downloads?: number
@@ -184,13 +245,17 @@ export type Database = {
           icon_url?: string | null
           id?: string
           kind?: Database["public"]["Enums"]["listing_kind"]
+          monetization?: string
           name?: string
+          price_month_mwk?: number
           price_mwk?: number
+          price_year_mwk?: number
           rating_avg?: number
           rating_count?: number
           rejection_reason?: string | null
           screenshots?: string[]
           slug?: string
+          sponsored?: boolean
           status?: Database["public"]["Enums"]["listing_status"]
           tagline?: string | null
           updated_at?: string
@@ -225,6 +290,134 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          amount_mwk: number
+          buyer_id: string | null
+          commission_mwk: number
+          country: string | null
+          coupon_code: string | null
+          created_at: string
+          id: string
+          kind: string
+          listing_id: string
+          method: string
+          net_mwk: number
+          provider_ref: string | null
+          seller_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount_mwk?: number
+          buyer_id?: string | null
+          commission_mwk?: number
+          country?: string | null
+          coupon_code?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          listing_id: string
+          method?: string
+          net_mwk?: number
+          provider_ref?: string | null
+          seller_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_mwk?: number
+          buyer_id?: string | null
+          commission_mwk?: number
+          country?: string | null
+          coupon_code?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          listing_id?: string
+          method?: string
+          net_mwk?: number
+          provider_ref?: string | null
+          seller_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payout_methods: {
+        Row: {
+          created_at: string
+          destination: string
+          id: string
+          is_default: boolean
+          kind: string
+          label: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          destination: string
+          id?: string
+          is_default?: boolean
+          kind?: string
+          label?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          destination?: string
+          id?: string
+          is_default?: boolean
+          kind?: string
+          label?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      payout_requests: {
+        Row: {
+          amount_mwk: number
+          created_at: string
+          destination: string
+          id: string
+          method: string
+          notes: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_mwk: number
+          created_at?: string
+          destination: string
+          id?: string
+          method?: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_mwk?: number
+          created_at?: string
+          destination?: string
+          id?: string
+          method?: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       phone_verifications: {
         Row: {
           code: string
@@ -252,6 +445,24 @@ export type Database = {
           phone?: string
           user_id?: string
           verified?: boolean
+        }
+        Relationships: []
+      }
+      platform_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
         }
         Relationships: []
       }
@@ -323,6 +534,50 @@ export type Database = {
           youtube_url?: string | null
         }
         Relationships: []
+      }
+      promotions: {
+        Row: {
+          budget_mwk: number
+          created_at: string
+          ends_at: string | null
+          id: string
+          kind: string
+          listing_id: string
+          owner_id: string
+          starts_at: string
+          status: string
+        }
+        Insert: {
+          budget_mwk?: number
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          kind?: string
+          listing_id: string
+          owner_id: string
+          starts_at?: string
+          status?: string
+        }
+        Update: {
+          budget_mwk?: number
+          created_at?: string
+          ends_at?: string | null
+          id?: string
+          kind?: string
+          listing_id?: string
+          owner_id?: string
+          starts_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promotions_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reports: {
         Row: {
@@ -488,6 +743,83 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      wallet_transactions: {
+        Row: {
+          amount_mwk: number
+          created_at: string
+          description: string | null
+          id: string
+          kind: string
+          listing_id: string | null
+          method: string | null
+          reference: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount_mwk?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          kind?: string
+          listing_id?: string | null
+          method?: string | null
+          reference?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount_mwk?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          kind?: string
+          listing_id?: string | null
+          method?: string | null
+          reference?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallet_transactions_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wallets: {
+        Row: {
+          balance_mwk: number
+          created_at: string
+          id: string
+          lifetime_mwk: number
+          pending_mwk: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance_mwk?: number
+          created_at?: string
+          id?: string
+          lifetime_mwk?: number
+          pending_mwk?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance_mwk?: number
+          created_at?: string
+          id?: string
+          lifetime_mwk?: number
+          pending_mwk?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       wishlist: {
         Row: {
