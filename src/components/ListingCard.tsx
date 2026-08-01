@@ -3,7 +3,7 @@ import { Globe, Smartphone, Star } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { useSignedUrl } from "@/hooks/useSession";
-import { formatMwk, type Listing } from "@/lib/store";
+import { type Listing } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export function AppIcon({
@@ -51,10 +51,6 @@ export function ListingTile({ listing }: { listing: Listing }) {
         ) : (
           "New"
         )}
-        <span className="mx-1" aria-hidden>
-          ·
-        </span>
-        {formatMwk(listing.price_mwk)}
       </p>
     </Link>
   );
@@ -88,9 +84,6 @@ export function ListingCard({ listing }: { listing: Listing }) {
           <span>{listing.downloads} installs</span>
         </div>
       </div>
-      <Badge variant={listing.price_mwk === 0 ? "secondary" : "default"} className="shrink-0">
-        {formatMwk(listing.price_mwk)}
-      </Badge>
     </Link>
   );
 }

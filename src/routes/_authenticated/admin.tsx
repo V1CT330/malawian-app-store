@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsAdmin, useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
-import { formatMwk, type Listing } from "@/lib/store";
+import { type Listing } from "@/lib/store";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -256,7 +256,7 @@ function AdminPage() {
                         {l.name}
                       </Link>
                       <p className="text-xs text-muted-foreground">
-                        {l.kind} · {l.category} · {formatMwk(l.price_mwk)} · {l.downloads} installs
+                        {l.kind} · {l.category} · {l.downloads} installs
                       </p>
                     </div>
                     <Badge variant="secondary" className="capitalize">

@@ -6,14 +6,13 @@ import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
 import { AppIcon, Stars } from "@/components/ListingCard";
-import { BuyPanel } from "@/components/BuyPanel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession, useSignedUrl } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
-import { formatBytes, formatMwk, type Listing } from "@/lib/store";
+import { formatBytes, type Listing } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/apps/$slug")({
@@ -161,7 +160,6 @@ function ListingDetail() {
                 {listing.kind}
               </Badge>
               <Badge variant="outline">{listing.category}</Badge>
-              <Badge>{formatMwk(listing.price_mwk)}</Badge>
             </div>
           </div>
         </header>
@@ -192,10 +190,6 @@ function ListingDetail() {
             </>
           )}
         </Button>
-
-        {userId ? (
-          <BuyPanel listing={listing} onPaid={() => queryClient.invalidateQueries({ queryKey: ["listing", slug] })} />
-        ) : null}
 
         {listing.description && (
           <section className="surface-card p-4">

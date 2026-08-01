@@ -17,7 +17,7 @@ import { AppShell } from "@/components/AppShell";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
-import { SUBSCRIPTION_PRICE_MWK, formatMwk, type Listing } from "@/lib/store";
+import { type Listing } from "@/lib/store";
 
 export const Route = createFileRoute("/_authenticated/analytics")({
   head: () => ({
@@ -28,7 +28,7 @@ export const Route = createFileRoute("/_authenticated/analytics")({
         content: "Downloads, views, device and country breakdowns and monthly reports for your listings.",
       },
       { property: "og:title", content: "Analytics — Malawian App Store" },
-      { property: "og:description", content: "Downloads, views, devices, countries and revenue." },
+      { property: "og:description", content: "Downloads, views, devices and countries." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -97,11 +97,6 @@ function AnalyticsPage() {
   const installs = events.data?.installs ?? [];
   const views = events.data?.views ?? [];
   const all = (listings.data ?? []);
-  const paid = all.filter((l) => l.price_mwk > 0);
-  const revenue = paid.reduce(
-    (sum, l) => sum + l.price_mwk * installs.filter((e) => e.listing_id === l.id).length,
-    0,
-  );
   const activeUsers = new Set(views.map((v) => `${v.device}-${v.country}`)).size;
   const reviews = all.reduce((s, l) => s + l.rating_count, 0);
   const avg = reviews ? all.reduce((s, l) => s + l.rating_avg * l.rating_count, 0) / reviews : 0;
@@ -127,15 +122,6 @@ function AnalyticsPage() {
             <p className="text-xs text-muted-foreground">{s.label}</p>
           </div>
         ))}
-      </div>
-
-      <div className="surface-card mt-4 p-4">
-        <h2 className="font-display text-base font-semibold">Earnings estimate</h2>
-        <p className="mt-1 text-2xl font-bold">{formatMwk(revenue)}</p>
-        <p className="text-xs text-muted-foreground">
-          Paid installs across {paid.length} paid listing{paid.length === 1 ? "" : "s"}. Publishing plan costs{" "}
-          {formatMwk(SUBSCRIPTION_PRICE_MWK)}/month.
-        </p>
       </div>
 
       {events.isLoading ? (

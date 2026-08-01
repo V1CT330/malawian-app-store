@@ -9,6 +9,19 @@ const Input = z.object({
     .default([]),
 });
 
+/** Strips markdown emphasis, bullet markers and emoji so replies stay professional. */
+function toPlainText(text: string) {
+  return text
+    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{2190}-\u{21FF}]/gu, "")
+    .replace(/^\s{0,3}#{1,6}\s*/gm, "")
+    .replace(/^\s*[-*+•]\s+/gm, "")
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/\*(.*?)\*/g, "$1")
+    .replace(/`{1,3}/g, "")
+    .replace(/[ \t]+$/gm, "")
+    .trim();
+}
+
 export const askAssistant = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => Input.parse(data))
   .handler(async ({ data }) => {
@@ -24,7 +37,7 @@ export const askAssistant = createServerFn({ method: "POST" })
           {
             role: "system",
             content:
-              "You are the Malawian App Store assistant. Help Malawian developers write app listings (name, tagline, description, category), understand KYC verification, phone verification over WhatsApp, the MK5,000 monthly publishing subscription, and app update/versioning best practices. Be concise, practical and friendly. Amounts are in Malawian Kwacha (MK).",
+              "You are the Malawian App Store assistant. Help Malawian developers write app listings (name, tagline, description, category), understand KYC verification, phone verification over WhatsApp, the MK5,000 monthly publishing subscription, and app update/versioning best practices. Be concise, practical and professional. Write in plain text only: never use markdown formatting, asterisks, bullet symbols, hashes, or emojis. Use short paragraphs, and where a list is needed use numbered lines such as '1.' on their own line. Amounts are in Malawian Kwacha (MK).",
           },
           ...data.history,
           { role: "user", content: data.message },
@@ -37,5 +50,6 @@ export const askAssistant = createServerFn({ method: "POST" })
     if (!response.ok) throw new Error(`Assistant failed [${response.status}]: ${await response.text()}`);
 
     const json = (await response.json()) as { choices?: { message?: { content?: string } }[] };
-    return { reply: json.choices?.[0]?.message?.content?.trim() ?? "Sorry, I had no answer for that." };
+    const raw = json.choices?.[0]?.message?.content ?? "";
+    return { reply: toPlainText(raw) || "Sorry, I had no answer for that." };
   });

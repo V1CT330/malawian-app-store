@@ -9,7 +9,6 @@ import {
   Search,
   Upload,
   User,
-  Wallet,
 } from "lucide-react";
 import { type ReactNode } from "react";
 
@@ -29,7 +28,6 @@ const USER_NAV = [
 const DEV_NAV = [
   { to: "/dashboard", label: "Home", icon: LayoutDashboard },
   { to: "/upload", label: "Upload", icon: Upload },
-  { to: "/wallet", label: "Wallet", icon: Wallet },
   { to: "/analytics", label: "Stats", icon: BarChart3 },
   { to: "/assistant", label: "AI", icon: Bot },
 ] as const;
@@ -57,7 +55,7 @@ export function AppShell({
         <div className="mx-auto w-full max-w-5xl">
           <div className="flex items-center gap-3 rounded-full bg-secondary px-3 py-2 shadow-soft">
             <Link to="/" aria-label="Malawian App Store home" className="shrink-0">
-              <img src={logo} alt="Malawian App Store logo" width={28} height={28} className="h-7 w-7 rounded-lg" />
+              <img src={logo} alt="Malawian App Store logo" width={28} height={28} className="h-7 w-7" />
             </Link>
             <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
             <input
@@ -89,7 +87,7 @@ export function AppShell({
       <footer className="border-t border-border px-4 py-8 pb-28 sm:pb-8">
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-3 text-sm text-muted-foreground">
           <p className="flex items-center gap-2 font-display font-semibold text-foreground">
-            <img src={logo} alt="" width={20} height={20} loading="lazy" className="h-5 w-5 rounded" />
+            <img src={logo} alt="" width={20} height={20} loading="lazy" className="h-5 w-5" />
             Malawian App Store
           </p>
           <p>Discover and publish apps and websites built in Malawi.</p>
