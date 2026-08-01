@@ -44,8 +44,12 @@
   --color-google-red: var(--google-red);
   --color-google-yellow: var(--google-yellow);
   --color-google-green: var(--google-green);
+  --color-brand-red: var(--google-red);
+  --color-brand-green: var(--google-green);
+  --color-brand-black: var(--foreground);
   --color-success: var(--google-green);
-  --color-warning: var(--google-yellow);
+  --color-warning: var(--google-red);
+
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
