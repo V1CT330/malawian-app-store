@@ -9,7 +9,6 @@ import {
   Search,
   Upload,
   User,
-  Wallet,
 } from "lucide-react";
 import { type ReactNode } from "react";
 
@@ -29,7 +28,6 @@ const USER_NAV = [
 const DEV_NAV = [
   { to: "/dashboard", label: "Home", icon: LayoutDashboard },
   { to: "/upload", label: "Upload", icon: Upload },
-  { to: "/wallet", label: "Wallet", icon: Wallet },
   { to: "/analytics", label: "Stats", icon: BarChart3 },
   { to: "/assistant", label: "AI", icon: Bot },
 ] as const;
