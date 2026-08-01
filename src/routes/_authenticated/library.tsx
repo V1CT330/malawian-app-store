@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Heart, History } from "lucide-react";
+import { Bookmark, Download, History } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
@@ -18,10 +18,10 @@ export const Route = createFileRoute("/_authenticated/library")({
       { title: "My Library — Malawian App Store" },
       {
         name: "description",
-        content: "Your wishlist and download history of Malawian apps and websites.",
+        content: "Your installed apps, saved listings and download history on the Malawian App Store.",
       },
       { property: "og:title", content: "My Library — Malawian App Store" },
-      { property: "og:description", content: "Wishlist and download history." },
+      { property: "og:description", content: "Installed apps, saved listings and download history." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -33,7 +33,34 @@ function LibraryPage() {
   const { userId } = useSession();
   const queryClient = useQueryClient();
 
-  const wishlist = useQuery({
+  const history = useQuery({
+    queryKey: ["install-history", userId],
+    enabled: Boolean(userId),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("install_events")
+        .select("id, created_at, listings(*)")
+        .eq("user_id", userId!)
+        .order("created_at", { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      return (data ?? []) as { id: string; created_at: string; listings: Listing | null }[];
+    },
+  });
+
+  /** Unique listings the user has installed, newest first. */
+  const installed = (() => {
+    const seen = new Set<string>();
+    const rows: { listing: Listing; created_at: string }[] = [];
+    for (const row of history.data ?? []) {
+      if (!row.listings || seen.has(row.listings.id)) continue;
+      seen.add(row.listings.id);
+      rows.push({ listing: row.listings, created_at: row.created_at });
+    }
+    return rows;
+  })();
+
+  const saved = useQuery({
     queryKey: ["wishlist", userId],
     enabled: Boolean(userId),
     queryFn: async () => {
@@ -47,21 +74,6 @@ function LibraryPage() {
     },
   });
 
-  const history = useQuery({
-    queryKey: ["install-history", userId],
-    enabled: Boolean(userId),
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("install_events")
-        .select("id, created_at, listings(*)")
-        .eq("user_id", userId!)
-        .order("created_at", { ascending: false })
-        .limit(50);
-      if (error) throw error;
-      return (data ?? []) as { id: string; created_at: string; listings: Listing | null }[];
-    },
-  });
-
   const remove = useMutation({
     mutationFn: async (listingId: string) => {
       const { error } = await supabase
@@ -72,7 +84,7 @@ function LibraryPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Removed from wishlist");
+      toast.success("Removed from saved");
       queryClient.invalidateQueries({ queryKey: ["wishlist", userId] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -81,21 +93,43 @@ function LibraryPage() {
   return (
     <AppShell>
       <h1 className="font-display text-2xl font-bold">My library</h1>
-      <Tabs defaultValue="wishlist" className="mt-4">
+      <Tabs defaultValue="installed" className="mt-4">
         <TabsList>
-          <TabsTrigger value="wishlist" className="gap-1.5">
-            <Heart className="h-4 w-4" /> Wishlist
+          <TabsTrigger value="installed" className="gap-1.5">
+            <Download className="h-4 w-4" /> Installed
+          </TabsTrigger>
+          <TabsTrigger value="saved" className="gap-1.5">
+            <Bookmark className="h-4 w-4" /> Saved
           </TabsTrigger>
           <TabsTrigger value="history" className="gap-1.5">
             <History className="h-4 w-4" /> History
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="wishlist" className="mt-4 space-y-3">
-          {wishlist.isLoading ? (
+        <TabsContent value="installed" className="mt-4 space-y-3">
+          {history.isLoading ? (
             <Skeleton className="h-20 w-full rounded-2xl" />
-          ) : wishlist.data?.length ? (
-            wishlist.data.map(
+          ) : installed.length ? (
+            installed.map((row) => (
+              <div key={row.listing.id} className="space-y-1">
+                <ListingCard listing={row.listing} />
+                <p className="px-1 text-xs text-muted-foreground">
+                  Installed {new Date(row.created_at).toLocaleDateString()}
+                </p>
+              </div>
+            ))
+          ) : (
+            <p className="surface-card p-6 text-center text-sm text-muted-foreground">
+              Apps and websites you install will appear here.
+            </p>
+          )}
+        </TabsContent>
+
+        <TabsContent value="saved" className="mt-4 space-y-3">
+          {saved.isLoading ? (
+            <Skeleton className="h-20 w-full rounded-2xl" />
+          ) : saved.data?.length ? (
+            saved.data.map(
               (row) =>
                 row.listings && (
                   <div key={row.listing_id} className="space-y-1">
@@ -110,7 +144,7 @@ function LibraryPage() {
             )
           ) : (
             <p className="surface-card p-6 text-center text-sm text-muted-foreground">
-              Tap the heart on any listing to save it here.
+              Save any listing to find it here later.
             </p>
           )}
         </TabsContent>
