@@ -28,7 +28,7 @@ export const Route = createFileRoute("/_authenticated/analytics")({
         content: "Downloads, views, device and country breakdowns and monthly reports for your listings.",
       },
       { property: "og:title", content: "Analytics — Malawian App Store" },
-      { property: "og:description", content: "Downloads, views, devices, countries and revenue." },
+      { property: "og:description", content: "Downloads, views, devices and countries." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
