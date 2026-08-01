@@ -1,15 +1,27 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { BarChart3, Bell, Bot, Gamepad2, Heart, LayoutDashboard, Search, Upload, User, Wallet } from "lucide-react";
+import {
+  BarChart3,
+  Bell,
+  Bot,
+  Gamepad2,
+  LayoutDashboard,
+  LayoutGrid,
+  Search,
+  Upload,
+  User,
+  Wallet,
+} from "lucide-react";
 import { type ReactNode } from "react";
 
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo-mark.png";
 import { useMode, useProfile, useUnreadCount } from "@/hooks/useSession";
 import { SOCIAL_LINKS } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 const USER_NAV = [
   { to: "/", label: "Apps", icon: Gamepad2 },
-  { to: "/library", label: "Library", icon: Heart },
+  { to: "/library", label: "Library", icon: LayoutGrid },
+
   { to: "/notifications", label: "Alerts", icon: Bell },
   { to: "/settings", label: "Account", icon: User },
 ] as const;
