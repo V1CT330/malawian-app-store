@@ -270,12 +270,9 @@ function SettingsPage() {
                 Save
               </Button>
             </div>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-2">
               {[
                 { to: "/dashboard", label: "Dashboard" },
-                { to: "/wallet", label: "Wallet" },
-                { to: "/business", label: "Business" },
-                { to: "/promote", label: "Promote" },
               ].map((l) => (
                 <Button key={l.to} asChild size="sm" variant="outline">
                   <Link to={l.to}>{l.label}</Link>

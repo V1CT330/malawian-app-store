@@ -46,7 +46,6 @@ function UploadPage() {
   const [tagline, setTagline] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<string>(CATEGORIES[0]);
-  const [price, setPrice] = useState("0");
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [version, setVersion] = useState("1.0.0");
   const [icon, setIcon] = useState<File | null>(null);
@@ -75,7 +74,6 @@ function UploadPage() {
           kind,
           icon_url: iconPath,
           website_url: kind === "website" ? websiteUrl.trim() : null,
-          price_mwk: Math.max(0, Number(price) || 0),
           status: "published",
         })
         .select("id,slug")
@@ -173,16 +171,6 @@ function UploadPage() {
                 ))}
               </SelectContent>
             </Select>
-          </div>
-          <div>
-            <Label htmlFor="price">Price (MK, 0 = free)</Label>
-            <Input
-              id="price"
-              type="number"
-              min={0}
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-            />
           </div>
         </div>
 
