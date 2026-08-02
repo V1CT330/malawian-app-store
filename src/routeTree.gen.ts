@@ -24,6 +24,7 @@ import { Route as AuthenticatedAssistantRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedManageIdRouteImport } from './routes/_authenticated/manage.$id'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -100,6 +101,11 @@ const AuthenticatedManageIdRoute = AuthenticatedManageIdRouteImport.update({
   path: '/manage/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/upload': typeof AuthenticatedUploadRoute
   '/apps/$slug': typeof AppsSlugRoute
   '/developers/$id': typeof DevelopersIdRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/manage/$id': typeof AuthenticatedManageIdRoute
 }
 export interface FileRoutesByTo {
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/upload': typeof AuthenticatedUploadRoute
   '/apps/$slug': typeof AppsSlugRoute
   '/developers/$id': typeof DevelopersIdRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/manage/$id': typeof AuthenticatedManageIdRoute
 }
 export interface FileRoutesById {
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/_authenticated/upload': typeof AuthenticatedUploadRoute
   '/apps/$slug': typeof AppsSlugRoute
   '/developers/$id': typeof DevelopersIdRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_authenticated/manage/$id': typeof AuthenticatedManageIdRoute
 }
 export interface FileRouteTypes {
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
     | '/upload'
     | '/apps/$slug'
     | '/developers/$id'
+    | '/.lovable/oauth/consent'
     | '/manage/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -183,6 +193,7 @@ export interface FileRouteTypes {
     | '/upload'
     | '/apps/$slug'
     | '/developers/$id'
+    | '/.lovable/oauth/consent'
     | '/manage/$id'
   id:
     | '__root__'
@@ -200,6 +211,7 @@ export interface FileRouteTypes {
     | '/_authenticated/upload'
     | '/apps/$slug'
     | '/developers/$id'
+    | '/.lovable/oauth/consent'
     | '/_authenticated/manage/$id'
   fileRoutesById: FileRoutesById
 }
@@ -210,6 +222,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AppsSlugRoute: typeof AppsSlugRoute
   DevelopersIdRoute: typeof DevelopersIdRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -319,6 +332,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedManageIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -356,6 +376,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AppsSlugRoute: AppsSlugRoute,
   DevelopersIdRoute: DevelopersIdRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
