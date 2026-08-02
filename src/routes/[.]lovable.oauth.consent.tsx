@@ -4,6 +4,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
+type OAuthDetails = {
+  client?: { name?: string | null } | null;
+  redirect_url?: string | null;
+  redirect_to?: string | null;
+};
+
 export const Route = createFileRoute("/.lovable/oauth/consent")({
   ssr: false,
   validateSearch: (s: Record<string, unknown>) => ({
@@ -19,9 +25,10 @@ export const Route = createFileRoute("/.lovable/oauth/consent")({
     const authorizationId = new URLSearchParams(location.search).get("authorization_id")!;
     const { data, error } = await supabase.auth.oauth.getAuthorizationDetails(authorizationId);
     if (error) throw error;
-    const immediate = data?.redirect_url ?? data?.redirect_to;
-    if (immediate && !data?.client) throw redirect({ href: immediate });
-    return data;
+    const details = data as OAuthDetails | null;
+    const immediate = details?.redirect_url ?? details?.redirect_to;
+    if (immediate && !details?.client) throw redirect({ href: immediate });
+    return details;
   },
   component: Consent,
   errorComponent: ({ error }) => (
@@ -48,7 +55,8 @@ function Consent() {
       setError(decisionError.message);
       return;
     }
-    const target = data?.redirect_url ?? data?.redirect_to;
+    const result = data as OAuthDetails | null;
+    const target = result?.redirect_url ?? result?.redirect_to;
     if (!target) {
       setBusy(false);
       setError("No redirect returned by the authorization server.");
