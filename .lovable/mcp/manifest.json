@@ -1,0 +1,196 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.1",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://txmukhfpoylrrhancmzu.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "malawian-app-store",
+      "version": "0.1.0",
+      "title": "Malawian App Store"
+    },
+    "tools": [
+      {
+        "name": "search_apps",
+        "title": "Search apps",
+        "description": "Search published apps and websites on the Malawian App Store by name, category or kind.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "query": {
+              "description": "Text to match against app name or tagline.",
+              "type": "string"
+            },
+            "category": {
+              "description": "Category filter, e.g. Education, Finance.",
+              "type": "string"
+            },
+            "kind": {
+              "description": "Limit to apps or websites.",
+              "type": "string",
+              "enum": [
+                "app",
+                "website"
+              ]
+            },
+            "limit": {
+              "description": "Maximum results (default 10).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_app",
+        "title": "Get app details",
+        "description": "Fetch full details, latest versions and recent reviews for one published app by its slug.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "slug": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The app slug, e.g. mzuni-notes."
+            }
+          },
+          "required": [
+            "slug"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "my_listings",
+        "title": "My listings",
+        "description": "List the signed-in developer's own listings with status, installs and ratings.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "status": {
+              "description": "Filter by status.",
+              "type": "string",
+              "enum": [
+                "draft",
+                "pending",
+                "published",
+                "rejected"
+              ]
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "my_notifications",
+        "title": "My notifications",
+        "description": "Read the signed-in user's recent notifications, such as review decisions and platform announcements.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "unread_only": {
+              "description": "Return only unread notifications.",
+              "type": "boolean"
+            },
+            "limit": {
+              "description": "Maximum results (default 10).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_listing_draft",
+        "title": "Create listing draft",
+        "description": "Create a new draft listing owned by the signed-in developer. Drafts are private until submitted for review in the app.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 80,
+              "description": "App or website name."
+            },
+            "tagline": {
+              "description": "Short one-line pitch.",
+              "type": "string",
+              "maxLength": 140
+            },
+            "description": {
+              "description": "Full listing description.",
+              "type": "string",
+              "maxLength": 4000
+            },
+            "category": {
+              "type": "string",
+              "minLength": 2,
+              "description": "Category, e.g. Education, Finance, Tools."
+            },
+            "kind": {
+              "type": "string",
+              "enum": [
+                "app",
+                "website"
+              ],
+              "description": "Whether this listing is an app or a website."
+            },
+            "website_url": {
+              "description": "Website URL, required for website listings.",
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          "required": [
+            "name",
+            "category",
+            "kind"
+          ]
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
