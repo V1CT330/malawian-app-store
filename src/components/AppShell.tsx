@@ -27,6 +27,7 @@ const USER_NAV = [
 
 const DEV_NAV = [
   { to: "/dashboard", label: "Home", icon: LayoutDashboard },
+  { to: "/products", label: "Products", icon: LayoutGrid },
   { to: "/upload", label: "Upload", icon: Upload },
   { to: "/analytics", label: "Stats", icon: BarChart3 },
   { to: "/assistant", label: "AI", icon: Bot },

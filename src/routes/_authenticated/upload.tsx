@@ -17,6 +17,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useProfile } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
+import { PRODUCT_KINDS, type ProductKind } from "@/lib/portal";
 import { CATEGORIES, slugify, uploadAsset } from "@/lib/store";
 
 export const Route = createFileRoute("/_authenticated/upload")({
@@ -41,7 +42,7 @@ function UploadPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const [kind, setKind] = useState<"app" | "website">("app");
+  const [kind, setKind] = useState<ProductKind>("app");
   const [name, setName] = useState("");
   const [tagline, setTagline] = useState("");
   const [description, setDescription] = useState("");
@@ -114,16 +115,16 @@ function UploadPage() {
       <div className="mt-5 space-y-4">
         <div>
           <Label>Type</Label>
-          <div className="mt-1.5 flex gap-2">
-            {(["app", "website"] as const).map((k) => (
+          <div className="mt-1.5 flex flex-wrap gap-2">
+            {PRODUCT_KINDS.map((k) => (
               <Button
-                key={k}
+                key={k.value}
                 type="button"
-                variant={kind === k ? "default" : "outline"}
-                onClick={() => setKind(k)}
-                className="flex-1 capitalize"
+                variant={kind === k.value ? "default" : "outline"}
+                onClick={() => setKind(k.value)}
+                className="flex-1"
               >
-                {k}
+                {k.label}
               </Button>
             ))}
           </div>
