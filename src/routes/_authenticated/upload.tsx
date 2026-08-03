@@ -114,16 +114,16 @@ function UploadPage() {
       <div className="mt-5 space-y-4">
         <div>
           <Label>Type</Label>
-          <div className="mt-1.5 flex gap-2">
-            {(["app", "website"] as const).map((k) => (
+          <div className="mt-1.5 flex flex-wrap gap-2">
+            {PRODUCT_KINDS.map((k) => (
               <Button
-                key={k}
+                key={k.value}
                 type="button"
-                variant={kind === k ? "default" : "outline"}
-                onClick={() => setKind(k)}
-                className="flex-1 capitalize"
+                variant={kind === k.value ? "default" : "outline"}
+                onClick={() => setKind(k.value)}
+                className="flex-1"
               >
-                {k}
+                {k.label}
               </Button>
             ))}
           </div>
