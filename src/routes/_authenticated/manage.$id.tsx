@@ -301,7 +301,7 @@ function ManagePage() {
         developer_id: userId,
         listing_id: id,
         title: announceTitle.trim(),
-        body: announceBody.trim() || null,
+        body: announceBody.trim(),
         pinned,
       });
       if (error) throw error;
