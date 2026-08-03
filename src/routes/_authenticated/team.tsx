@@ -103,7 +103,7 @@ function TeamPage() {
   });
 
   const updateMember = useMutation({
-    mutationFn: async ({ id, patch }: { id: string; patch: Record<string, string> }) => {
+    mutationFn: async ({ id, patch }: { id: string; patch: { role?: string; status?: string } }) => {
       const { error } = await supabase.from("team_members").update(patch).eq("id", id);
       if (error) throw error;
     },
