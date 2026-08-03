@@ -14,6 +14,173 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action: string
+          actor_id: string
+          created_at: string
+          id: string
+          listing_id: string | null
+          owner_id: string
+          target: string | null
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          owner_id: string
+          target?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          owner_id?: string
+          target?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_logs_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      announcements: {
+        Row: {
+          body: string
+          created_at: string
+          developer_id: string
+          id: string
+          listing_id: string | null
+          pinned: boolean
+          published: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          developer_id: string
+          id?: string
+          listing_id?: string | null
+          pinned?: boolean
+          published?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          developer_id?: string
+          id?: string
+          listing_id?: string | null
+          pinned?: boolean
+          published?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "announcements_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      beta_feedback: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          kind: string
+          listing_id: string
+          owner_id: string
+          severity: string
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          kind?: string
+          listing_id: string
+          owner_id: string
+          severity?: string
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          listing_id?: string
+          owner_id?: string
+          severity?: string
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beta_feedback_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      beta_testers: {
+        Row: {
+          channel: string
+          created_at: string
+          email: string
+          id: string
+          listing_id: string
+          owner_id: string
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          channel?: string
+          created_at?: string
+          email: string
+          id?: string
+          listing_id: string
+          owner_id: string
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          email?: string
+          id?: string
+          listing_id?: string
+          owner_id?: string
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beta_testers_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coupons: {
         Row: {
           active: boolean
@@ -60,6 +227,86 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      feature_requests: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          status: string
+          title: string
+          user_id: string
+          vote_count: number
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          status?: string
+          title: string
+          user_id: string
+          vote_count?: number
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          status?: string
+          title?: string
+          user_id?: string
+          vote_count?: number
+        }
+        Relationships: []
+      }
+      feature_votes: {
+        Row: {
+          created_at: string
+          id: string
+          request_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          request_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          request_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feature_votes_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "feature_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      follows: {
+        Row: {
+          created_at: string
+          developer_id: string
+          follower_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          developer_id: string
+          follower_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          developer_id?: string
+          follower_id?: string
+          id?: string
+        }
+        Relationships: []
       }
       install_events: {
         Row: {
@@ -141,29 +388,44 @@ export type Database = {
       listing_versions: {
         Row: {
           changelog: string | null
+          channel: string
           created_at: string
           file_url: string | null
           id: string
+          is_current: boolean
           listing_id: string
+          release_notes: string | null
+          scheduled_at: string | null
           size_bytes: number | null
+          status: string
           version: string
         }
         Insert: {
           changelog?: string | null
+          channel?: string
           created_at?: string
           file_url?: string | null
           id?: string
+          is_current?: boolean
           listing_id: string
+          release_notes?: string | null
+          scheduled_at?: string | null
           size_bytes?: number | null
+          status?: string
           version: string
         }
         Update: {
           changelog?: string | null
+          channel?: string
           created_at?: string
           file_url?: string | null
           id?: string
+          is_current?: boolean
           listing_id?: string
+          release_notes?: string | null
+          scheduled_at?: string | null
           size_bytes?: number | null
+          status?: string
           version?: string
         }
         Relationships: [
@@ -179,6 +441,8 @@ export type Database = {
       listings: {
         Row: {
           allow_donations: boolean
+          archived_at: string | null
+          banner_url: string | null
           category: string
           created_at: string
           crypto_address: string | null
@@ -188,25 +452,33 @@ export type Database = {
           featured: boolean
           icon_url: string | null
           id: string
-          kind: Database["public"]["Enums"]["listing_kind"]
+          keywords: string[]
+          kind: string
           monetization: string
           name: string
           price_month_mwk: number
           price_mwk: number
           price_year_mwk: number
+          promo_images: string[]
+          quality_score: number
           rating_avg: number
           rating_count: number
           rejection_reason: string | null
           screenshots: string[]
+          seo_score: number
           slug: string
           sponsored: boolean
-          status: Database["public"]["Enums"]["listing_status"]
+          status: string
           tagline: string | null
+          tags: string[]
           updated_at: string
+          video_url: string | null
           website_url: string | null
         }
         Insert: {
           allow_donations?: boolean
+          archived_at?: string | null
+          banner_url?: string | null
           category?: string
           created_at?: string
           crypto_address?: string | null
@@ -216,25 +488,33 @@ export type Database = {
           featured?: boolean
           icon_url?: string | null
           id?: string
-          kind?: Database["public"]["Enums"]["listing_kind"]
+          keywords?: string[]
+          kind?: string
           monetization?: string
           name: string
           price_month_mwk?: number
           price_mwk?: number
           price_year_mwk?: number
+          promo_images?: string[]
+          quality_score?: number
           rating_avg?: number
           rating_count?: number
           rejection_reason?: string | null
           screenshots?: string[]
+          seo_score?: number
           slug: string
           sponsored?: boolean
-          status?: Database["public"]["Enums"]["listing_status"]
+          status?: string
           tagline?: string | null
+          tags?: string[]
           updated_at?: string
+          video_url?: string | null
           website_url?: string | null
         }
         Update: {
           allow_donations?: boolean
+          archived_at?: string | null
+          banner_url?: string | null
           category?: string
           created_at?: string
           crypto_address?: string | null
@@ -244,22 +524,61 @@ export type Database = {
           featured?: boolean
           icon_url?: string | null
           id?: string
-          kind?: Database["public"]["Enums"]["listing_kind"]
+          keywords?: string[]
+          kind?: string
           monetization?: string
           name?: string
           price_month_mwk?: number
           price_mwk?: number
           price_year_mwk?: number
+          promo_images?: string[]
+          quality_score?: number
           rating_avg?: number
           rating_count?: number
           rejection_reason?: string | null
           screenshots?: string[]
+          seo_score?: number
           slug?: string
           sponsored?: boolean
-          status?: Database["public"]["Enums"]["listing_status"]
+          status?: string
           tagline?: string | null
+          tags?: string[]
           updated_at?: string
+          video_url?: string | null
           website_url?: string | null
+        }
+        Relationships: []
+      }
+      login_events: {
+        Row: {
+          country: string | null
+          created_at: string
+          device: string | null
+          id: string
+          ip_hint: string | null
+          platform: string | null
+          session_active: boolean
+          user_id: string
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          device?: string | null
+          id?: string
+          ip_hint?: string | null
+          platform?: string | null
+          session_active?: boolean
+          user_id: string
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          device?: string | null
+          id?: string
+          ip_hint?: string | null
+          platform?: string | null
+          session_active?: boolean
+          user_id?: string
         }
         Relationships: []
       }
@@ -470,18 +789,23 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
+          company_name: string | null
+          contact_email: string | null
           created_at: string
           developer_name: string | null
           display_name: string | null
           facebook_url: string | null
+          follower_count: number
           id: string
           instagram_url: string | null
           is_developer: boolean
           kyc_status: Database["public"]["Enums"]["kyc_status"]
           linkedin_url: string | null
+          location: string | null
           mode: string
           phone: string | null
           phone_verified: boolean
+          reputation_score: number
           suspended: boolean
           updated_at: string
           website_url: string | null
@@ -492,18 +816,23 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           bio?: string | null
+          company_name?: string | null
+          contact_email?: string | null
           created_at?: string
           developer_name?: string | null
           display_name?: string | null
           facebook_url?: string | null
+          follower_count?: number
           id: string
           instagram_url?: string | null
           is_developer?: boolean
           kyc_status?: Database["public"]["Enums"]["kyc_status"]
           linkedin_url?: string | null
+          location?: string | null
           mode?: string
           phone?: string | null
           phone_verified?: boolean
+          reputation_score?: number
           suspended?: boolean
           updated_at?: string
           website_url?: string | null
@@ -514,18 +843,23 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           bio?: string | null
+          company_name?: string | null
+          contact_email?: string | null
           created_at?: string
           developer_name?: string | null
           display_name?: string | null
           facebook_url?: string | null
+          follower_count?: number
           id?: string
           instagram_url?: string | null
           is_developer?: boolean
           kyc_status?: Database["public"]["Enums"]["kyc_status"]
           linkedin_url?: string | null
+          location?: string | null
           mode?: string
           phone?: string | null
           phone_verified?: boolean
+          reputation_score?: number
           suspended?: boolean
           updated_at?: string
           website_url?: string | null
@@ -624,27 +958,33 @@ export type Database = {
         Row: {
           body: string | null
           created_at: string
+          developer_reply: string | null
           id: string
           listing_id: string
           rating: number
+          replied_at: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           body?: string | null
           created_at?: string
+          developer_reply?: string | null
           id?: string
           listing_id: string
           rating: number
+          replied_at?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           body?: string | null
           created_at?: string
+          developer_reply?: string | null
           id?: string
           listing_id?: string
           rating?: number
+          replied_at?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -657,6 +997,68 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      search_events: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string | null
+          query: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          query: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          query?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "search_events_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      security_settings: {
+        Row: {
+          backup_codes: string[]
+          created_at: string
+          recovery_email: string | null
+          two_factor_enabled: boolean
+          two_factor_secret: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          backup_codes?: string[]
+          created_at?: string
+          recovery_email?: string | null
+          two_factor_enabled?: boolean
+          two_factor_secret?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          backup_codes?: string[]
+          created_at?: string
+          recovery_email?: string | null
+          two_factor_enabled?: boolean
+          two_factor_secret?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       subscriptions: {
         Row: {
@@ -688,6 +1090,39 @@ export type Database = {
           status?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      team_members: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          member_id: string | null
+          owner_id: string
+          role: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          member_id?: string | null
+          owner_id: string
+          role?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          member_id?: string | null
+          owner_id?: string
+          role?: string
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -856,11 +1291,16 @@ export type Database = {
     }
     Functions: {
       claim_first_admin: { Args: never; Returns: boolean }
+      compute_reputation: { Args: { _developer: string }; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_team_member: {
+        Args: { _owner: string; _user: string }
         Returns: boolean
       }
     }
