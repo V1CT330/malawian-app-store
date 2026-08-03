@@ -17,6 +17,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useProfile } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
+import { PRODUCT_KINDS, type ProductKind } from "@/lib/portal";
 import { CATEGORIES, slugify, uploadAsset } from "@/lib/store";
 
 export const Route = createFileRoute("/_authenticated/upload")({
@@ -41,7 +42,7 @@ function UploadPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const [kind, setKind] = useState<"app" | "website">("app");
+  const [kind, setKind] = useState<ProductKind>("app");
   const [name, setName] = useState("");
   const [tagline, setTagline] = useState("");
   const [description, setDescription] = useState("");
