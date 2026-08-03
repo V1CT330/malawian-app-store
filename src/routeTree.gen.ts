@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DevelopersIdRouteImport } from './routes/developers.$id'
 import { Route as AppsSlugRouteImport } from './routes/apps.$slug'
 import { Route as AuthenticatedUploadRouteImport } from './routes/_authenticated/upload'
+import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated/team'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedProductsRouteImport } from './routes/_authenticated/products'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
@@ -68,6 +69,11 @@ const AppsSlugRoute = AppsSlugRouteImport.update({
 const AuthenticatedUploadRoute = AuthenticatedUploadRouteImport.update({
   id: '/upload',
   path: '/upload',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTeamRoute = AuthenticatedTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/products': typeof AuthenticatedProductsRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/team': typeof AuthenticatedTeamRoute
   '/upload': typeof AuthenticatedUploadRoute
   '/apps/$slug': typeof AppsSlugRoute
   '/developers/$id': typeof DevelopersIdRoute
@@ -177,6 +184,7 @@ export interface FileRoutesByTo {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/products': typeof AuthenticatedProductsRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/team': typeof AuthenticatedTeamRoute
   '/upload': typeof AuthenticatedUploadRoute
   '/apps/$slug': typeof AppsSlugRoute
   '/developers/$id': typeof DevelopersIdRoute
@@ -201,6 +209,7 @@ export interface FileRoutesById {
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/products': typeof AuthenticatedProductsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/team': typeof AuthenticatedTeamRoute
   '/_authenticated/upload': typeof AuthenticatedUploadRoute
   '/apps/$slug': typeof AppsSlugRoute
   '/developers/$id': typeof DevelopersIdRoute
@@ -225,6 +234,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/products'
     | '/settings'
+    | '/team'
     | '/upload'
     | '/apps/$slug'
     | '/developers/$id'
@@ -247,6 +257,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/products'
     | '/settings'
+    | '/team'
     | '/upload'
     | '/apps/$slug'
     | '/developers/$id'
@@ -270,6 +281,7 @@ export interface FileRouteTypes {
     | '/_authenticated/notifications'
     | '/_authenticated/products'
     | '/_authenticated/settings'
+    | '/_authenticated/team'
     | '/_authenticated/upload'
     | '/apps/$slug'
     | '/developers/$id'
@@ -348,6 +360,13 @@ declare module '@tanstack/react-router' {
       path: '/upload'
       fullPath: '/upload'
       preLoaderRoute: typeof AuthenticatedUploadRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/team': {
+      id: '/_authenticated/team'
+      path: '/team'
+      fullPath: '/team'
+      preLoaderRoute: typeof AuthenticatedTeamRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/settings': {
@@ -453,6 +472,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedProductsRoute: typeof AuthenticatedProductsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedTeamRoute: typeof AuthenticatedTeamRoute
   AuthenticatedUploadRoute: typeof AuthenticatedUploadRoute
   AuthenticatedManageIdRoute: typeof AuthenticatedManageIdRoute
 }
@@ -466,6 +486,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedProductsRoute: AuthenticatedProductsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedTeamRoute: AuthenticatedTeamRoute,
   AuthenticatedUploadRoute: AuthenticatedUploadRoute,
   AuthenticatedManageIdRoute: AuthenticatedManageIdRoute,
 }
