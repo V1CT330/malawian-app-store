@@ -58,20 +58,6 @@ function DashboardPage() {
   });
 
   const listings = listingsQuery.data ?? [];
-  const ids = listings.map((l) => l.id);
-
-  const viewsQuery = useQuery({
-    queryKey: ["portal-views", ids.join(",")],
-    enabled: ids.length > 0,
-    queryFn: async () => {
-      const { count, error } = await supabase
-        .from("view_events")
-        .select("id", { count: "exact", head: true })
-        .in("listing_id", ids);
-      if (error) throw error;
-      return count ?? 0;
-    },
-  });
 
   const reputationQuery = useQuery({
     queryKey: ["reputation", userId],
@@ -97,9 +83,6 @@ function DashboardPage() {
     },
   });
 
-  const installs = listings.reduce((sum, l) => sum + l.downloads, 0);
-  const reviews = listings.reduce((sum, l) => sum + l.rating_count, 0);
-  const avg = reviews > 0 ? listings.reduce((s, l) => s + l.rating_avg * l.rating_count, 0) / reviews : 0;
   const published = listings.filter((l) => l.status === "published");
   const pending = listings.filter((l) => l.status === "pending");
   const drafts = listings.filter((l) => l.status === "draft");
@@ -138,11 +121,8 @@ function DashboardPage() {
           <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
             <Stat value={listings.length} label="products" />
             <Stat value={published.length} label="published" />
-            <Stat value={installs} label="installs" />
-            <Stat value={viewsQuery.data ?? 0} label="views" />
             <Stat value={pending.length} label="in review" />
             <Stat value={drafts.length} label="drafts" />
-            <Stat value={avg ? avg.toFixed(1) : "—"} label={`${reviews} ratings`} />
             <Stat value={unread} label="notifications" />
           </div>
 
@@ -186,38 +166,6 @@ function DashboardPage() {
             </Button>
           </div>
 
-          <section className="mt-5">
-            <div className="mb-2 flex items-center justify-between">
-              <h2 className="font-display text-base font-semibold">Recent products</h2>
-              <Link to="/products" className="text-sm font-medium text-primary underline">
-                Manage all
-              </Link>
-            </div>
-            {listings.length === 0 ? (
-              <div className="surface-card p-6 text-center text-sm text-muted-foreground">
-                You haven't published anything yet.
-              </div>
-            ) : (
-              <ul className="space-y-2">
-                {listings.slice(0, 6).map((l) => (
-                  <li key={l.id} className="surface-card flex items-center gap-3 p-3">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium">{l.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {kindLabel(l.kind)} · {l.downloads} installs · {l.rating_avg || "—"} ★
-                      </p>
-                    </div>
-                    <Badge variant="secondary" className="ml-auto shrink-0 capitalize">
-                      {l.status}
-                    </Badge>
-                    <Link to="/manage/$id" params={{ id: l.id }} className="shrink-0 text-sm font-medium text-primary underline">
-                      Open
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
         </>
       )}
     </AppShell>
