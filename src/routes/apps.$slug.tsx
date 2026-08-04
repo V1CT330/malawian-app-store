@@ -247,6 +247,29 @@ function ListingDetail() {
           )}
         </Button>
 
+        {userId && (
+          <Button
+            variant="outline"
+            className="w-full"
+            disabled={toggleSave.isPending}
+            onClick={() => toggleSave.mutate()}
+          >
+            {saved.data ? "Remove from saved" : "Save to library"}
+          </Button>
+        )}
+
+        {developerQuery.data && (
+          <Link
+            to="/developers/$id"
+            params={{ id: developerQuery.data.id }}
+            className="block text-sm text-primary underline"
+          >
+            More from {developerQuery.data.developer_name ?? developerQuery.data.display_name ?? "this developer"}
+          </Link>
+        )}
+
+
+
         {listing.description && (
           <section className="surface-card p-4">
             <h2 className="mb-2 font-display text-base font-semibold">About</h2>
