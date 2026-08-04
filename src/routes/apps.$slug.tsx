@@ -102,13 +102,68 @@ function ListingDetail() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const developerQuery = useQuery({
+    queryKey: ["listing-developer", listing?.developer_id],
+    enabled: Boolean(listing?.developer_id),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, display_name, developer_name, kyc_status")
+        .eq("id", listing!.developer_id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const saved = useQuery({
+    queryKey: ["wishlist-item", userId, listing?.id],
+    enabled: Boolean(userId && listing?.id),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("wishlist")
+        .select("id")
+        .eq("user_id", userId!)
+        .eq("listing_id", listing!.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data?.id ?? null;
+    },
+  });
+
+  const toggleSave = useMutation({
+    mutationFn: async () => {
+      if (saved.data) {
+        const { error } = await supabase.from("wishlist").delete().eq("id", saved.data);
+        if (error) throw error;
+        return false;
+      }
+      const { error } = await supabase
+        .from("wishlist")
+        .insert({ user_id: userId!, listing_id: listing!.id });
+      if (error) throw error;
+      return true;
+    },
+    onSuccess: (added) => {
+      toast.success(added ? "Saved to your library" : "Removed from saved");
+      queryClient.invalidateQueries({ queryKey: ["wishlist-item", userId, listing?.id] });
+      queryClient.invalidateQueries({ queryKey: ["wishlist", userId] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const install = useMutation({
     mutationFn: async () => {
-      await supabase.from("install_events").insert({ listing_id: listing!.id, user_id: userId ?? null });
-      await supabase
-        .from("listings")
-        .update({ downloads: listing!.downloads + 1 })
-        .eq("id", listing!.id);
+      const { error } = await supabase.rpc("register_install", {
+        _listing_id: listing!.id,
+        _device: typeof navigator !== "undefined" ? navigator.platform : undefined,
+      });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["listing", slug] });
+      queryClient.invalidateQueries({ queryKey: ["install-history", userId] });
     },
   });
 
@@ -123,8 +178,9 @@ function ListingDetail() {
       window.open(fileUrl, "_blank", "noopener");
       return;
     }
-    toast.info("No download file has been published for this listing yet.");
+    toast.info("Added to your library. The developer has not published a download file yet.");
   }
+
 
   if (listingQuery.isLoading) {
     return (

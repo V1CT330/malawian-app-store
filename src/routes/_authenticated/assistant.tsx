@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { askAssistant } from "@/lib/assistant.functions";
 import { cn } from "@/lib/utils";
+import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 
 export const Route = createFileRoute("/_authenticated/assistant")({
   head: () => ({
@@ -38,6 +39,7 @@ const SUGGESTIONS = [
 ];
 
 function AssistantPage() {
+  useRequireDeveloper();
   const ask = useServerFn(askAssistant);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");

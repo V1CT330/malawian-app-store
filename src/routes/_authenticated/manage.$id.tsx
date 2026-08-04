@@ -24,6 +24,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { asoReport, kindLabel, logActivity, type PortalListing, type PortalVersion } from "@/lib/portal";
 import { AI_TASKS, publishingAssist } from "@/lib/publishing.functions";
 import { CATEGORIES, formatBytes, uploadAsset } from "@/lib/store";
+import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 
 export const Route = createFileRoute("/_authenticated/manage/$id")({
   head: () => ({
@@ -63,6 +64,7 @@ type Review = {
 };
 
 function ManagePage() {
+  useRequireDeveloper();
   const { id } = Route.useParams();
   const { userId } = useSession();
   const queryClient = useQueryClient();

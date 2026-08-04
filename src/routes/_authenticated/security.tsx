@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 import { clientContext } from "@/lib/store";
+import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 
 export const Route = createFileRoute("/_authenticated/security")({
   head: () => ({
@@ -51,6 +52,7 @@ function makeCodes() {
 }
 
 function SecurityPage() {
+  useRequireDeveloper();
   const { userId } = useSession();
   const queryClient = useQueryClient();
   const [recovery, setRecovery] = useState<string | null>(null);

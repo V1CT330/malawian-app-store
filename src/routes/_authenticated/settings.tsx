@@ -5,6 +5,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
+import { DeveloperTermsDialog } from "@/components/DeveloperTerms";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,6 +44,8 @@ function SettingsPage() {
   const isAdmin = useIsAdmin();
   const { dark, setTheme } = useTheme();
   const [socials, setSocials] = useState<Record<string, string>>({});
+  const [termsOpen, setTermsOpen] = useState(false);
+
 
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [developerName, setDeveloperName] = useState<string | null>(null);
@@ -90,21 +94,39 @@ function SettingsPage() {
   });
 
   const setMode = useMutation({
-    mutationFn: async (next: "developer" | "user") => {
+    mutationFn: async ({ next, acceptTerms }: { next: "developer" | "user"; acceptTerms?: boolean }) => {
       const { error } = await supabase
         .from("profiles")
-        .update({ mode: next, is_developer: next === "developer" ? true : profile?.is_developer ?? false })
+        .update({
+          mode: next,
+          is_developer: next === "developer" ? true : profile?.is_developer ?? false,
+          ...(acceptTerms ? { developer_terms_accepted_at: new Date().toISOString() } : {}),
+        })
         .eq("id", userId!);
       if (error) throw error;
       return next;
     },
     onSuccess: async (next) => {
+      setTermsOpen(false);
       await queryClient.invalidateQueries({ queryKey: ["profile", userId] });
       toast.success(next === "developer" ? "Developer workspace on" : "Back to the store");
       navigate({ to: next === "developer" ? "/dashboard" : "/" });
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  function toggleDeveloper(on: boolean) {
+    if (!on) {
+      setMode.mutate({ next: "user" });
+      return;
+    }
+    if (!profile?.developer_terms_accepted_at) {
+      setTermsOpen(true);
+      return;
+    }
+    setMode.mutate({ next: "developer" });
+  }
+
 
   const saveSocials = useMutation({
     mutationFn: async () => {
@@ -249,7 +271,7 @@ function SettingsPage() {
           <Switch
             aria-label="Switch between user and developer mode"
             checked={mode === "developer"}
-            onCheckedChange={(v) => setMode.mutate(v ? "developer" : "user")}
+            onCheckedChange={(v) => toggleDeveloper(v)}
           />
         </div>
         {profile?.is_developer && (
@@ -433,6 +455,14 @@ function SettingsPage() {
       <Button variant="outline" className="mt-4 w-full" onClick={signOut}>
         <LogOut className="mr-2 h-4 w-4" /> Sign out
       </Button>
+
+      <DeveloperTermsDialog
+        open={termsOpen}
+        onOpenChange={setTermsOpen}
+        pending={setMode.isPending}
+        onAccept={() => setMode.mutate({ next: "developer", acceptTerms: true })}
+      />
     </AppShell>
+
   );
 }

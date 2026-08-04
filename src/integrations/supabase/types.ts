@@ -793,6 +793,7 @@ export type Database = {
           contact_email: string | null
           created_at: string
           developer_name: string | null
+          developer_terms_accepted_at: string | null
           display_name: string | null
           facebook_url: string | null
           follower_count: number
@@ -820,6 +821,7 @@ export type Database = {
           contact_email?: string | null
           created_at?: string
           developer_name?: string | null
+          developer_terms_accepted_at?: string | null
           display_name?: string | null
           facebook_url?: string | null
           follower_count?: number
@@ -847,6 +849,7 @@ export type Database = {
           contact_email?: string | null
           created_at?: string
           developer_name?: string | null
+          developer_terms_accepted_at?: string | null
           display_name?: string | null
           facebook_url?: string | null
           follower_count?: number
@@ -1302,6 +1305,10 @@ export type Database = {
       is_team_member: {
         Args: { _owner: string; _user: string }
         Returns: boolean
+      }
+      register_install: {
+        Args: { _country?: string; _device?: string; _listing_id: string }
+        Returns: undefined
       }
     }
     Enums: {

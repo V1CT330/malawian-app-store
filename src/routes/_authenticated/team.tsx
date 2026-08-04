@@ -19,6 +19,7 @@ import {
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 import { logActivity, TEAM_ROLES } from "@/lib/portal";
+import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 
 export const Route = createFileRoute("/_authenticated/team")({
   head: () => ({
@@ -48,6 +49,7 @@ type Member = {
 type ActivityRow = { id: string; action: string; target: string | null; created_at: string };
 
 function TeamPage() {
+  useRequireDeveloper();
   const { userId } = useSession();
   const queryClient = useQueryClient();
   const [email, setEmail] = useState("");
