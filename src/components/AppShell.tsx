@@ -2,7 +2,6 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   BarChart3,
   Bell,
-  Bot,
   Gamepad2,
   LayoutDashboard,
   LayoutGrid,
@@ -13,6 +12,7 @@ import {
 import { type ReactNode } from "react";
 
 import logo from "@/assets/logo-mark.png";
+import { GeminiIcon } from "@/components/GeminiIcon";
 import { useMode, useProfile, useUnreadCount } from "@/hooks/useSession";
 import { SOCIAL_LINKS } from "@/lib/store";
 import { cn } from "@/lib/utils";
