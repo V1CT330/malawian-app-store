@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Bot, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
+import { GeminiIcon } from "@/components/GeminiIcon";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { askAssistant } from "@/lib/assistant.functions";
@@ -61,10 +62,10 @@ function AssistantPage() {
   return (
     <AppShell>
       <h1 className="flex items-center gap-2 font-display text-2xl font-bold">
-        <Bot className="h-6 w-6 text-primary" /> AI agent
+        <GeminiIcon className="h-6 w-6" /> AI agent
       </h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        Your publishing assistant for listings, KYC and updates.
+        Powered by Gemini. Your publishing assistant for listings, KYC and updates.
       </p>
 
       {messages.length === 0 && (

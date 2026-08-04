@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { BadgeCheck, Bot, PlusCircle } from "lucide-react";
+import { BadgeCheck, PlusCircle } from "lucide-react";
 
 import { AppShell } from "@/components/AppShell";
+import { GeminiIcon } from "@/components/GeminiIcon";
 import { PortalTabs } from "@/components/PortalTabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -180,7 +181,7 @@ function DashboardPage() {
             </Button>
             <Button asChild variant="outline" className="justify-start" size="lg">
               <Link to="/assistant">
-                <Bot className="mr-2 h-4 w-4" /> AI publishing assistant
+                <GeminiIcon className="mr-2 h-4 w-4" /> AI publishing assistant
               </Link>
             </Button>
           </div>
