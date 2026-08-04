@@ -19,6 +19,7 @@ import { useProfile } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 import { PRODUCT_KINDS, type ProductKind } from "@/lib/portal";
 import { CATEGORIES, slugify, uploadAsset } from "@/lib/store";
+import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 
 export const Route = createFileRoute("/_authenticated/upload")({
   head: () => ({
@@ -38,6 +39,7 @@ export const Route = createFileRoute("/_authenticated/upload")({
 });
 
 function UploadPage() {
+  useRequireDeveloper();
   const { userId, profile } = useProfile();
   const navigate = useNavigate();
   const queryClient = useQueryClient();

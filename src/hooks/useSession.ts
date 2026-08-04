@@ -15,7 +15,9 @@ export type Profile = {
   developer_name: string | null;
   kyc_status: "none" | "pending" | "approved" | "rejected";
   mode: string;
+  developer_terms_accepted_at: string | null;
   suspended: boolean;
+
   website_url: string | null;
   facebook_url: string | null;
   x_url: string | null;

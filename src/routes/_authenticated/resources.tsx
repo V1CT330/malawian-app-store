@@ -18,6 +18,7 @@ import {
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 import { SUBSCRIPTION_BENEFITS } from "@/lib/portal";
+import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 
 export const Route = createFileRoute("/_authenticated/resources")({
   head: () => ({
@@ -70,6 +71,7 @@ const FAQS = [
 type FeatureRequest = { id: string; title: string; body: string | null; status: string; vote_count: number; created_at: string };
 
 function ResourcesPage() {
+  useRequireDeveloper();
   const { userId } = useSession();
   const queryClient = useQueryClient();
   const [title, setTitle] = useState("");

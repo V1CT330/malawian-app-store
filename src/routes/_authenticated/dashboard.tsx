@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile, useUnreadCount } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 import { reputationTier, type PortalListing } from "@/lib/portal";
+import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -41,6 +42,7 @@ function Stat({ value, label }: { value: string | number; label: string }) {
 }
 
 function DashboardPage() {
+  useRequireDeveloper();
   const { userId, profile } = useProfile();
   const unread = useUnreadCount();
 
