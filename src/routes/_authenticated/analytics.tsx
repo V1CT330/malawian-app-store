@@ -1,6 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { BarChart3 } from "lucide-react";
+import { toast } from "sonner";
 import {
   Bar,
   BarChart,
@@ -14,21 +15,25 @@ import {
 } from "recharts";
 
 import { AppShell } from "@/components/AppShell";
+import { PortalTabs } from "@/components/PortalTabs";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
-import { type Listing } from "@/lib/store";
+import { kindLabel, logActivity, type PortalListing } from "@/lib/portal";
 
 export const Route = createFileRoute("/_authenticated/analytics")({
   head: () => ({
     meta: [
-      { title: "Analytics — Malawian App Store" },
+      { title: "Stats & Products — Malawian App Store" },
       {
         name: "description",
-        content: "Downloads, views, device and country breakdowns and monthly reports for your listings.",
+        content:
+          "Downloads, views, device and country breakdowns plus a simple list of the products you publish.",
       },
-      { property: "og:title", content: "Analytics — Malawian App Store" },
-      { property: "og:description", content: "Downloads, views, devices and countries." },
+      { property: "og:title", content: "Stats & Products — Malawian App Store" },
+      { property: "og:description", content: "Performance and products in one place." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -36,7 +41,12 @@ export const Route = createFileRoute("/_authenticated/analytics")({
   component: AnalyticsPage,
 });
 
-type Event = { created_at: string; device: string | null; country: string | null; listing_id: string };
+type Event = {
+  created_at: string;
+  device: string | null;
+  country: string | null;
+  listing_id: string;
+};
 
 function tally(rows: Event[], key: "device" | "country") {
   const map = new Map<string, number>();
@@ -44,7 +54,9 @@ function tally(rows: Event[], key: "device" | "country") {
     const k = r[key] || "Unknown";
     map.set(k, (map.get(k) ?? 0) + 1);
   }
-  return [...map.entries()].map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+  return [...map.entries()]
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value);
 }
 
 function monthly(installs: Event[], views: Event[]) {
@@ -64,26 +76,60 @@ function monthly(installs: Event[], views: Event[]) {
 
 function AnalyticsPage() {
   const { userId } = useSession();
+  const queryClient = useQueryClient();
 
   const listings = useQuery({
     queryKey: ["my-listings", userId],
     enabled: Boolean(userId),
     queryFn: async () => {
-      const { data, error } = await supabase.from("listings").select("*").eq("developer_id", userId!);
+      const { data, error } = await supabase
+        .from("listings")
+        .select("*")
+        .eq("developer_id", userId!)
+        .order("updated_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as Listing[];
+      return (data ?? []) as unknown as PortalListing[];
     },
   });
 
-  const ids = (listings.data ?? []).map((l) => l.id);
+  const setStatus = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const { error } = await supabase
+        .from("listings")
+        .update({ status, archived_at: status === "archived" ? new Date().toISOString() : null })
+        .eq("id", id);
+      if (error) throw error;
+      if (userId)
+        await logActivity({
+          ownerId: userId,
+          actorId: userId,
+          action: `Set status to ${status}`,
+          listingId: id,
+        });
+    },
+    onSuccess: () => {
+      toast.success("Product updated");
+      queryClient.invalidateQueries({ queryKey: ["my-listings", userId] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const all = listings.data ?? [];
+  const ids = all.map((l) => l.id);
 
   const events = useQuery({
     queryKey: ["analytics-events", userId, ids.length],
     enabled: ids.length > 0,
     queryFn: async () => {
       const [installs, views] = await Promise.all([
-        supabase.from("install_events").select("created_at,device,country,listing_id").in("listing_id", ids),
-        supabase.from("view_events").select("created_at,device,country,listing_id").in("listing_id", ids),
+        supabase
+          .from("install_events")
+          .select("created_at,device,country,listing_id")
+          .in("listing_id", ids),
+        supabase
+          .from("view_events")
+          .select("created_at,device,country,listing_id")
+          .in("listing_id", ids),
       ]);
       if (installs.error) throw installs.error;
       if (views.error) throw views.error;
@@ -96,7 +142,6 @@ function AnalyticsPage() {
 
   const installs = events.data?.installs ?? [];
   const views = events.data?.views ?? [];
-  const all = (listings.data ?? []);
   const activeUsers = new Set(views.map((v) => `${v.device}-${v.country}`)).size;
   const reviews = all.reduce((s, l) => s + l.rating_count, 0);
   const avg = reviews ? all.reduce((s, l) => s + l.rating_avg * l.rating_count, 0) / reviews : 0;
@@ -111,11 +156,17 @@ function AnalyticsPage() {
   return (
     <AppShell>
       <h1 className="flex items-center gap-2 font-display text-2xl font-bold">
-        <BarChart3 className="h-5 w-5" /> Analytics
+        <BarChart3 className="h-5 w-5" /> Stats
       </h1>
-      <p className="text-sm text-muted-foreground">Across all of your listings.</p>
+      <p className="text-sm text-muted-foreground">
+        Performance and products across everything you publish.
+      </p>
 
-      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="mt-4">
+        <PortalTabs />
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {stats.map((s) => (
           <div key={s.label} className="surface-card p-3 text-center">
             <p className="font-display text-xl font-bold">{s.value}</p>
@@ -123,6 +174,54 @@ function AnalyticsPage() {
           </div>
         ))}
       </div>
+
+      <section className="mt-5">
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="font-display text-base font-semibold">Products</h2>
+          <Button asChild size="sm" className="rounded-full">
+            <Link to="/upload">New product</Link>
+          </Button>
+        </div>
+        {listings.isLoading ? (
+          <Skeleton className="h-24 w-full rounded-2xl" />
+        ) : all.length === 0 ? (
+          <p className="surface-card p-6 text-center text-sm text-muted-foreground">
+            Nothing published yet. Upload your first product to get started.
+          </p>
+        ) : (
+          <ul className="space-y-2">
+            {all.map((l) => (
+              <li key={l.id} className="surface-card flex flex-wrap items-center gap-3 p-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium">{l.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {kindLabel(l.kind)} · {l.downloads} installs · {l.rating_avg || "—"} ★
+                  </p>
+                </div>
+                <Badge
+                  variant={l.status === "published" ? "default" : "secondary"}
+                  className="ml-auto capitalize"
+                >
+                  {l.status}
+                </Badge>
+                {l.status !== "published" && (
+                  <Button
+                    size="sm"
+                    onClick={() => setStatus.mutate({ id: l.id, status: "published" })}
+                  >
+                    Publish
+                  </Button>
+                )}
+                <Button asChild size="sm" variant="outline">
+                  <Link to="/manage/$id" params={{ id: l.id }}>
+                    Manage
+                  </Link>
+                </Button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       {events.isLoading ? (
         <Skeleton className="mt-4 h-56 w-full rounded-2xl" />
@@ -137,8 +236,18 @@ function AnalyticsPage() {
                   <XAxis dataKey="name" fontSize={12} />
                   <YAxis fontSize={12} allowDecimals={false} />
                   <Tooltip />
-                  <Line type="monotone" dataKey="views" stroke="var(--google-blue)" strokeWidth={2} />
-                  <Line type="monotone" dataKey="installs" stroke="var(--google-green)" strokeWidth={2} />
+                  <Line
+                    type="monotone"
+                    dataKey="views"
+                    stroke="var(--google-blue)"
+                    strokeWidth={2}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="installs"
+                    stroke="var(--google-green)"
+                    strokeWidth={2}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -147,7 +256,9 @@ function AnalyticsPage() {
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             {(["device", "country"] as const).map((key) => (
               <section key={key} className="surface-card p-4">
-                <h2 className="mb-3 font-display text-base font-semibold capitalize">{key} breakdown</h2>
+                <h2 className="mb-3 font-display text-base font-semibold capitalize">
+                  {key} breakdown
+                </h2>
                 {installs.length + views.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No traffic recorded yet.</p>
                 ) : (

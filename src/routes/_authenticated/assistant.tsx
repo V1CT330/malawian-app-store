@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Bot, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
+import { GeminiIcon } from "@/components/GeminiIcon";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { askAssistant } from "@/lib/assistant.functions";
@@ -16,7 +17,8 @@ export const Route = createFileRoute("/_authenticated/assistant")({
       { title: "AI Agent — Malawian App Store" },
       {
         name: "description",
-        content: "Get AI help writing listings, passing KYC and planning app updates on the Malawian App Store.",
+        content:
+          "Get AI help writing listings, passing KYC and planning app updates on the Malawian App Store.",
       },
       { property: "og:title", content: "AI Agent — Malawian App Store" },
       { property: "og:description", content: "AI help for Malawian app developers." },
@@ -61,10 +63,10 @@ function AssistantPage() {
   return (
     <AppShell>
       <h1 className="flex items-center gap-2 font-display text-2xl font-bold">
-        <Bot className="h-6 w-6 text-primary" /> AI agent
+        <GeminiIcon className="h-6 w-6" /> AI agent
       </h1>
       <p className="mt-1 text-sm text-muted-foreground">
-        Your publishing assistant for listings, KYC and updates.
+        Powered by Gemini. Your publishing assistant for listings, KYC and updates.
       </p>
 
       {messages.length === 0 && (
@@ -113,7 +115,12 @@ function AssistantPage() {
           }}
           className="bg-background"
         />
-        <Button size="icon" disabled={busy || !input.trim()} onClick={() => send(input)} aria-label="Send">
+        <Button
+          size="icon"
+          disabled={busy || !input.trim()}
+          onClick={() => send(input)}
+          aria-label="Send"
+        >
           <Send className="h-4 w-4" />
         </Button>
       </div>

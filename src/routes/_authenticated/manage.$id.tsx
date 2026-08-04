@@ -350,7 +350,7 @@ function ManagePage() {
           <h1 className="font-display text-lg font-semibold">Product unavailable</h1>
           <p className="mt-1 text-sm text-muted-foreground">You can only manage products you published.</p>
           <Button asChild className="mt-4">
-            <Link to="/products">Back to products</Link>
+            <Link to="/analytics">Back to products</Link>
           </Button>
         </div>
       </AppShell>

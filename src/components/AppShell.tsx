@@ -2,7 +2,6 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   BarChart3,
   Bell,
-  Bot,
   Gamepad2,
   LayoutDashboard,
   LayoutGrid,
@@ -13,6 +12,7 @@ import {
 import { type ReactNode } from "react";
 
 import logo from "@/assets/logo-mark.png";
+import { GeminiIcon } from "@/components/GeminiIcon";
 import { useMode, useProfile, useUnreadCount } from "@/hooks/useSession";
 import { SOCIAL_LINKS } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -27,10 +27,9 @@ const USER_NAV = [
 
 const DEV_NAV = [
   { to: "/dashboard", label: "Home", icon: LayoutDashboard },
-  { to: "/products", label: "Products", icon: LayoutGrid },
   { to: "/upload", label: "Upload", icon: Upload },
   { to: "/analytics", label: "Stats", icon: BarChart3 },
-  { to: "/assistant", label: "AI", icon: Bot },
+  { to: "/assistant", label: "AI", icon: GeminiIcon },
 ] as const;
 
 export function AppShell({
