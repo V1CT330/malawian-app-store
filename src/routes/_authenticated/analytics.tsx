@@ -29,7 +29,8 @@ export const Route = createFileRoute("/_authenticated/analytics")({
       { title: "Stats & Products — Malawian App Store" },
       {
         name: "description",
-        content: "Downloads, views, device and country breakdowns plus a simple list of the products you publish.",
+        content:
+          "Downloads, views, device and country breakdowns plus a simple list of the products you publish.",
       },
       { property: "og:title", content: "Stats & Products — Malawian App Store" },
       { property: "og:description", content: "Performance and products in one place." },
@@ -40,7 +41,12 @@ export const Route = createFileRoute("/_authenticated/analytics")({
   component: AnalyticsPage,
 });
 
-type Event = { created_at: string; device: string | null; country: string | null; listing_id: string };
+type Event = {
+  created_at: string;
+  device: string | null;
+  country: string | null;
+  listing_id: string;
+};
 
 function tally(rows: Event[], key: "device" | "country") {
   const map = new Map<string, number>();
@@ -48,7 +54,9 @@ function tally(rows: Event[], key: "device" | "country") {
     const k = r[key] || "Unknown";
     map.set(k, (map.get(k) ?? 0) + 1);
   }
-  return [...map.entries()].map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value);
+  return [...map.entries()]
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value);
 }
 
 function monthly(installs: Event[], views: Event[]) {
@@ -91,7 +99,13 @@ function AnalyticsPage() {
         .update({ status, archived_at: status === "archived" ? new Date().toISOString() : null })
         .eq("id", id);
       if (error) throw error;
-      if (userId) await logActivity({ ownerId: userId, actorId: userId, action: `Set status to ${status}`, listingId: id });
+      if (userId)
+        await logActivity({
+          ownerId: userId,
+          actorId: userId,
+          action: `Set status to ${status}`,
+          listingId: id,
+        });
     },
     onSuccess: () => {
       toast.success("Product updated");
@@ -108,8 +122,14 @@ function AnalyticsPage() {
     enabled: ids.length > 0,
     queryFn: async () => {
       const [installs, views] = await Promise.all([
-        supabase.from("install_events").select("created_at,device,country,listing_id").in("listing_id", ids),
-        supabase.from("view_events").select("created_at,device,country,listing_id").in("listing_id", ids),
+        supabase
+          .from("install_events")
+          .select("created_at,device,country,listing_id")
+          .in("listing_id", ids),
+        supabase
+          .from("view_events")
+          .select("created_at,device,country,listing_id")
+          .in("listing_id", ids),
       ]);
       if (installs.error) throw installs.error;
       if (views.error) throw views.error;
@@ -138,7 +158,9 @@ function AnalyticsPage() {
       <h1 className="flex items-center gap-2 font-display text-2xl font-bold">
         <BarChart3 className="h-5 w-5" /> Stats
       </h1>
-      <p className="text-sm text-muted-foreground">Performance and products across everything you publish.</p>
+      <p className="text-sm text-muted-foreground">
+        Performance and products across everything you publish.
+      </p>
 
       <div className="mt-4">
         <PortalTabs />
@@ -176,11 +198,17 @@ function AnalyticsPage() {
                     {kindLabel(l.kind)} · {l.downloads} installs · {l.rating_avg || "—"} ★
                   </p>
                 </div>
-                <Badge variant={l.status === "published" ? "default" : "secondary"} className="ml-auto capitalize">
+                <Badge
+                  variant={l.status === "published" ? "default" : "secondary"}
+                  className="ml-auto capitalize"
+                >
                   {l.status}
                 </Badge>
                 {l.status !== "published" && (
-                  <Button size="sm" onClick={() => setStatus.mutate({ id: l.id, status: "published" })}>
+                  <Button
+                    size="sm"
+                    onClick={() => setStatus.mutate({ id: l.id, status: "published" })}
+                  >
                     Publish
                   </Button>
                 )}
@@ -208,8 +236,18 @@ function AnalyticsPage() {
                   <XAxis dataKey="name" fontSize={12} />
                   <YAxis fontSize={12} allowDecimals={false} />
                   <Tooltip />
-                  <Line type="monotone" dataKey="views" stroke="var(--google-blue)" strokeWidth={2} />
-                  <Line type="monotone" dataKey="installs" stroke="var(--google-green)" strokeWidth={2} />
+                  <Line
+                    type="monotone"
+                    dataKey="views"
+                    stroke="var(--google-blue)"
+                    strokeWidth={2}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="installs"
+                    stroke="var(--google-green)"
+                    strokeWidth={2}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -218,7 +256,9 @@ function AnalyticsPage() {
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             {(["device", "country"] as const).map((key) => (
               <section key={key} className="surface-card p-4">
-                <h2 className="mb-3 font-display text-base font-semibold capitalize">{key} breakdown</h2>
+                <h2 className="mb-3 font-display text-base font-semibold capitalize">
+                  {key} breakdown
+                </h2>
                 {installs.length + views.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No traffic recorded yet.</p>
                 ) : (

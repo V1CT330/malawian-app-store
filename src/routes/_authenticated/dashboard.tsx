@@ -11,7 +11,7 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile, useUnreadCount } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
-import { kindLabel, reputationTier, type PortalListing } from "@/lib/portal";
+import { reputationTier, type PortalListing } from "@/lib/portal";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -19,7 +19,8 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       { title: "Developer Dashboard — Malawian App Store" },
       {
         name: "description",
-        content: "Products, installs, views, ratings, reviews and account status for everything you publish.",
+        content:
+          "Products, installs, views, ratings, reviews and account status for everything you publish.",
       },
       { property: "og:title", content: "Developer Dashboard — Malawian App Store" },
       { property: "og:description", content: "Your publishing overview at a glance." },
@@ -86,7 +87,9 @@ function DashboardPage() {
   const published = listings.filter((l) => l.status === "published");
   const pending = listings.filter((l) => l.status === "pending");
   const drafts = listings.filter((l) => l.status === "draft");
-  const stale = published.filter((l) => Date.now() - new Date(l.updated_at).getTime() > 1000 * 60 * 60 * 24 * 90);
+  const stale = published.filter(
+    (l) => Date.now() - new Date(l.updated_at).getTime() > 1000 * 60 * 60 * 24 * 90,
+  );
   const reputation = reputationQuery.data ?? 0;
   const subscribed = subscriptionQuery.data?.status === "active";
 
@@ -133,8 +136,8 @@ function DashboardPage() {
             </div>
             <Progress value={reputation} className="mt-3" />
             <p className="mt-2 text-xs text-muted-foreground">
-              {reputation}/100 from product quality, ratings, update frequency, compliance, profile completeness and
-              responsiveness.
+              {reputation}/100 from product quality, ratings, update frequency, compliance, profile
+              completeness and responsiveness.
             </p>
           </section>
 
@@ -144,7 +147,10 @@ function DashboardPage() {
               <li>Subscription: {subscribed ? "Active — MK5,000 monthly" : "Not subscribed"}</li>
               <li>KYC: {profile?.kyc_status ?? "none"}</li>
               <li>Phone verified: {profile?.phone_verified ? "yes" : "no"}</li>
-              <li>Updates needed: {stale.length ? `${stale.length} product(s) not updated in 90 days` : "none"}</li>
+              <li>
+                Updates needed:{" "}
+                {stale.length ? `${stale.length} product(s) not updated in 90 days` : "none"}
+              </li>
             </ul>
             {!subscribed && (
               <Button asChild size="sm" className="mt-3">
@@ -165,7 +171,6 @@ function DashboardPage() {
               </Link>
             </Button>
           </div>
-
         </>
       )}
     </AppShell>

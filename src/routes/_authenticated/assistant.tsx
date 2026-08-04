@@ -17,7 +17,8 @@ export const Route = createFileRoute("/_authenticated/assistant")({
       { title: "AI Agent — Malawian App Store" },
       {
         name: "description",
-        content: "Get AI help writing listings, passing KYC and planning app updates on the Malawian App Store.",
+        content:
+          "Get AI help writing listings, passing KYC and planning app updates on the Malawian App Store.",
       },
       { property: "og:title", content: "AI Agent — Malawian App Store" },
       { property: "og:description", content: "AI help for Malawian app developers." },
@@ -114,7 +115,12 @@ function AssistantPage() {
           }}
           className="bg-background"
         />
-        <Button size="icon" disabled={busy || !input.trim()} onClick={() => send(input)} aria-label="Send">
+        <Button
+          size="icon"
+          disabled={busy || !input.trim()}
+          onClick={() => send(input)}
+          aria-label="Send"
+        >
           <Send className="h-4 w-4" />
         </Button>
       </div>
