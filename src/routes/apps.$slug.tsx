@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Download, ExternalLink, ShieldCheck } from "lucide-react";
+import { Download, ExternalLink, ShieldCheck, Star } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
