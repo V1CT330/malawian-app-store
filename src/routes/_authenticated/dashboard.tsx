@@ -11,7 +11,14 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useProfile, useUnreadCount } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  FOUNDING_HEADLINE,
+  FOUNDING_LEAD,
+  FOUNDING_PRIORITY_NOTE,
+  FOUNDING_SUPPORT,
+} from "@/lib/pro";
 import { reputationTier, type PortalListing } from "@/lib/portal";
+
 import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
