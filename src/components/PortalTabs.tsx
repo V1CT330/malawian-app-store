@@ -1,8 +1,13 @@
 import { Link } from "@tanstack/react-router";
 
 const TABS = [
-  { to: "/dashboard", label: "Overview" },
-  { to: "/analytics", label: "Stats" },
+  { to: "/dashboard", label: "Dashboard" },
+  { to: "/analytics", label: "Growth" },
+  { to: "/advertise", label: "Advertise" },
+  { to: "/spotlight", label: "Spotlight" },
+  { to: "/profile", label: "My Profile" },
+  { to: "/verification", label: "Verification" },
+  { to: "/pro", label: "Developer Pro" },
   { to: "/team", label: "Team" },
   { to: "/security", label: "Security" },
   { to: "/resources", label: "Resources" },

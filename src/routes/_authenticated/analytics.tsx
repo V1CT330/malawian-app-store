@@ -15,7 +15,6 @@ import {
 } from "recharts";
 
 import { AppShell } from "@/components/AppShell";
-import { PortalTabs } from "@/components/PortalTabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -158,17 +157,14 @@ function AnalyticsPage() {
   return (
     <AppShell>
       <h1 className="flex items-center gap-2 font-display text-2xl font-bold">
-        <BarChart3 className="h-5 w-5" /> Stats
+        <BarChart3 className="h-5 w-5" /> Growth
       </h1>
       <p className="text-sm text-muted-foreground">
         Performance and products across everything you publish.
       </p>
 
-      <div className="mt-4">
-        <PortalTabs />
-      </div>
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {stats.map((s) => (
           <div key={s.label} className="surface-card p-3 text-center">
             <p className="font-display text-xl font-bold">{s.value}</p>

@@ -16,16 +16,21 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DevelopersIdRouteImport } from './routes/developers.$id'
 import { Route as AppsSlugRouteImport } from './routes/apps.$slug'
+import { Route as AuthenticatedVerificationRouteImport } from './routes/_authenticated/verification'
 import { Route as AuthenticatedUploadRouteImport } from './routes/_authenticated/upload'
 import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated/team'
+import { Route as AuthenticatedSpotlightRouteImport } from './routes/_authenticated/spotlight'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSecurityRouteImport } from './routes/_authenticated/security'
 import { Route as AuthenticatedResourcesRouteImport } from './routes/_authenticated/resources'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedProRouteImport } from './routes/_authenticated/pro'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAssistantRouteImport } from './routes/_authenticated/assistant'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
+import { Route as AuthenticatedAdvertiseRouteImport } from './routes/_authenticated/advertise'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
@@ -67,6 +72,12 @@ const AppsSlugRoute = AppsSlugRouteImport.update({
   path: '/apps/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedVerificationRoute =
+  AuthenticatedVerificationRouteImport.update({
+    id: '/verification',
+    path: '/verification',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedUploadRoute = AuthenticatedUploadRouteImport.update({
   id: '/upload',
   path: '/upload',
@@ -75,6 +86,11 @@ const AuthenticatedUploadRoute = AuthenticatedUploadRouteImport.update({
 const AuthenticatedTeamRoute = AuthenticatedTeamRouteImport.update({
   id: '/team',
   path: '/team',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSpotlightRoute = AuthenticatedSpotlightRouteImport.update({
+  id: '/spotlight',
+  path: '/spotlight',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
@@ -90,6 +106,16 @@ const AuthenticatedSecurityRoute = AuthenticatedSecurityRouteImport.update({
 const AuthenticatedResourcesRoute = AuthenticatedResourcesRouteImport.update({
   id: '/resources',
   path: '/resources',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProRoute = AuthenticatedProRouteImport.update({
+  id: '/pro',
+  path: '/pro',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedNotificationsRoute =
@@ -116,6 +142,11 @@ const AuthenticatedAssistantRoute = AuthenticatedAssistantRouteImport.update({
 const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdvertiseRoute = AuthenticatedAdvertiseRouteImport.update({
+  id: '/advertise',
+  path: '/advertise',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
@@ -160,16 +191,21 @@ export interface FileRoutesByFullPath {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/advertise': typeof AuthenticatedAdvertiseRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/assistant': typeof AuthenticatedAssistantRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/pro': typeof AuthenticatedProRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/resources': typeof AuthenticatedResourcesRoute
   '/security': typeof AuthenticatedSecurityRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/spotlight': typeof AuthenticatedSpotlightRoute
   '/team': typeof AuthenticatedTeamRoute
   '/upload': typeof AuthenticatedUploadRoute
+  '/verification': typeof AuthenticatedVerificationRoute
   '/apps/$slug': typeof AppsSlugRoute
   '/developers/$id': typeof DevelopersIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -184,16 +220,21 @@ export interface FileRoutesByTo {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/advertise': typeof AuthenticatedAdvertiseRoute
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/assistant': typeof AuthenticatedAssistantRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/library': typeof AuthenticatedLibraryRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/pro': typeof AuthenticatedProRoute
+  '/profile': typeof AuthenticatedProfileRoute
   '/resources': typeof AuthenticatedResourcesRoute
   '/security': typeof AuthenticatedSecurityRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/spotlight': typeof AuthenticatedSpotlightRoute
   '/team': typeof AuthenticatedTeamRoute
   '/upload': typeof AuthenticatedUploadRoute
+  '/verification': typeof AuthenticatedVerificationRoute
   '/apps/$slug': typeof AppsSlugRoute
   '/developers/$id': typeof DevelopersIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -210,16 +251,21 @@ export interface FileRoutesById {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/advertise': typeof AuthenticatedAdvertiseRoute
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/assistant': typeof AuthenticatedAssistantRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
+  '/_authenticated/pro': typeof AuthenticatedProRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/resources': typeof AuthenticatedResourcesRoute
   '/_authenticated/security': typeof AuthenticatedSecurityRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/spotlight': typeof AuthenticatedSpotlightRoute
   '/_authenticated/team': typeof AuthenticatedTeamRoute
   '/_authenticated/upload': typeof AuthenticatedUploadRoute
+  '/_authenticated/verification': typeof AuthenticatedVerificationRoute
   '/apps/$slug': typeof AppsSlugRoute
   '/developers/$id': typeof DevelopersIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -236,16 +282,21 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin'
+    | '/advertise'
     | '/analytics'
     | '/assistant'
     | '/dashboard'
     | '/library'
     | '/notifications'
+    | '/pro'
+    | '/profile'
     | '/resources'
     | '/security'
     | '/settings'
+    | '/spotlight'
     | '/team'
     | '/upload'
+    | '/verification'
     | '/apps/$slug'
     | '/developers/$id'
     | '/.lovable/oauth/consent'
@@ -260,16 +311,21 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin'
+    | '/advertise'
     | '/analytics'
     | '/assistant'
     | '/dashboard'
     | '/library'
     | '/notifications'
+    | '/pro'
+    | '/profile'
     | '/resources'
     | '/security'
     | '/settings'
+    | '/spotlight'
     | '/team'
     | '/upload'
+    | '/verification'
     | '/apps/$slug'
     | '/developers/$id'
     | '/.lovable/oauth/consent'
@@ -285,16 +341,21 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/_authenticated/admin'
+    | '/_authenticated/advertise'
     | '/_authenticated/analytics'
     | '/_authenticated/assistant'
     | '/_authenticated/dashboard'
     | '/_authenticated/library'
     | '/_authenticated/notifications'
+    | '/_authenticated/pro'
+    | '/_authenticated/profile'
     | '/_authenticated/resources'
     | '/_authenticated/security'
     | '/_authenticated/settings'
+    | '/_authenticated/spotlight'
     | '/_authenticated/team'
     | '/_authenticated/upload'
+    | '/_authenticated/verification'
     | '/apps/$slug'
     | '/developers/$id'
     | '/.lovable/oauth/consent'
@@ -367,6 +428,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/verification': {
+      id: '/_authenticated/verification'
+      path: '/verification'
+      fullPath: '/verification'
+      preLoaderRoute: typeof AuthenticatedVerificationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/upload': {
       id: '/_authenticated/upload'
       path: '/upload'
@@ -379,6 +447,13 @@ declare module '@tanstack/react-router' {
       path: '/team'
       fullPath: '/team'
       preLoaderRoute: typeof AuthenticatedTeamRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/spotlight': {
+      id: '/_authenticated/spotlight'
+      path: '/spotlight'
+      fullPath: '/spotlight'
+      preLoaderRoute: typeof AuthenticatedSpotlightRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/settings': {
@@ -400,6 +475,20 @@ declare module '@tanstack/react-router' {
       path: '/resources'
       fullPath: '/resources'
       preLoaderRoute: typeof AuthenticatedResourcesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/pro': {
+      id: '/_authenticated/pro'
+      path: '/pro'
+      fullPath: '/pro'
+      preLoaderRoute: typeof AuthenticatedProRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/notifications': {
@@ -435,6 +524,13 @@ declare module '@tanstack/react-router' {
       path: '/analytics'
       fullPath: '/analytics'
       preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/advertise': {
+      id: '/_authenticated/advertise'
+      path: '/advertise'
+      fullPath: '/advertise'
+      preLoaderRoute: typeof AuthenticatedAdvertiseRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin': {
@@ -484,31 +580,41 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdvertiseRoute: typeof AuthenticatedAdvertiseRoute
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedAssistantRoute: typeof AuthenticatedAssistantRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
+  AuthenticatedProRoute: typeof AuthenticatedProRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedResourcesRoute: typeof AuthenticatedResourcesRoute
   AuthenticatedSecurityRoute: typeof AuthenticatedSecurityRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedSpotlightRoute: typeof AuthenticatedSpotlightRoute
   AuthenticatedTeamRoute: typeof AuthenticatedTeamRoute
   AuthenticatedUploadRoute: typeof AuthenticatedUploadRoute
+  AuthenticatedVerificationRoute: typeof AuthenticatedVerificationRoute
   AuthenticatedManageIdRoute: typeof AuthenticatedManageIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdvertiseRoute: AuthenticatedAdvertiseRoute,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedAssistantRoute: AuthenticatedAssistantRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
+  AuthenticatedProRoute: AuthenticatedProRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedResourcesRoute: AuthenticatedResourcesRoute,
   AuthenticatedSecurityRoute: AuthenticatedSecurityRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedSpotlightRoute: AuthenticatedSpotlightRoute,
   AuthenticatedTeamRoute: AuthenticatedTeamRoute,
   AuthenticatedUploadRoute: AuthenticatedUploadRoute,
+  AuthenticatedVerificationRoute: AuthenticatedVerificationRoute,
   AuthenticatedManageIdRoute: AuthenticatedManageIdRoute,
 }
 

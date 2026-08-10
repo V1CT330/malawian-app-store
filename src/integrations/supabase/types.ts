@@ -785,6 +785,27 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_views: {
+        Row: {
+          created_at: string
+          developer_id: string
+          id: string
+          viewer_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          developer_id: string
+          id?: string
+          viewer_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          developer_id?: string
+          id?: string
+          viewer_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -797,6 +818,7 @@ export type Database = {
           display_name: string | null
           facebook_url: string | null
           follower_count: number
+          github_url: string | null
           id: string
           instagram_url: string | null
           is_developer: boolean
@@ -806,7 +828,9 @@ export type Database = {
           mode: string
           phone: string | null
           phone_verified: boolean
+          portfolio_url: string | null
           reputation_score: number
+          skills: string[]
           suspended: boolean
           updated_at: string
           website_url: string | null
@@ -825,6 +849,7 @@ export type Database = {
           display_name?: string | null
           facebook_url?: string | null
           follower_count?: number
+          github_url?: string | null
           id: string
           instagram_url?: string | null
           is_developer?: boolean
@@ -834,7 +859,9 @@ export type Database = {
           mode?: string
           phone?: string | null
           phone_verified?: boolean
+          portfolio_url?: string | null
           reputation_score?: number
+          skills?: string[]
           suspended?: boolean
           updated_at?: string
           website_url?: string | null
@@ -853,6 +880,7 @@ export type Database = {
           display_name?: string | null
           facebook_url?: string | null
           follower_count?: number
+          github_url?: string | null
           id?: string
           instagram_url?: string | null
           is_developer?: boolean
@@ -862,7 +890,9 @@ export type Database = {
           mode?: string
           phone?: string | null
           phone_verified?: boolean
+          portfolio_url?: string | null
           reputation_score?: number
+          skills?: string[]
           suspended?: boolean
           updated_at?: string
           website_url?: string | null
@@ -875,36 +905,51 @@ export type Database = {
       promotions: {
         Row: {
           budget_mwk: number
+          clicks: number
           created_at: string
           ends_at: string | null
           id: string
+          impressions: number
           kind: string
           listing_id: string
+          name: string | null
           owner_id: string
+          spent_mwk: number
           starts_at: string
           status: string
+          target_location: string | null
         }
         Insert: {
           budget_mwk?: number
+          clicks?: number
           created_at?: string
           ends_at?: string | null
           id?: string
+          impressions?: number
           kind?: string
           listing_id: string
+          name?: string | null
           owner_id: string
+          spent_mwk?: number
           starts_at?: string
           status?: string
+          target_location?: string | null
         }
         Update: {
           budget_mwk?: number
+          clicks?: number
           created_at?: string
           ends_at?: string | null
           id?: string
+          impressions?: number
           kind?: string
           listing_id?: string
+          name?: string | null
           owner_id?: string
+          spent_mwk?: number
           starts_at?: string
           status?: string
+          target_location?: string | null
         }
         Relationships: [
           {
@@ -1062,6 +1107,47 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      spotlight_applications: {
+        Row: {
+          created_at: string
+          developer_id: string
+          id: string
+          listing_id: string | null
+          opportunity: string
+          pitch: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          developer_id: string
+          id?: string
+          listing_id?: string | null
+          opportunity: string
+          pitch?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          developer_id?: string
+          id?: string
+          listing_id?: string | null
+          opportunity?: string
+          pitch?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spotlight_applications_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscriptions: {
         Row: {

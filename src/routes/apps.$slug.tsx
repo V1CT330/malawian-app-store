@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Download, ExternalLink, ShieldCheck } from "lucide-react";
+import { Download, ExternalLink, ShieldCheck, Star } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -309,15 +309,20 @@ function ListingDetail() {
                       key={n}
                       onClick={() => setRating(n)}
                       aria-label={`Rate ${n} stars`}
-                      className={cn(
-                        "h-7 w-7 rounded-full text-sm",
-                        n <= rating ? "bg-google-yellow text-foreground" : "bg-background text-muted-foreground",
-                      )}
+                      className="rounded-full p-0.5"
                     >
-                      {n}
+                      <Star
+                        className={cn(
+                          "h-6 w-6",
+                          n <= rating
+                            ? "fill-google-yellow text-google-yellow"
+                            : "text-muted-foreground",
+                        )}
+                      />
                     </button>
                   ))}
                 </div>
+
               </div>
               <Textarea
                 value={body}
