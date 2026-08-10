@@ -16,6 +16,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DevelopersIdRouteImport } from './routes/developers.$id'
 import { Route as AppsSlugRouteImport } from './routes/apps.$slug'
+import { Route as AuthenticatedVerificationRouteImport } from './routes/_authenticated/verification'
 import { Route as AuthenticatedUploadRouteImport } from './routes/_authenticated/upload'
 import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated/team'
 import { Route as AuthenticatedSpotlightRouteImport } from './routes/_authenticated/spotlight'
@@ -71,6 +72,12 @@ const AppsSlugRoute = AppsSlugRouteImport.update({
   path: '/apps/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedVerificationRoute =
+  AuthenticatedVerificationRouteImport.update({
+    id: '/verification',
+    path: '/verification',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedUploadRoute = AuthenticatedUploadRouteImport.update({
   id: '/upload',
   path: '/upload',
@@ -198,6 +205,7 @@ export interface FileRoutesByFullPath {
   '/spotlight': typeof AuthenticatedSpotlightRoute
   '/team': typeof AuthenticatedTeamRoute
   '/upload': typeof AuthenticatedUploadRoute
+  '/verification': typeof AuthenticatedVerificationRoute
   '/apps/$slug': typeof AppsSlugRoute
   '/developers/$id': typeof DevelopersIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -226,6 +234,7 @@ export interface FileRoutesByTo {
   '/spotlight': typeof AuthenticatedSpotlightRoute
   '/team': typeof AuthenticatedTeamRoute
   '/upload': typeof AuthenticatedUploadRoute
+  '/verification': typeof AuthenticatedVerificationRoute
   '/apps/$slug': typeof AppsSlugRoute
   '/developers/$id': typeof DevelopersIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -256,6 +265,7 @@ export interface FileRoutesById {
   '/_authenticated/spotlight': typeof AuthenticatedSpotlightRoute
   '/_authenticated/team': typeof AuthenticatedTeamRoute
   '/_authenticated/upload': typeof AuthenticatedUploadRoute
+  '/_authenticated/verification': typeof AuthenticatedVerificationRoute
   '/apps/$slug': typeof AppsSlugRoute
   '/developers/$id': typeof DevelopersIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -286,6 +296,7 @@ export interface FileRouteTypes {
     | '/spotlight'
     | '/team'
     | '/upload'
+    | '/verification'
     | '/apps/$slug'
     | '/developers/$id'
     | '/.lovable/oauth/consent'
@@ -314,6 +325,7 @@ export interface FileRouteTypes {
     | '/spotlight'
     | '/team'
     | '/upload'
+    | '/verification'
     | '/apps/$slug'
     | '/developers/$id'
     | '/.lovable/oauth/consent'
@@ -343,6 +355,7 @@ export interface FileRouteTypes {
     | '/_authenticated/spotlight'
     | '/_authenticated/team'
     | '/_authenticated/upload'
+    | '/_authenticated/verification'
     | '/apps/$slug'
     | '/developers/$id'
     | '/.lovable/oauth/consent'
@@ -414,6 +427,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/apps/$slug'
       preLoaderRoute: typeof AppsSlugRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/verification': {
+      id: '/_authenticated/verification'
+      path: '/verification'
+      fullPath: '/verification'
+      preLoaderRoute: typeof AuthenticatedVerificationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/upload': {
       id: '/_authenticated/upload'
@@ -574,6 +594,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSpotlightRoute: typeof AuthenticatedSpotlightRoute
   AuthenticatedTeamRoute: typeof AuthenticatedTeamRoute
   AuthenticatedUploadRoute: typeof AuthenticatedUploadRoute
+  AuthenticatedVerificationRoute: typeof AuthenticatedVerificationRoute
   AuthenticatedManageIdRoute: typeof AuthenticatedManageIdRoute
 }
 
@@ -593,6 +614,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSpotlightRoute: AuthenticatedSpotlightRoute,
   AuthenticatedTeamRoute: AuthenticatedTeamRoute,
   AuthenticatedUploadRoute: AuthenticatedUploadRoute,
+  AuthenticatedVerificationRoute: AuthenticatedVerificationRoute,
   AuthenticatedManageIdRoute: AuthenticatedManageIdRoute,
 }
 
