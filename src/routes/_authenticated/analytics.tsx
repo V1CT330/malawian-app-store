@@ -15,7 +15,6 @@ import {
 } from "recharts";
 
 import { AppShell } from "@/components/AppShell";
-import { PortalTabs } from "@/components/PortalTabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
