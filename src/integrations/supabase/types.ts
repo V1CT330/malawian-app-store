@@ -1108,6 +1108,47 @@ export type Database = {
         }
         Relationships: []
       }
+      spotlight_applications: {
+        Row: {
+          created_at: string
+          developer_id: string
+          id: string
+          listing_id: string | null
+          opportunity: string
+          pitch: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          developer_id: string
+          id?: string
+          listing_id?: string | null
+          opportunity: string
+          pitch?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          developer_id?: string
+          id?: string
+          listing_id?: string | null
+          opportunity?: string
+          pitch?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spotlight_applications_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscriptions: {
         Row: {
           amount_mwk: number
