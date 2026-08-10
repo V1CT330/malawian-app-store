@@ -18,6 +18,7 @@ import { Route as DevelopersIdRouteImport } from './routes/developers.$id'
 import { Route as AppsSlugRouteImport } from './routes/apps.$slug'
 import { Route as AuthenticatedUploadRouteImport } from './routes/_authenticated/upload'
 import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated/team'
+import { Route as AuthenticatedSpotlightRouteImport } from './routes/_authenticated/spotlight'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedSecurityRouteImport } from './routes/_authenticated/security'
 import { Route as AuthenticatedResourcesRouteImport } from './routes/_authenticated/resources'
@@ -76,6 +77,11 @@ const AuthenticatedUploadRoute = AuthenticatedUploadRouteImport.update({
 const AuthenticatedTeamRoute = AuthenticatedTeamRouteImport.update({
   id: '/team',
   path: '/team',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSpotlightRoute = AuthenticatedSpotlightRouteImport.update({
+  id: '/spotlight',
+  path: '/spotlight',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
@@ -175,6 +181,7 @@ export interface FileRoutesByFullPath {
   '/resources': typeof AuthenticatedResourcesRoute
   '/security': typeof AuthenticatedSecurityRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/spotlight': typeof AuthenticatedSpotlightRoute
   '/team': typeof AuthenticatedTeamRoute
   '/upload': typeof AuthenticatedUploadRoute
   '/apps/$slug': typeof AppsSlugRoute
@@ -200,6 +207,7 @@ export interface FileRoutesByTo {
   '/resources': typeof AuthenticatedResourcesRoute
   '/security': typeof AuthenticatedSecurityRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/spotlight': typeof AuthenticatedSpotlightRoute
   '/team': typeof AuthenticatedTeamRoute
   '/upload': typeof AuthenticatedUploadRoute
   '/apps/$slug': typeof AppsSlugRoute
@@ -227,6 +235,7 @@ export interface FileRoutesById {
   '/_authenticated/resources': typeof AuthenticatedResourcesRoute
   '/_authenticated/security': typeof AuthenticatedSecurityRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/spotlight': typeof AuthenticatedSpotlightRoute
   '/_authenticated/team': typeof AuthenticatedTeamRoute
   '/_authenticated/upload': typeof AuthenticatedUploadRoute
   '/apps/$slug': typeof AppsSlugRoute
@@ -254,6 +263,7 @@ export interface FileRouteTypes {
     | '/resources'
     | '/security'
     | '/settings'
+    | '/spotlight'
     | '/team'
     | '/upload'
     | '/apps/$slug'
@@ -279,6 +289,7 @@ export interface FileRouteTypes {
     | '/resources'
     | '/security'
     | '/settings'
+    | '/spotlight'
     | '/team'
     | '/upload'
     | '/apps/$slug'
@@ -305,6 +316,7 @@ export interface FileRouteTypes {
     | '/_authenticated/resources'
     | '/_authenticated/security'
     | '/_authenticated/settings'
+    | '/_authenticated/spotlight'
     | '/_authenticated/team'
     | '/_authenticated/upload'
     | '/apps/$slug'
@@ -391,6 +403,13 @@ declare module '@tanstack/react-router' {
       path: '/team'
       fullPath: '/team'
       preLoaderRoute: typeof AuthenticatedTeamRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/spotlight': {
+      id: '/_authenticated/spotlight'
+      path: '/spotlight'
+      fullPath: '/spotlight'
+      preLoaderRoute: typeof AuthenticatedSpotlightRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/settings': {
@@ -512,6 +531,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedResourcesRoute: typeof AuthenticatedResourcesRoute
   AuthenticatedSecurityRoute: typeof AuthenticatedSecurityRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedSpotlightRoute: typeof AuthenticatedSpotlightRoute
   AuthenticatedTeamRoute: typeof AuthenticatedTeamRoute
   AuthenticatedUploadRoute: typeof AuthenticatedUploadRoute
   AuthenticatedManageIdRoute: typeof AuthenticatedManageIdRoute
@@ -528,6 +548,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedResourcesRoute: AuthenticatedResourcesRoute,
   AuthenticatedSecurityRoute: AuthenticatedSecurityRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedSpotlightRoute: AuthenticatedSpotlightRoute,
   AuthenticatedTeamRoute: AuthenticatedTeamRoute,
   AuthenticatedUploadRoute: AuthenticatedUploadRoute,
   AuthenticatedManageIdRoute: AuthenticatedManageIdRoute,
