@@ -17,7 +17,7 @@ function toPlainText(text: string) {
     .replace(/^\s*[-*+•]\s+/gm, "")
     .replace(/\*\*(.*?)\*\*/g, "$1")
     .replace(/\*(.*?)\*/g, "$1")
-    .replace(/`{1,3}/g, "")
+    .replace(/`{1,3}/g, "").replace(/[\u2013\u2014]/g, ",").replace(/ - /g, ", ")
     .replace(/[ \t]+$/gm, "")
     .trim();
 }
