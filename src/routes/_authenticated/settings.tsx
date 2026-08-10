@@ -331,125 +331,30 @@ function SettingsPage() {
       )}
 
       {mode === "developer" && (
-        <>
-          <section className="surface-card mt-4 space-y-3 p-4">
-            <h2 className="font-display text-base font-semibold">Social media pages</h2>
-            <p className="text-xs text-muted-foreground">Shown on your public developer profile.</p>
-            {SOCIAL_FIELDS.map((f) => (
-              <div key={f.key}>
-                <Label htmlFor={f.key}>{f.label}</Label>
-                <Input
-                  id={f.key}
-                  placeholder={f.placeholder}
-                  value={socials[f.key] ?? (profile?.[f.key] as string | null) ?? ""}
-                  onChange={(e) => setSocials((prev) => ({ ...prev, [f.key]: e.target.value }))}
-                />
-              </div>
+        <section className="surface-card mt-4 space-y-3 p-4">
+          <h2 className="font-display text-base font-semibold">Developer tools</h2>
+          <p className="text-xs text-muted-foreground">
+            Your public profile, social pages, verification and Developer Pro plan live in the developer
+            section.
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {[
+              { to: "/dashboard", label: "Developer dashboard" },
+              { to: "/profile", label: "My public profile" },
+              { to: "/verification", label: "Verification" },
+              { to: "/pro", label: "Developer Pro plan" },
+            ].map((l) => (
+              <Button key={l.to} asChild size="sm" variant="outline">
+                <Link to={l.to}>{l.label}</Link>
+              </Button>
             ))}
-            <Button size="sm" disabled={saveSocials.isPending} onClick={() => saveSocials.mutate()}>
-              Save links
-            </Button>
-          </section>
-
-          <section className="surface-card mt-4 space-y-3 p-4">
-            <div className="flex items-center justify-between">
-              <h2 className="font-display text-base font-semibold">WhatsApp verification</h2>
-              {profile?.phone_verified && (
-                <Badge className="gap-1">
-                  <BadgeCheck className="h-3.5 w-3.5" /> Verified
-                </Badge>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="phone">Phone number</Label>
-              <Input
-                id="phone"
-                value={phoneValue}
-                placeholder="+265991234567"
-                onChange={(e) => setPhone(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Button size="sm" variant="outline" onClick={sendWhatsAppCode}>
-                Send code on WhatsApp
-              </Button>
-              {sentCode && (
-                <>
-                  <Input
-                    className="w-32"
-                    value={code}
-                    inputMode="numeric"
-                    maxLength={6}
-                    onChange={(e) => setCode(e.target.value)}
-                    placeholder="6-digit code"
-                  />
-                  <Button size="sm" onClick={() => confirmPhone.mutate()}>
-                    Confirm
-                  </Button>
-                </>
-              )}
-            </div>
-          </section>
-
-          <section className="surface-card mt-4 space-y-3 p-4">
-            <div className="flex items-center justify-between">
-              <h2 className="font-display text-base font-semibold">KYC verification badge</h2>
-              <Badge variant="secondary" className="capitalize">
-                {profile?.kyc_status ?? "none"}
-              </Badge>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Upload a national ID or passport. Documents are stored privately and only reviewed by the store team.
-            </p>
-            <div>
-              <Label htmlFor="fullname">Full legal name</Label>
-              <Input id="fullname" value={fullName} maxLength={80} onChange={(e) => setFullName(e.target.value)} />
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div>
-                <Label htmlFor="idtype">Document type</Label>
-                <Input id="idtype" value={idType} onChange={(e) => setIdType(e.target.value)} />
-              </div>
-              <div>
-                <Label htmlFor="idnumber">Document number</Label>
-                <Input
-                  id="idnumber"
-                  value={idNumber}
-                  maxLength={40}
-                  onChange={(e) => setIdNumber(e.target.value)}
-                />
-              </div>
-            </div>
-            <Input
-              type="file"
-              accept="image/*,application/pdf"
-              onChange={(e) => setIdDoc(e.target.files?.[0] ?? null)}
-            />
-            <Button size="sm" disabled={submitKyc.isPending} onClick={() => submitKyc.mutate()}>
-              Submit for verification
-            </Button>
-          </section>
-
-          <section className="surface-card mt-4 space-y-3 p-4">
-            <h2 className="font-display text-base font-semibold">Publishing subscription</h2>
-            <p className="text-sm text-muted-foreground">
-              {formatMwk(SUBSCRIPTION_PRICE_MWK)} per month to keep your listings live.
-            </p>
-            {subscription.data?.status === "active" ? (
-              <p className="text-sm">
-                Active · renews{" "}
-                {subscription.data.current_period_end
-                  ? new Date(subscription.data.current_period_end).toLocaleDateString()
-                  : "monthly"}
-              </p>
-            ) : (
-              <Button size="sm" disabled={startSubscription.isPending} onClick={() => startSubscription.mutate()}>
-                Activate plan
-              </Button>
-            )}
-          </section>
-        </>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Plan: {subscription.data?.status === "active" ? `Active · ${formatMwk(SUBSCRIPTION_PRICE_MWK)} monthly` : "Not subscribed"}
+          </p>
+        </section>
       )}
+
 
 
       <Button variant="outline" className="mt-4 w-full" onClick={signOut}>
