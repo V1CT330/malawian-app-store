@@ -119,17 +119,40 @@ function DashboardPage() {
         <PortalTabs />
       </div>
 
+      <section className="surface-card border-l-4 border-l-brand-green p-4">
+        <h2 className="font-display text-base font-semibold">{FOUNDING_HEADLINE}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{FOUNDING_LEAD}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{FOUNDING_SUPPORT}</p>
+        <p className="mt-2 text-xs font-medium">{FOUNDING_PRIORITY_NOTE}</p>
+      </section>
+
       {listingsQuery.isLoading ? (
-        <Skeleton className="h-28 w-full rounded-2xl" />
+        <Skeleton className="mt-4 h-28 w-full rounded-2xl" />
       ) : (
         <>
-          <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+          <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
             <Stat value={listings.length} label="products" />
             <Stat value={published.length} label="published" />
             <Stat value={pending.length} label="in review" />
             <Stat value={drafts.length} label="drafts" />
             <Stat value={unread} label="notifications" />
           </div>
+
+          {listings.length === 0 && (
+            <section className="surface-card mt-4 p-4">
+              <h2 className="font-display text-base font-semibold">Welcome, founder</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Publish your first product to claim your place in the founding group.
+              </p>
+              <ol className="mt-3 space-y-1 text-sm text-muted-foreground">
+                <li>1. Complete your developer profile</li>
+                <li>2. Verify your identity</li>
+                <li>3. Publish your first product</li>
+                <li>4. Promote it inside the store</li>
+              </ol>
+            </section>
+          )}
+
 
           <section className="surface-card mt-4 p-4">
             <div className="flex items-center justify-between">
