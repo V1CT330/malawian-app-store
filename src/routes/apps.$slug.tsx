@@ -309,15 +309,20 @@ function ListingDetail() {
                       key={n}
                       onClick={() => setRating(n)}
                       aria-label={`Rate ${n} stars`}
-                      className={cn(
-                        "h-7 w-7 rounded-full text-sm",
-                        n <= rating ? "bg-google-yellow text-foreground" : "bg-background text-muted-foreground",
-                      )}
+                      className="rounded-full p-0.5"
                     >
-                      {n}
+                      <Star
+                        className={cn(
+                          "h-6 w-6",
+                          n <= rating
+                            ? "fill-google-yellow text-google-yellow"
+                            : "text-muted-foreground",
+                        )}
+                      />
                     </button>
                   ))}
                 </div>
+
               </div>
               <Textarea
                 value={body}
