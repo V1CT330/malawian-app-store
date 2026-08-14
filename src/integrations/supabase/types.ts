@@ -1155,6 +1155,7 @@ export type Database = {
           created_at: string
           current_period_end: string | null
           id: string
+          payment_reference: string | null
           plan: string
           status: string
           updated_at: string
@@ -1165,6 +1166,7 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           id?: string
+          payment_reference?: string | null
           plan?: string
           status?: string
           updated_at?: string
@@ -1175,6 +1177,7 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           id?: string
+          payment_reference?: string | null
           plan?: string
           status?: string
           updated_at?: string
@@ -1376,11 +1379,90 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          company_name: string | null
+          created_at: string | null
+          developer_name: string | null
+          display_name: string | null
+          facebook_url: string | null
+          follower_count: number | null
+          github_url: string | null
+          id: string | null
+          instagram_url: string | null
+          is_developer: boolean | null
+          kyc_status: Database["public"]["Enums"]["kyc_status"] | null
+          linkedin_url: string | null
+          location: string | null
+          portfolio_url: string | null
+          reputation_score: number | null
+          skills: string[] | null
+          website_url: string | null
+          x_url: string | null
+          youtube_url: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          developer_name?: string | null
+          display_name?: string | null
+          facebook_url?: string | null
+          follower_count?: number | null
+          github_url?: string | null
+          id?: string | null
+          instagram_url?: string | null
+          is_developer?: boolean | null
+          kyc_status?: Database["public"]["Enums"]["kyc_status"] | null
+          linkedin_url?: string | null
+          location?: string | null
+          portfolio_url?: string | null
+          reputation_score?: number | null
+          skills?: string[] | null
+          website_url?: string | null
+          x_url?: string | null
+          youtube_url?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          company_name?: string | null
+          created_at?: string | null
+          developer_name?: string | null
+          display_name?: string | null
+          facebook_url?: string | null
+          follower_count?: number | null
+          github_url?: string | null
+          id?: string | null
+          instagram_url?: string | null
+          is_developer?: boolean | null
+          kyc_status?: Database["public"]["Enums"]["kyc_status"] | null
+          linkedin_url?: string | null
+          location?: string | null
+          portfolio_url?: string | null
+          reputation_score?: number | null
+          skills?: string[] | null
+          website_url?: string | null
+          x_url?: string | null
+          youtube_url?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       claim_first_admin: { Args: never; Returns: boolean }
       compute_reputation: { Args: { _developer: string }; Returns: number }
+      developer_stats: {
+        Args: { _days: number; _developer: string }
+        Returns: {
+          day: string
+          installs: number
+          views: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1388,12 +1470,17 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_pro: { Args: { _user: string }; Returns: boolean }
       is_team_member: {
         Args: { _owner: string; _user: string }
         Returns: boolean
       }
       register_install: {
         Args: { _country?: string; _device?: string; _listing_id: string }
+        Returns: undefined
+      }
+      request_pro_subscription: {
+        Args: { _reference: string }
         Returns: undefined
       }
     }
