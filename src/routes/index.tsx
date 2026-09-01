@@ -1,11 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { ListingCard, ListingTile } from "@/components/ListingCard";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { CATEGORIES, type Listing } from "@/lib/store";
