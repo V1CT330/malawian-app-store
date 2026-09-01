@@ -227,7 +227,7 @@ function ListingDetail() {
           </div>
           <div className="surface-card p-3">
             <p className="font-display text-lg font-bold">{listing.downloads}</p>
-            <p className="text-xs text-muted-foreground">installs</p>
+            <p className="text-xs text-muted-foreground">{listing.kind === "website" ? "visits" : "installs"}</p>
           </div>
           <div className="surface-card p-3">
             <p className="font-display text-lg font-bold">{latest?.version ?? "—"}</p>
@@ -315,7 +315,7 @@ function ListingDetail() {
                         className={cn(
                           "h-6 w-6",
                           n <= rating
-                            ? "fill-google-yellow text-google-yellow"
+                            ? "fill-brand-gold text-brand-gold"
                             : "text-muted-foreground",
                         )}
                       />

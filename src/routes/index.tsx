@@ -157,16 +157,13 @@ function StorePage() {
           <p className="mt-1 text-sm text-muted-foreground">
             Be the first developer to publish on the Malawian App Store.
           </p>
-          <Button asChild className="mt-4 rounded-full">
-            <Link to="/upload">Upload a listing</Link>
-          </Button>
         </div>
       ) : (
         <div>
           {browsing ? (
             <>
               <Shelf title="Recommended for you" subtitle="Fresh from Malawian developers" items={fresh} />
-              <Shelf title="Top charts" subtitle="Most installed this week" items={topCharts} />
+              <Shelf title="Top charts" subtitle="Most popular this week" items={topCharts} />
               <Shelf title="Top rated" subtitle="Loved by reviewers" items={topRated} />
             </>
           ) : null}
