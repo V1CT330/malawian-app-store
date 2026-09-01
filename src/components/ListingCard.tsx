@@ -46,7 +46,7 @@ export function ListingTile({ listing }: { listing: Listing }) {
         {listing.rating_count ? (
           <>
             {listing.rating_avg.toFixed(1)}
-            <Star className="h-2.5 w-2.5 fill-muted-foreground text-muted-foreground" />
+            <Star className="h-2.5 w-2.5 fill-brand-gold text-brand-gold" />
           </>
         ) : (
           "New"
@@ -78,10 +78,10 @@ export function ListingCard({ listing }: { listing: Listing }) {
         <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-0.5">
             {listing.rating_count ? listing.rating_avg.toFixed(1) : "New"}
-            <Star className="h-3 w-3 fill-muted-foreground text-muted-foreground" />
+            <Star className="h-3 w-3 fill-brand-gold text-brand-gold" />
           </span>
           <span aria-hidden>·</span>
-          <span>{listing.downloads} installs</span>
+          <span>{listing.kind === "website" ? `${listing.downloads} visits` : `${listing.downloads} installs`}</span>
         </div>
       </div>
     </Link>
@@ -96,7 +96,7 @@ export function Stars({ value, className }: { value: number; className?: string 
           key={i}
           className={cn(
             "h-4 w-4",
-            i <= Math.round(value) ? "fill-google-green text-google-green" : "text-border",
+            i <= Math.round(value) ? "fill-brand-gold text-brand-gold" : "text-border",
           )}
         />
       ))}

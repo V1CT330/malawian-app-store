@@ -35,6 +35,14 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as AuthenticatedManageIdRouteImport } from './routes/_authenticated/manage.$id'
+import { Route as AuthenticatedConsoleVerificationRouteImport } from './routes/_authenticated/console.verification'
+import { Route as AuthenticatedConsoleSubscriptionRouteImport } from './routes/_authenticated/console.subscription'
+import { Route as AuthenticatedConsoleStoreRouteImport } from './routes/_authenticated/console.store'
+import { Route as AuthenticatedConsoleSecurityRouteImport } from './routes/_authenticated/console.security'
+import { Route as AuthenticatedConsoleResourcesRouteImport } from './routes/_authenticated/console.resources'
+import { Route as AuthenticatedConsoleManageRouteImport } from './routes/_authenticated/console.manage'
+import { Route as AuthenticatedConsoleAssistantRouteImport } from './routes/_authenticated/console.assistant'
+import { Route as AuthenticatedConsoleAnalyticsRouteImport } from './routes/_authenticated/console.analytics'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 
@@ -171,6 +179,54 @@ const AuthenticatedManageIdRoute = AuthenticatedManageIdRouteImport.update({
   path: '/manage/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedConsoleVerificationRoute =
+  AuthenticatedConsoleVerificationRouteImport.update({
+    id: '/console/verification',
+    path: '/console/verification',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleSubscriptionRoute =
+  AuthenticatedConsoleSubscriptionRouteImport.update({
+    id: '/console/subscription',
+    path: '/console/subscription',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleStoreRoute =
+  AuthenticatedConsoleStoreRouteImport.update({
+    id: '/console/store',
+    path: '/console/store',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleSecurityRoute =
+  AuthenticatedConsoleSecurityRouteImport.update({
+    id: '/console/security',
+    path: '/console/security',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleResourcesRoute =
+  AuthenticatedConsoleResourcesRouteImport.update({
+    id: '/console/resources',
+    path: '/console/resources',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleManageRoute =
+  AuthenticatedConsoleManageRouteImport.update({
+    id: '/console/manage',
+    path: '/console/manage',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleAssistantRoute =
+  AuthenticatedConsoleAssistantRouteImport.update({
+    id: '/console/assistant',
+    path: '/console/assistant',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleAnalyticsRoute =
+  AuthenticatedConsoleAnalyticsRouteImport.update({
+    id: '/console/analytics',
+    path: '/console/analytics',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const Char91DotmcpChar93InvokeToolToolRoute =
   Char91DotmcpChar93InvokeToolToolRouteImport.update({
     id: '/.mcp/invoke-tool/$tool',
@@ -210,6 +266,14 @@ export interface FileRoutesByFullPath {
   '/developers/$id': typeof DevelopersIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/console/analytics': typeof AuthenticatedConsoleAnalyticsRoute
+  '/console/assistant': typeof AuthenticatedConsoleAssistantRoute
+  '/console/manage': typeof AuthenticatedConsoleManageRoute
+  '/console/resources': typeof AuthenticatedConsoleResourcesRoute
+  '/console/security': typeof AuthenticatedConsoleSecurityRoute
+  '/console/store': typeof AuthenticatedConsoleStoreRoute
+  '/console/subscription': typeof AuthenticatedConsoleSubscriptionRoute
+  '/console/verification': typeof AuthenticatedConsoleVerificationRoute
   '/manage/$id': typeof AuthenticatedManageIdRoute
 }
 export interface FileRoutesByTo {
@@ -239,6 +303,14 @@ export interface FileRoutesByTo {
   '/developers/$id': typeof DevelopersIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/console/analytics': typeof AuthenticatedConsoleAnalyticsRoute
+  '/console/assistant': typeof AuthenticatedConsoleAssistantRoute
+  '/console/manage': typeof AuthenticatedConsoleManageRoute
+  '/console/resources': typeof AuthenticatedConsoleResourcesRoute
+  '/console/security': typeof AuthenticatedConsoleSecurityRoute
+  '/console/store': typeof AuthenticatedConsoleStoreRoute
+  '/console/subscription': typeof AuthenticatedConsoleSubscriptionRoute
+  '/console/verification': typeof AuthenticatedConsoleVerificationRoute
   '/manage/$id': typeof AuthenticatedManageIdRoute
 }
 export interface FileRoutesById {
@@ -270,6 +342,14 @@ export interface FileRoutesById {
   '/developers/$id': typeof DevelopersIdRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/_authenticated/console/analytics': typeof AuthenticatedConsoleAnalyticsRoute
+  '/_authenticated/console/assistant': typeof AuthenticatedConsoleAssistantRoute
+  '/_authenticated/console/manage': typeof AuthenticatedConsoleManageRoute
+  '/_authenticated/console/resources': typeof AuthenticatedConsoleResourcesRoute
+  '/_authenticated/console/security': typeof AuthenticatedConsoleSecurityRoute
+  '/_authenticated/console/store': typeof AuthenticatedConsoleStoreRoute
+  '/_authenticated/console/subscription': typeof AuthenticatedConsoleSubscriptionRoute
+  '/_authenticated/console/verification': typeof AuthenticatedConsoleVerificationRoute
   '/_authenticated/manage/$id': typeof AuthenticatedManageIdRoute
 }
 export interface FileRouteTypes {
@@ -301,6 +381,14 @@ export interface FileRouteTypes {
     | '/developers/$id'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/console/analytics'
+    | '/console/assistant'
+    | '/console/manage'
+    | '/console/resources'
+    | '/console/security'
+    | '/console/store'
+    | '/console/subscription'
+    | '/console/verification'
     | '/manage/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -330,6 +418,14 @@ export interface FileRouteTypes {
     | '/developers/$id'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/console/analytics'
+    | '/console/assistant'
+    | '/console/manage'
+    | '/console/resources'
+    | '/console/security'
+    | '/console/store'
+    | '/console/subscription'
+    | '/console/verification'
     | '/manage/$id'
   id:
     | '__root__'
@@ -360,6 +456,14 @@ export interface FileRouteTypes {
     | '/developers/$id'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/_authenticated/console/analytics'
+    | '/_authenticated/console/assistant'
+    | '/_authenticated/console/manage'
+    | '/_authenticated/console/resources'
+    | '/_authenticated/console/security'
+    | '/_authenticated/console/store'
+    | '/_authenticated/console/subscription'
+    | '/_authenticated/console/verification'
     | '/_authenticated/manage/$id'
   fileRoutesById: FileRoutesById
 }
@@ -561,6 +665,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedManageIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/console/verification': {
+      id: '/_authenticated/console/verification'
+      path: '/console/verification'
+      fullPath: '/console/verification'
+      preLoaderRoute: typeof AuthenticatedConsoleVerificationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/subscription': {
+      id: '/_authenticated/console/subscription'
+      path: '/console/subscription'
+      fullPath: '/console/subscription'
+      preLoaderRoute: typeof AuthenticatedConsoleSubscriptionRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/store': {
+      id: '/_authenticated/console/store'
+      path: '/console/store'
+      fullPath: '/console/store'
+      preLoaderRoute: typeof AuthenticatedConsoleStoreRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/security': {
+      id: '/_authenticated/console/security'
+      path: '/console/security'
+      fullPath: '/console/security'
+      preLoaderRoute: typeof AuthenticatedConsoleSecurityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/resources': {
+      id: '/_authenticated/console/resources'
+      path: '/console/resources'
+      fullPath: '/console/resources'
+      preLoaderRoute: typeof AuthenticatedConsoleResourcesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/manage': {
+      id: '/_authenticated/console/manage'
+      path: '/console/manage'
+      fullPath: '/console/manage'
+      preLoaderRoute: typeof AuthenticatedConsoleManageRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/assistant': {
+      id: '/_authenticated/console/assistant'
+      path: '/console/assistant'
+      fullPath: '/console/assistant'
+      preLoaderRoute: typeof AuthenticatedConsoleAssistantRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/analytics': {
+      id: '/_authenticated/console/analytics'
+      path: '/console/analytics'
+      fullPath: '/console/analytics'
+      preLoaderRoute: typeof AuthenticatedConsoleAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/.mcp/invoke-tool/$tool': {
       id: '/.mcp/invoke-tool/$tool'
       path: '/.mcp/invoke-tool/$tool'
@@ -595,6 +755,14 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedTeamRoute: typeof AuthenticatedTeamRoute
   AuthenticatedUploadRoute: typeof AuthenticatedUploadRoute
   AuthenticatedVerificationRoute: typeof AuthenticatedVerificationRoute
+  AuthenticatedConsoleAnalyticsRoute: typeof AuthenticatedConsoleAnalyticsRoute
+  AuthenticatedConsoleAssistantRoute: typeof AuthenticatedConsoleAssistantRoute
+  AuthenticatedConsoleManageRoute: typeof AuthenticatedConsoleManageRoute
+  AuthenticatedConsoleResourcesRoute: typeof AuthenticatedConsoleResourcesRoute
+  AuthenticatedConsoleSecurityRoute: typeof AuthenticatedConsoleSecurityRoute
+  AuthenticatedConsoleStoreRoute: typeof AuthenticatedConsoleStoreRoute
+  AuthenticatedConsoleSubscriptionRoute: typeof AuthenticatedConsoleSubscriptionRoute
+  AuthenticatedConsoleVerificationRoute: typeof AuthenticatedConsoleVerificationRoute
   AuthenticatedManageIdRoute: typeof AuthenticatedManageIdRoute
 }
 
@@ -615,6 +783,14 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedTeamRoute: AuthenticatedTeamRoute,
   AuthenticatedUploadRoute: AuthenticatedUploadRoute,
   AuthenticatedVerificationRoute: AuthenticatedVerificationRoute,
+  AuthenticatedConsoleAnalyticsRoute: AuthenticatedConsoleAnalyticsRoute,
+  AuthenticatedConsoleAssistantRoute: AuthenticatedConsoleAssistantRoute,
+  AuthenticatedConsoleManageRoute: AuthenticatedConsoleManageRoute,
+  AuthenticatedConsoleResourcesRoute: AuthenticatedConsoleResourcesRoute,
+  AuthenticatedConsoleSecurityRoute: AuthenticatedConsoleSecurityRoute,
+  AuthenticatedConsoleStoreRoute: AuthenticatedConsoleStoreRoute,
+  AuthenticatedConsoleSubscriptionRoute: AuthenticatedConsoleSubscriptionRoute,
+  AuthenticatedConsoleVerificationRoute: AuthenticatedConsoleVerificationRoute,
   AuthenticatedManageIdRoute: AuthenticatedManageIdRoute,
 }
 

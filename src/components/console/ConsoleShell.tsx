@@ -1,0 +1,307 @@
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import {
+  BadgeCheck,
+  Bell,
+  ChevronRight,
+  CircleHelp,
+  ClipboardCheck,
+  FlaskConical,
+  LayoutDashboard,
+  LayoutList,
+  LifeBuoy,
+  LineChart,
+  LogOut,
+  Menu,
+  MessageSquare,
+  Moon,
+  Rocket,
+  Settings,
+  ShieldCheck,
+  Store,
+  Sun,
+  Users,
+} from "lucide-react";
+import { useState, type ReactNode } from "react";
+import { toast } from "sonner";
+
+import logo from "@/assets/logo-mark.png";
+import { GeminiIcon } from "@/components/GeminiIcon";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useProfile, useUnreadCount } from "@/hooks/useSession";
+import { useTheme } from "@/hooks/useTheme";
+import { supabase } from "@/integrations/supabase/client";
+import { CONSOLE_NAV } from "@/lib/console";
+import { cn } from "@/lib/utils";
+
+const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  dashboard: LayoutDashboard,
+  products: LayoutList,
+  publishing: Rocket,
+  testing: FlaskConical,
+  quality: ClipboardCheck,
+  analytics: LineChart,
+  reviews: MessageSquare,
+  store: Store,
+  manage: Users,
+  settings: Settings,
+};
+
+function NavList({ onNavigate }: { onNavigate?: () => void }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  return (
+    <nav aria-label="Developer console" className="space-y-1">
+      {CONSOLE_NAV.map((item) => {
+        const Icon = ICONS[item.icon] ?? LayoutDashboard;
+        const active =
+          item.to === "/console" ? pathname === "/console" : pathname.startsWith(item.to);
+        return (
+          <Link
+            key={item.to}
+            to={item.to}
+            onClick={onNavigate}
+            className={cn(
+              "flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors",
+              active
+                ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+            )}
+          >
+            <Icon className="h-4 w-4 shrink-0" />
+            {item.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+export type Crumb = { label: string; to?: string };
+
+export function ConsoleShell({
+  title,
+  description,
+  breadcrumbs,
+  actions,
+  children,
+}: {
+  title: string;
+  description?: string;
+  breadcrumbs?: Crumb[];
+  actions?: ReactNode;
+  children: ReactNode;
+}) {
+  const { userId, profile } = useProfile();
+  const unread = useUnreadCount();
+  const { dark, toggle } = useTheme();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [drawer, setDrawer] = useState(false);
+
+  const initial = (profile?.developer_name || profile?.display_name || "D").slice(0, 1).toUpperCase();
+  const verified = profile?.kyc_status === "approved";
+
+  const leaveDeveloper = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("profiles").update({ mode: "user" }).eq("id", userId!);
+      if (error) throw error;
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["profile", userId] });
+      navigate({ to: "/" });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  async function signOut() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  }
+
+  return (
+    <div className="flex min-h-screen bg-background">
+      <aside className="sticky top-0 hidden h-screen w-[248px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar px-3 py-4 lg:flex">
+        <Link to="/console" className="mb-5 flex items-center gap-2 px-2">
+          <img src={logo} alt="" width={28} height={28} className="h-7 w-7" />
+          <span className="font-display text-sm font-bold leading-tight">
+            Developer
+            <span className="block text-xs font-medium text-muted-foreground">Malawian App Store</span>
+          </span>
+        </Link>
+        <NavList />
+        <div className="mt-auto space-y-1 pt-4">
+          <Link
+            to="/console/assistant"
+            className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
+          >
+            <GeminiIcon className="h-4 w-4" /> AI assistant
+          </Link>
+          <Link
+            to="/console/resources"
+            className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
+          >
+            <LifeBuoy className="h-4 w-4" /> Help and resources
+          </Link>
+        </div>
+      </aside>
+
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur">
+          <div className="flex items-center gap-2 px-3 py-2.5 sm:px-5">
+            <Sheet open={drawer} onOpenChange={setDrawer}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open console menu">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[260px] bg-sidebar p-3">
+                <SheetTitle className="mb-4 flex items-center gap-2 px-2 font-display text-sm">
+                  <img src={logo} alt="" width={24} height={24} className="h-6 w-6" />
+                  Developer console
+                </SheetTitle>
+                <NavList onNavigate={() => setDrawer(false)} />
+                <div className="mt-4 space-y-1 border-t border-border pt-3">
+                  <Link
+                    to="/console/assistant"
+                    onClick={() => setDrawer(false)}
+                    className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground"
+                  >
+                    <GeminiIcon className="h-4 w-4" /> AI assistant
+                  </Link>
+                  <Link
+                    to="/console/resources"
+                    onClick={() => setDrawer(false)}
+                    className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground"
+                  >
+                    <LifeBuoy className="h-4 w-4" /> Help and resources
+                  </Link>
+                </div>
+              </SheetContent>
+            </Sheet>
+
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium">
+                {profile?.developer_name || profile?.display_name || "Your developer account"}
+              </p>
+              <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                {verified ? (
+                  <>
+                    <BadgeCheck className="h-3.5 w-3.5 text-brand-green" /> Verified developer
+                  </>
+                ) : (
+                  <>
+                    <ShieldCheck className="h-3.5 w-3.5" /> Verification {profile?.kyc_status ?? "none"}
+                  </>
+                )}
+              </p>
+            </div>
+
+            <Button variant="ghost" size="icon" aria-label="Toggle theme" onClick={toggle}>
+              {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
+            <Button asChild variant="ghost" size="icon" aria-label="Help">
+              <Link to="/console/resources">
+                <CircleHelp className="h-5 w-5" />
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" size="icon" aria-label="Notifications" className="relative">
+              <Link to="/notifications">
+                <Bell className="h-5 w-5" />
+                {unread > 0 && (
+                  <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-destructive" />
+                )}
+              </Link>
+            </Button>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  aria-label="Account menu"
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground"
+                >
+                  {initial}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel className="truncate">
+                  {profile?.display_name || "Developer"}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/console/settings">Console settings</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/console/verification">Verification</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/console/subscription">Subscription</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={() => leaveDeveloper.mutate()}>
+                  Switch to shopping mode
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => void signOut()}>
+                  <LogOut className="mr-2 h-4 w-4" /> Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </header>
+
+        <main className="mx-auto w-full max-w-6xl flex-1 px-3 pb-16 pt-4 sm:px-5">
+          {breadcrumbs && breadcrumbs.length > 0 && (
+            <ol className="mb-2 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
+              {breadcrumbs.map((c, i) => (
+                <li key={`${c.label}-${i}`} className="flex items-center gap-1">
+                  {c.to ? (
+                    <Link to={c.to} className="hover:text-foreground">
+                      {c.label}
+                    </Link>
+                  ) : (
+                    <span>{c.label}</span>
+                  )}
+                  {i < breadcrumbs.length - 1 && <ChevronRight className="h-3 w-3" />}
+                </li>
+              ))}
+            </ol>
+          )}
+          <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h1 className="font-display text-2xl font-bold leading-tight">{title}</h1>
+              {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
+            </div>
+            {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+          </div>
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+export function VerifiedBadge({ status }: { status: string | undefined }) {
+  if (status === "approved") {
+    return (
+      <Badge className="gap-1">
+        <BadgeCheck className="h-3.5 w-3.5" /> Verified
+      </Badge>
+    );
+  }
+  return (
+    <Badge variant="secondary" className="capitalize">
+      KYC {status ?? "none"}
+    </Badge>
+  );
+}
