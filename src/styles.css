@@ -49,6 +49,7 @@
   --color-brand-black: var(--foreground);
   --color-success: var(--google-green);
   --color-warning: var(--google-red);
+  --color-brand-gold: var(--brand-gold);
 
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -92,6 +93,7 @@
   --google-red: oklch(0.55 0.21 27);
   --google-yellow: oklch(0.55 0.21 27);
   --google-green: oklch(0.55 0.16 145);
+  --brand-gold: oklch(0.76 0.15 85);
   --chart-1: oklch(0.55 0.16 145);
   --chart-2: oklch(0.55 0.21 27);
   --chart-3: oklch(0.18 0.015 265);
