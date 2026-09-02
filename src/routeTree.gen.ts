@@ -34,6 +34,7 @@ import { Route as AuthenticatedAdvertiseRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
+import { Route as AuthenticatedConsoleIndexRouteImport } from './routes/_authenticated/console.index'
 import { Route as AuthenticatedManageIdRouteImport } from './routes/_authenticated/manage.$id'
 import { Route as AuthenticatedConsoleVerificationRouteImport } from './routes/_authenticated/console.verification'
 import { Route as AuthenticatedConsoleSubscriptionRouteImport } from './routes/_authenticated/console.subscription'
@@ -45,6 +46,8 @@ import { Route as AuthenticatedConsoleAssistantRouteImport } from './routes/_aut
 import { Route as AuthenticatedConsoleAnalyticsRouteImport } from './routes/_authenticated/console.analytics'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
+import { Route as AuthenticatedConsoleProductsIndexRouteImport } from './routes/_authenticated/console.products.index'
+import { Route as AuthenticatedConsoleProductsIdRouteImport } from './routes/_authenticated/console.products.$id'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -174,6 +177,12 @@ const Char91DotmcpChar93ListToolsRoute =
     path: '/.mcp/list-tools',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedConsoleIndexRoute =
+  AuthenticatedConsoleIndexRouteImport.update({
+    id: '/console/',
+    path: '/console/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedManageIdRoute = AuthenticatedManageIdRouteImport.update({
   id: '/manage/$id',
   path: '/manage/$id',
@@ -238,6 +247,18 @@ const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedConsoleProductsIndexRoute =
+  AuthenticatedConsoleProductsIndexRouteImport.update({
+    id: '/console/products/',
+    path: '/console/products/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleProductsIdRoute =
+  AuthenticatedConsoleProductsIdRouteImport.update({
+    id: '/console/products/$id',
+    path: '/console/products/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -275,6 +296,9 @@ export interface FileRoutesByFullPath {
   '/console/subscription': typeof AuthenticatedConsoleSubscriptionRoute
   '/console/verification': typeof AuthenticatedConsoleVerificationRoute
   '/manage/$id': typeof AuthenticatedManageIdRoute
+  '/console/': typeof AuthenticatedConsoleIndexRoute
+  '/console/products/$id': typeof AuthenticatedConsoleProductsIdRoute
+  '/console/products/': typeof AuthenticatedConsoleProductsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -312,6 +336,9 @@ export interface FileRoutesByTo {
   '/console/subscription': typeof AuthenticatedConsoleSubscriptionRoute
   '/console/verification': typeof AuthenticatedConsoleVerificationRoute
   '/manage/$id': typeof AuthenticatedManageIdRoute
+  '/console': typeof AuthenticatedConsoleIndexRoute
+  '/console/products/$id': typeof AuthenticatedConsoleProductsIdRoute
+  '/console/products': typeof AuthenticatedConsoleProductsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -351,6 +378,9 @@ export interface FileRoutesById {
   '/_authenticated/console/subscription': typeof AuthenticatedConsoleSubscriptionRoute
   '/_authenticated/console/verification': typeof AuthenticatedConsoleVerificationRoute
   '/_authenticated/manage/$id': typeof AuthenticatedManageIdRoute
+  '/_authenticated/console/': typeof AuthenticatedConsoleIndexRoute
+  '/_authenticated/console/products/$id': typeof AuthenticatedConsoleProductsIdRoute
+  '/_authenticated/console/products/': typeof AuthenticatedConsoleProductsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -390,6 +420,9 @@ export interface FileRouteTypes {
     | '/console/subscription'
     | '/console/verification'
     | '/manage/$id'
+    | '/console/'
+    | '/console/products/$id'
+    | '/console/products/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -427,6 +460,9 @@ export interface FileRouteTypes {
     | '/console/subscription'
     | '/console/verification'
     | '/manage/$id'
+    | '/console'
+    | '/console/products/$id'
+    | '/console/products'
   id:
     | '__root__'
     | '/'
@@ -465,6 +501,9 @@ export interface FileRouteTypes {
     | '/_authenticated/console/subscription'
     | '/_authenticated/console/verification'
     | '/_authenticated/manage/$id'
+    | '/_authenticated/console/'
+    | '/_authenticated/console/products/$id'
+    | '/_authenticated/console/products/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -658,6 +697,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/console/': {
+      id: '/_authenticated/console/'
+      path: '/console'
+      fullPath: '/console/'
+      preLoaderRoute: typeof AuthenticatedConsoleIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/manage/$id': {
       id: '/_authenticated/manage/$id'
       path: '/manage/$id'
@@ -735,6 +781,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/console/products/': {
+      id: '/_authenticated/console/products/'
+      path: '/console/products'
+      fullPath: '/console/products/'
+      preLoaderRoute: typeof AuthenticatedConsoleProductsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/products/$id': {
+      id: '/_authenticated/console/products/$id'
+      path: '/console/products/$id'
+      fullPath: '/console/products/$id'
+      preLoaderRoute: typeof AuthenticatedConsoleProductsIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -764,6 +824,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedConsoleSubscriptionRoute: typeof AuthenticatedConsoleSubscriptionRoute
   AuthenticatedConsoleVerificationRoute: typeof AuthenticatedConsoleVerificationRoute
   AuthenticatedManageIdRoute: typeof AuthenticatedManageIdRoute
+  AuthenticatedConsoleIndexRoute: typeof AuthenticatedConsoleIndexRoute
+  AuthenticatedConsoleProductsIdRoute: typeof AuthenticatedConsoleProductsIdRoute
+  AuthenticatedConsoleProductsIndexRoute: typeof AuthenticatedConsoleProductsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -792,6 +855,10 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedConsoleSubscriptionRoute: AuthenticatedConsoleSubscriptionRoute,
   AuthenticatedConsoleVerificationRoute: AuthenticatedConsoleVerificationRoute,
   AuthenticatedManageIdRoute: AuthenticatedManageIdRoute,
+  AuthenticatedConsoleIndexRoute: AuthenticatedConsoleIndexRoute,
+  AuthenticatedConsoleProductsIdRoute: AuthenticatedConsoleProductsIdRoute,
+  AuthenticatedConsoleProductsIndexRoute:
+    AuthenticatedConsoleProductsIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
