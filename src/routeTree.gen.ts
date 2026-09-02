@@ -47,6 +47,7 @@ import { Route as AuthenticatedConsoleAnalyticsRouteImport } from './routes/_aut
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as AuthenticatedConsoleProductsIndexRouteImport } from './routes/_authenticated/console.products.index'
+import { Route as AuthenticatedConsoleProductsIdRouteImport } from './routes/_authenticated/console.products.$id'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -252,6 +253,12 @@ const AuthenticatedConsoleProductsIndexRoute =
     path: '/console/products/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedConsoleProductsIdRoute =
+  AuthenticatedConsoleProductsIdRouteImport.update({
+    id: '/console/products/$id',
+    path: '/console/products/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -290,6 +297,7 @@ export interface FileRoutesByFullPath {
   '/console/verification': typeof AuthenticatedConsoleVerificationRoute
   '/manage/$id': typeof AuthenticatedManageIdRoute
   '/console/': typeof AuthenticatedConsoleIndexRoute
+  '/console/products/$id': typeof AuthenticatedConsoleProductsIdRoute
   '/console/products/': typeof AuthenticatedConsoleProductsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -329,6 +337,7 @@ export interface FileRoutesByTo {
   '/console/verification': typeof AuthenticatedConsoleVerificationRoute
   '/manage/$id': typeof AuthenticatedManageIdRoute
   '/console': typeof AuthenticatedConsoleIndexRoute
+  '/console/products/$id': typeof AuthenticatedConsoleProductsIdRoute
   '/console/products': typeof AuthenticatedConsoleProductsIndexRoute
 }
 export interface FileRoutesById {
@@ -370,6 +379,7 @@ export interface FileRoutesById {
   '/_authenticated/console/verification': typeof AuthenticatedConsoleVerificationRoute
   '/_authenticated/manage/$id': typeof AuthenticatedManageIdRoute
   '/_authenticated/console/': typeof AuthenticatedConsoleIndexRoute
+  '/_authenticated/console/products/$id': typeof AuthenticatedConsoleProductsIdRoute
   '/_authenticated/console/products/': typeof AuthenticatedConsoleProductsIndexRoute
 }
 export interface FileRouteTypes {
@@ -411,6 +421,7 @@ export interface FileRouteTypes {
     | '/console/verification'
     | '/manage/$id'
     | '/console/'
+    | '/console/products/$id'
     | '/console/products/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -450,6 +461,7 @@ export interface FileRouteTypes {
     | '/console/verification'
     | '/manage/$id'
     | '/console'
+    | '/console/products/$id'
     | '/console/products'
   id:
     | '__root__'
@@ -490,6 +502,7 @@ export interface FileRouteTypes {
     | '/_authenticated/console/verification'
     | '/_authenticated/manage/$id'
     | '/_authenticated/console/'
+    | '/_authenticated/console/products/$id'
     | '/_authenticated/console/products/'
   fileRoutesById: FileRoutesById
 }
@@ -775,6 +788,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConsoleProductsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/console/products/$id': {
+      id: '/_authenticated/console/products/$id'
+      path: '/console/products/$id'
+      fullPath: '/console/products/$id'
+      preLoaderRoute: typeof AuthenticatedConsoleProductsIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -805,6 +825,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedConsoleVerificationRoute: typeof AuthenticatedConsoleVerificationRoute
   AuthenticatedManageIdRoute: typeof AuthenticatedManageIdRoute
   AuthenticatedConsoleIndexRoute: typeof AuthenticatedConsoleIndexRoute
+  AuthenticatedConsoleProductsIdRoute: typeof AuthenticatedConsoleProductsIdRoute
   AuthenticatedConsoleProductsIndexRoute: typeof AuthenticatedConsoleProductsIndexRoute
 }
 
@@ -835,6 +856,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedConsoleVerificationRoute: AuthenticatedConsoleVerificationRoute,
   AuthenticatedManageIdRoute: AuthenticatedManageIdRoute,
   AuthenticatedConsoleIndexRoute: AuthenticatedConsoleIndexRoute,
+  AuthenticatedConsoleProductsIdRoute: AuthenticatedConsoleProductsIdRoute,
   AuthenticatedConsoleProductsIndexRoute:
     AuthenticatedConsoleProductsIndexRoute,
 }
