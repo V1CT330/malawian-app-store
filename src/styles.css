@@ -189,6 +189,28 @@
 @utility surface-card {
   background-color: var(--card);
   border: 1px solid var(--border);
+  border-radius: calc(var(--radius) + 4px);
+  box-shadow: var(--shadow-card);
+}
+
+/* Console hero / banner surface: soft brand wash behind the page intro. */
+@utility console-hero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) + 8px);
+  background-image: linear-gradient(
+    120deg,
+    color-mix(in oklab, var(--primary) 14%, var(--card)) 0%,
+    var(--card) 55%,
+    color-mix(in oklab, var(--google-red) 8%, var(--card)) 100%
+  );
+  box-shadow: var(--shadow-card);
+}
+
+/* Muted inner tile used inside cards for KPI and list rows. */
+@utility inset-tile {
+  background-color: color-mix(in oklab, var(--muted) 65%, var(--card));
+  border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: var(--shadow-soft);
 }
