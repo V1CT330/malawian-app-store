@@ -57,10 +57,16 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   settings: Settings,
 };
 
+const navLinkClass =
+  "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors";
+
 function NavList({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <nav aria-label="Developer console" className="space-y-1">
+      <p className="px-3 pb-1 pt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+        Console
+      </p>
       {CONSOLE_NAV.map((item) => {
         const Icon = ICONS[item.icon] ?? LayoutDashboard;
         const active =
@@ -70,15 +76,16 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
             key={item.to}
             to={item.to}
             onClick={onNavigate}
+            aria-current={active ? "page" : undefined}
             className={cn(
-              "flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors",
+              navLinkClass,
               active
-                ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                ? "bg-primary text-primary-foreground shadow-soft"
                 : "text-muted-foreground hover:bg-secondary hover:text-foreground",
             )}
           >
-            <Icon className="h-4 w-4 shrink-0" />
-            {item.label}
+            <Icon className="h-[18px] w-[18px] shrink-0" />
+            <span className="truncate">{item.label}</span>
           </Link>
         );
       })}
