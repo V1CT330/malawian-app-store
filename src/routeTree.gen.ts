@@ -37,10 +37,15 @@ import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]
 import { Route as AuthenticatedConsoleIndexRouteImport } from './routes/_authenticated/console.index'
 import { Route as AuthenticatedManageIdRouteImport } from './routes/_authenticated/manage.$id'
 import { Route as AuthenticatedConsoleVerificationRouteImport } from './routes/_authenticated/console.verification'
+import { Route as AuthenticatedConsoleTestingRouteImport } from './routes/_authenticated/console.testing'
 import { Route as AuthenticatedConsoleSubscriptionRouteImport } from './routes/_authenticated/console.subscription'
 import { Route as AuthenticatedConsoleStoreRouteImport } from './routes/_authenticated/console.store'
+import { Route as AuthenticatedConsoleSettingsRouteImport } from './routes/_authenticated/console.settings'
 import { Route as AuthenticatedConsoleSecurityRouteImport } from './routes/_authenticated/console.security'
+import { Route as AuthenticatedConsoleReviewsRouteImport } from './routes/_authenticated/console.reviews'
 import { Route as AuthenticatedConsoleResourcesRouteImport } from './routes/_authenticated/console.resources'
+import { Route as AuthenticatedConsoleQualityRouteImport } from './routes/_authenticated/console.quality'
+import { Route as AuthenticatedConsolePublishingRouteImport } from './routes/_authenticated/console.publishing'
 import { Route as AuthenticatedConsoleManageRouteImport } from './routes/_authenticated/console.manage'
 import { Route as AuthenticatedConsoleAssistantRouteImport } from './routes/_authenticated/console.assistant'
 import { Route as AuthenticatedConsoleAnalyticsRouteImport } from './routes/_authenticated/console.analytics'
@@ -194,6 +199,12 @@ const AuthenticatedConsoleVerificationRoute =
     path: '/console/verification',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedConsoleTestingRoute =
+  AuthenticatedConsoleTestingRouteImport.update({
+    id: '/console/testing',
+    path: '/console/testing',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedConsoleSubscriptionRoute =
   AuthenticatedConsoleSubscriptionRouteImport.update({
     id: '/console/subscription',
@@ -206,16 +217,40 @@ const AuthenticatedConsoleStoreRoute =
     path: '/console/store',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedConsoleSettingsRoute =
+  AuthenticatedConsoleSettingsRouteImport.update({
+    id: '/console/settings',
+    path: '/console/settings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedConsoleSecurityRoute =
   AuthenticatedConsoleSecurityRouteImport.update({
     id: '/console/security',
     path: '/console/security',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedConsoleReviewsRoute =
+  AuthenticatedConsoleReviewsRouteImport.update({
+    id: '/console/reviews',
+    path: '/console/reviews',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedConsoleResourcesRoute =
   AuthenticatedConsoleResourcesRouteImport.update({
     id: '/console/resources',
     path: '/console/resources',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleQualityRoute =
+  AuthenticatedConsoleQualityRouteImport.update({
+    id: '/console/quality',
+    path: '/console/quality',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsolePublishingRoute =
+  AuthenticatedConsolePublishingRouteImport.update({
+    id: '/console/publishing',
+    path: '/console/publishing',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedConsoleManageRoute =
@@ -290,10 +325,15 @@ export interface FileRoutesByFullPath {
   '/console/analytics': typeof AuthenticatedConsoleAnalyticsRoute
   '/console/assistant': typeof AuthenticatedConsoleAssistantRoute
   '/console/manage': typeof AuthenticatedConsoleManageRoute
+  '/console/publishing': typeof AuthenticatedConsolePublishingRoute
+  '/console/quality': typeof AuthenticatedConsoleQualityRoute
   '/console/resources': typeof AuthenticatedConsoleResourcesRoute
+  '/console/reviews': typeof AuthenticatedConsoleReviewsRoute
   '/console/security': typeof AuthenticatedConsoleSecurityRoute
+  '/console/settings': typeof AuthenticatedConsoleSettingsRoute
   '/console/store': typeof AuthenticatedConsoleStoreRoute
   '/console/subscription': typeof AuthenticatedConsoleSubscriptionRoute
+  '/console/testing': typeof AuthenticatedConsoleTestingRoute
   '/console/verification': typeof AuthenticatedConsoleVerificationRoute
   '/manage/$id': typeof AuthenticatedManageIdRoute
   '/console/': typeof AuthenticatedConsoleIndexRoute
@@ -330,10 +370,15 @@ export interface FileRoutesByTo {
   '/console/analytics': typeof AuthenticatedConsoleAnalyticsRoute
   '/console/assistant': typeof AuthenticatedConsoleAssistantRoute
   '/console/manage': typeof AuthenticatedConsoleManageRoute
+  '/console/publishing': typeof AuthenticatedConsolePublishingRoute
+  '/console/quality': typeof AuthenticatedConsoleQualityRoute
   '/console/resources': typeof AuthenticatedConsoleResourcesRoute
+  '/console/reviews': typeof AuthenticatedConsoleReviewsRoute
   '/console/security': typeof AuthenticatedConsoleSecurityRoute
+  '/console/settings': typeof AuthenticatedConsoleSettingsRoute
   '/console/store': typeof AuthenticatedConsoleStoreRoute
   '/console/subscription': typeof AuthenticatedConsoleSubscriptionRoute
+  '/console/testing': typeof AuthenticatedConsoleTestingRoute
   '/console/verification': typeof AuthenticatedConsoleVerificationRoute
   '/manage/$id': typeof AuthenticatedManageIdRoute
   '/console': typeof AuthenticatedConsoleIndexRoute
@@ -372,10 +417,15 @@ export interface FileRoutesById {
   '/_authenticated/console/analytics': typeof AuthenticatedConsoleAnalyticsRoute
   '/_authenticated/console/assistant': typeof AuthenticatedConsoleAssistantRoute
   '/_authenticated/console/manage': typeof AuthenticatedConsoleManageRoute
+  '/_authenticated/console/publishing': typeof AuthenticatedConsolePublishingRoute
+  '/_authenticated/console/quality': typeof AuthenticatedConsoleQualityRoute
   '/_authenticated/console/resources': typeof AuthenticatedConsoleResourcesRoute
+  '/_authenticated/console/reviews': typeof AuthenticatedConsoleReviewsRoute
   '/_authenticated/console/security': typeof AuthenticatedConsoleSecurityRoute
+  '/_authenticated/console/settings': typeof AuthenticatedConsoleSettingsRoute
   '/_authenticated/console/store': typeof AuthenticatedConsoleStoreRoute
   '/_authenticated/console/subscription': typeof AuthenticatedConsoleSubscriptionRoute
+  '/_authenticated/console/testing': typeof AuthenticatedConsoleTestingRoute
   '/_authenticated/console/verification': typeof AuthenticatedConsoleVerificationRoute
   '/_authenticated/manage/$id': typeof AuthenticatedManageIdRoute
   '/_authenticated/console/': typeof AuthenticatedConsoleIndexRoute
@@ -414,10 +464,15 @@ export interface FileRouteTypes {
     | '/console/analytics'
     | '/console/assistant'
     | '/console/manage'
+    | '/console/publishing'
+    | '/console/quality'
     | '/console/resources'
+    | '/console/reviews'
     | '/console/security'
+    | '/console/settings'
     | '/console/store'
     | '/console/subscription'
+    | '/console/testing'
     | '/console/verification'
     | '/manage/$id'
     | '/console/'
@@ -454,10 +509,15 @@ export interface FileRouteTypes {
     | '/console/analytics'
     | '/console/assistant'
     | '/console/manage'
+    | '/console/publishing'
+    | '/console/quality'
     | '/console/resources'
+    | '/console/reviews'
     | '/console/security'
+    | '/console/settings'
     | '/console/store'
     | '/console/subscription'
+    | '/console/testing'
     | '/console/verification'
     | '/manage/$id'
     | '/console'
@@ -495,10 +555,15 @@ export interface FileRouteTypes {
     | '/_authenticated/console/analytics'
     | '/_authenticated/console/assistant'
     | '/_authenticated/console/manage'
+    | '/_authenticated/console/publishing'
+    | '/_authenticated/console/quality'
     | '/_authenticated/console/resources'
+    | '/_authenticated/console/reviews'
     | '/_authenticated/console/security'
+    | '/_authenticated/console/settings'
     | '/_authenticated/console/store'
     | '/_authenticated/console/subscription'
+    | '/_authenticated/console/testing'
     | '/_authenticated/console/verification'
     | '/_authenticated/manage/$id'
     | '/_authenticated/console/'
@@ -718,6 +783,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConsoleVerificationRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/console/testing': {
+      id: '/_authenticated/console/testing'
+      path: '/console/testing'
+      fullPath: '/console/testing'
+      preLoaderRoute: typeof AuthenticatedConsoleTestingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/console/subscription': {
       id: '/_authenticated/console/subscription'
       path: '/console/subscription'
@@ -732,6 +804,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConsoleStoreRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/console/settings': {
+      id: '/_authenticated/console/settings'
+      path: '/console/settings'
+      fullPath: '/console/settings'
+      preLoaderRoute: typeof AuthenticatedConsoleSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/console/security': {
       id: '/_authenticated/console/security'
       path: '/console/security'
@@ -739,11 +818,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConsoleSecurityRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/console/reviews': {
+      id: '/_authenticated/console/reviews'
+      path: '/console/reviews'
+      fullPath: '/console/reviews'
+      preLoaderRoute: typeof AuthenticatedConsoleReviewsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/console/resources': {
       id: '/_authenticated/console/resources'
       path: '/console/resources'
       fullPath: '/console/resources'
       preLoaderRoute: typeof AuthenticatedConsoleResourcesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/quality': {
+      id: '/_authenticated/console/quality'
+      path: '/console/quality'
+      fullPath: '/console/quality'
+      preLoaderRoute: typeof AuthenticatedConsoleQualityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/publishing': {
+      id: '/_authenticated/console/publishing'
+      path: '/console/publishing'
+      fullPath: '/console/publishing'
+      preLoaderRoute: typeof AuthenticatedConsolePublishingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/console/manage': {
@@ -818,10 +918,15 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedConsoleAnalyticsRoute: typeof AuthenticatedConsoleAnalyticsRoute
   AuthenticatedConsoleAssistantRoute: typeof AuthenticatedConsoleAssistantRoute
   AuthenticatedConsoleManageRoute: typeof AuthenticatedConsoleManageRoute
+  AuthenticatedConsolePublishingRoute: typeof AuthenticatedConsolePublishingRoute
+  AuthenticatedConsoleQualityRoute: typeof AuthenticatedConsoleQualityRoute
   AuthenticatedConsoleResourcesRoute: typeof AuthenticatedConsoleResourcesRoute
+  AuthenticatedConsoleReviewsRoute: typeof AuthenticatedConsoleReviewsRoute
   AuthenticatedConsoleSecurityRoute: typeof AuthenticatedConsoleSecurityRoute
+  AuthenticatedConsoleSettingsRoute: typeof AuthenticatedConsoleSettingsRoute
   AuthenticatedConsoleStoreRoute: typeof AuthenticatedConsoleStoreRoute
   AuthenticatedConsoleSubscriptionRoute: typeof AuthenticatedConsoleSubscriptionRoute
+  AuthenticatedConsoleTestingRoute: typeof AuthenticatedConsoleTestingRoute
   AuthenticatedConsoleVerificationRoute: typeof AuthenticatedConsoleVerificationRoute
   AuthenticatedManageIdRoute: typeof AuthenticatedManageIdRoute
   AuthenticatedConsoleIndexRoute: typeof AuthenticatedConsoleIndexRoute
@@ -849,10 +954,15 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedConsoleAnalyticsRoute: AuthenticatedConsoleAnalyticsRoute,
   AuthenticatedConsoleAssistantRoute: AuthenticatedConsoleAssistantRoute,
   AuthenticatedConsoleManageRoute: AuthenticatedConsoleManageRoute,
+  AuthenticatedConsolePublishingRoute: AuthenticatedConsolePublishingRoute,
+  AuthenticatedConsoleQualityRoute: AuthenticatedConsoleQualityRoute,
   AuthenticatedConsoleResourcesRoute: AuthenticatedConsoleResourcesRoute,
+  AuthenticatedConsoleReviewsRoute: AuthenticatedConsoleReviewsRoute,
   AuthenticatedConsoleSecurityRoute: AuthenticatedConsoleSecurityRoute,
+  AuthenticatedConsoleSettingsRoute: AuthenticatedConsoleSettingsRoute,
   AuthenticatedConsoleStoreRoute: AuthenticatedConsoleStoreRoute,
   AuthenticatedConsoleSubscriptionRoute: AuthenticatedConsoleSubscriptionRoute,
+  AuthenticatedConsoleTestingRoute: AuthenticatedConsoleTestingRoute,
   AuthenticatedConsoleVerificationRoute: AuthenticatedConsoleVerificationRoute,
   AuthenticatedManageIdRoute: AuthenticatedManageIdRoute,
   AuthenticatedConsoleIndexRoute: AuthenticatedConsoleIndexRoute,
