@@ -52,9 +52,9 @@ export function MetricTile({
   hint?: string;
 }) {
   return (
-    <div className="surface-card p-4">
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="mt-1 font-display text-[28px] font-bold leading-none tabular-nums">{value}</p>
+    <div className="surface-card p-5 transition-shadow hover:shadow-soft">
+      <p className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">{label}</p>
+      <p className="mt-2 font-display text-[32px] font-bold leading-none tabular-nums">{value}</p>
       {delta !== undefined && delta !== null ? (
         <p
           className={cn(
@@ -84,10 +84,10 @@ export function SectionCard({
   className?: string;
 }) {
   return (
-    <section className={cn("surface-card p-5", className)}>
+    <section className={cn("surface-card p-5 sm:p-6", className)}>
       {(title || action) && (
-        <div className="mb-3 flex items-center justify-between gap-3">
-          {title && <h2 className="font-display text-base font-semibold">{title}</h2>}
+        <div className="mb-4 flex items-center justify-between gap-3">
+          {title && <h2 className="font-display text-[17px] font-semibold tracking-tight">{title}</h2>}
           {action}
         </div>
       )}

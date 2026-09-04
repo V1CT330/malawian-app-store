@@ -138,10 +138,10 @@ export function ConsoleShell({
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <aside className="sticky top-0 hidden h-screen w-[248px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar px-3 py-4 lg:flex">
-        <Link to="/console" className="mb-5 flex items-center gap-2 px-2">
-          <img src={logo} alt="" width={28} height={28} className="h-7 w-7" />
+    <div className="flex min-h-screen bg-muted/40">
+      <aside className="sticky top-0 hidden h-screen w-[264px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar px-4 py-5 lg:flex">
+        <Link to="/console" className="mb-6 flex items-center gap-2.5 rounded-2xl px-2 py-1.5">
+          <img src={logo} alt="" width={32} height={32} className="h-8 w-8" />
           <span className="font-display text-sm font-bold leading-tight">
             Developer
             <span className="block text-xs font-medium text-muted-foreground">Malawian App Store</span>
@@ -165,8 +165,8 @@ export function ConsoleShell({
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur">
-          <div className="flex items-center gap-2 px-3 py-2.5 sm:px-5">
+        <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-xl">
+          <div className="mx-auto flex w-full max-w-6xl items-center gap-2 px-3 py-3 sm:px-6">
             <Sheet open={drawer} onOpenChange={setDrawer}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open console menu">
@@ -267,9 +267,9 @@ export function ConsoleShell({
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-6xl flex-1 px-3 pb-16 pt-4 sm:px-5">
+        <main className="mx-auto w-full max-w-6xl flex-1 px-3 pb-20 pt-5 sm:px-6">
           {breadcrumbs && breadcrumbs.length > 0 && (
-            <ol className="mb-2 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
+            <ol className="mb-3 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
               {breadcrumbs.map((c, i) => (
                 <li key={`${c.label}-${i}`} className="flex items-center gap-1">
                   {c.to ? (
@@ -284,10 +284,12 @@ export function ConsoleShell({
               ))}
             </ol>
           )}
-          <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
+          <div className="console-hero mb-6 flex flex-wrap items-start justify-between gap-4 p-5 sm:p-6">
             <div className="min-w-0">
-              <h1 className="font-display text-2xl font-bold leading-tight">{title}</h1>
-              {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
+              <h1 className="font-display text-2xl font-bold leading-tight sm:text-3xl">{title}</h1>
+              {description && (
+                <p className="mt-1.5 max-w-xl text-sm text-muted-foreground">{description}</p>
+              )}
             </div>
             {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
           </div>
