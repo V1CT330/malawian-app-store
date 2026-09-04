@@ -267,9 +267,9 @@ export function ConsoleShell({
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-6xl flex-1 px-3 pb-16 pt-4 sm:px-5">
+        <main className="mx-auto w-full max-w-6xl flex-1 px-3 pb-20 pt-5 sm:px-6">
           {breadcrumbs && breadcrumbs.length > 0 && (
-            <ol className="mb-2 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
+            <ol className="mb-3 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
               {breadcrumbs.map((c, i) => (
                 <li key={`${c.label}-${i}`} className="flex items-center gap-1">
                   {c.to ? (
