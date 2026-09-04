@@ -84,10 +84,10 @@ export function SectionCard({
   className?: string;
 }) {
   return (
-    <section className={cn("surface-card p-5", className)}>
+    <section className={cn("surface-card p-5 sm:p-6", className)}>
       {(title || action) && (
-        <div className="mb-3 flex items-center justify-between gap-3">
-          {title && <h2 className="font-display text-base font-semibold">{title}</h2>}
+        <div className="mb-4 flex items-center justify-between gap-3">
+          {title && <h2 className="font-display text-[17px] font-semibold tracking-tight">{title}</h2>}
           {action}
         </div>
       )}
