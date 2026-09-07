@@ -188,6 +188,6 @@ function SpotlightPage() {
           <p className="mt-2 text-sm text-muted-foreground">No applications yet.</p>
         )}
       </section>
-    </AppShell>
+    </ConsoleShell>
   );
 }

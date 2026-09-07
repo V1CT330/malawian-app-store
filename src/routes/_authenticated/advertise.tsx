@@ -298,6 +298,6 @@ function AdvertisePage() {
           }
         />
       </section>
-    </AppShell>
+    </ConsoleShell>
   );
 }

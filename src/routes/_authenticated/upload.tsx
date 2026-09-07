@@ -219,6 +219,6 @@ function UploadPage() {
           {publish.isPending ? "Publishing…" : "Publish listing"}
         </Button>
       </div>
-    </AppShell>
+    </ConsoleShell>
   );
 }
