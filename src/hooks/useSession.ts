@@ -66,7 +66,13 @@ export function useProfile() {
       return data as Profile | null;
     },
   });
-  return { userId, ready, profile: query.data ?? null, isLoading: query.isLoading };
+  return {
+    userId,
+    ready,
+    profile: query.data ?? null,
+    isLoading: query.isLoading,
+    isFetching: query.isFetching,
+  };
 }
 
 /** True when the signed-in account holds the admin role. */

@@ -100,7 +100,7 @@ function SettingsPage() {
       setTermsOpen(false);
       await queryClient.invalidateQueries({ queryKey: ["profile", userId] });
       toast.success(next === "developer" ? "Developer workspace on" : "Back to the store");
-      navigate({ to: next === "developer" ? "/dashboard" : "/" });
+      navigate({ to: next === "developer" ? "/console" : "/" });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -218,10 +218,10 @@ function SettingsPage() {
           </p>
           <div className="grid gap-2 sm:grid-cols-2">
             {[
-              { to: "/dashboard", label: "Developer dashboard" },
-              { to: "/profile", label: "My public profile" },
-              { to: "/verification", label: "Verification" },
-              { to: "/pro", label: PRO_NAME },
+              { to: "/console", label: "Developer console" },
+              { to: "/console/store", label: "My public profile" },
+              { to: "/console/verification", label: "Verification" },
+              { to: "/console/subscription", label: PRO_NAME },
             ].map((l) => (
               <Button key={l.to} asChild size="sm" variant="outline">
                 <Link to={l.to}>{l.label}</Link>

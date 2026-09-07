@@ -9,6 +9,8 @@ export const CONSOLE_NAV = [
   { to: "/console/quality", label: "Quality", icon: "quality" },
   { to: "/console/analytics", label: "Analytics", icon: "analytics" },
   { to: "/console/reviews", label: "Reviews", icon: "reviews" },
+  { to: "/advertise", label: "Advertise", icon: "advertise" },
+  { to: "/spotlight", label: "Spotlight", icon: "spotlight" },
   { to: "/console/store", label: "Store listing", icon: "store" },
   { to: "/console/manage", label: "Manage", icon: "manage" },
   { to: "/console/settings", label: "Settings", icon: "settings" },

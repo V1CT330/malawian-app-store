@@ -3,7 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { AppShell } from "@/components/AppShell";
+import { ConsoleShell } from "@/components/console/ConsoleShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -108,11 +108,11 @@ function UploadPage() {
   });
 
   return (
-    <AppShell>
-      <h1 className="font-display text-2xl font-bold">Publish a listing</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Apps and websites are reviewed by the store team after publishing.
-      </p>
+    <ConsoleShell
+      title="Publish a listing"
+      description="Apps and websites are reviewed by the store team after publishing."
+      breadcrumbs={[{ label: "Console", to: "/console" }, { label: "Publish a listing" }]}
+    >
 
       <div className="mt-5 space-y-4">
         <div>
@@ -219,6 +219,6 @@ function UploadPage() {
           {publish.isPending ? "Publishing…" : "Publish listing"}
         </Button>
       </div>
-    </AppShell>
+    </ConsoleShell>
   );
 }

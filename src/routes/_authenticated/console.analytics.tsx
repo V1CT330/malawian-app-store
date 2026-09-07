@@ -211,7 +211,7 @@ function AnalyticsPage() {
                   </Button>
                 )}
                 <Button asChild size="sm" variant="outline">
-                  <Link to="/manage/$id" params={{ id: l.id }}>
+                  <Link to="/console/products/$id" params={{ id: l.id }}>
                     Manage
                   </Link>
                 </Button>

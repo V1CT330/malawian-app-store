@@ -4,8 +4,7 @@ import { BadgeCheck } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { AppShell } from "@/components/AppShell";
-import { PortalTabs } from "@/components/PortalTabs";
+import { ConsoleShell } from "@/components/console/ConsoleShell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -91,15 +90,11 @@ function SpotlightPage() {
   const verified = profile?.kyc_status === "approved";
 
   return (
-    <AppShell>
-      <h1 className="font-display text-2xl font-bold">Spotlight</h1>
-      <p className="text-sm text-muted-foreground">
-        Feature opportunities for developers building for Malawi.
-      </p>
-
-      <div className="mt-4">
-        <PortalTabs />
-      </div>
+    <ConsoleShell
+      title="Spotlight"
+      description="Feature opportunities for developers building for Malawi."
+      breadcrumbs={[{ label: "Console", to: "/console" }, { label: "Spotlight" }]}
+    >
 
       <section className="surface-card p-4">
         <div className="flex items-center justify-between gap-2">
@@ -189,6 +184,6 @@ function SpotlightPage() {
           <p className="mt-2 text-sm text-muted-foreground">No applications yet.</p>
         )}
       </section>
-    </AppShell>
+    </ConsoleShell>
   );
 }
