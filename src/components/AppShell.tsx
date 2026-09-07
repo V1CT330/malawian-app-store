@@ -26,10 +26,10 @@ const USER_NAV = [
 ] as const;
 
 const DEV_NAV = [
-  { to: "/dashboard", label: "Home", icon: LayoutDashboard },
+  { to: "/console", label: "Home", icon: LayoutDashboard },
   { to: "/upload", label: "Upload", icon: Upload },
-  { to: "/analytics", label: "Stats", icon: BarChart3 },
-  { to: "/assistant", label: "AI", icon: GeminiIcon },
+  { to: "/console/analytics", label: "Stats", icon: BarChart3 },
+  { to: "/console/assistant", label: "AI", icon: GeminiIcon },
 ] as const;
 
 export function AppShell({
