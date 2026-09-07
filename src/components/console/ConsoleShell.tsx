@@ -52,6 +52,8 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   quality: ClipboardCheck,
   analytics: LineChart,
   reviews: MessageSquare,
+  advertise: Megaphone,
+  spotlight: Sparkles,
   store: Store,
   manage: Users,
   settings: Settings,
