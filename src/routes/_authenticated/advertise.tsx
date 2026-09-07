@@ -122,15 +122,11 @@ function AdvertisePage() {
   });
 
   return (
-    <AppShell>
-      <h1 className="font-display text-2xl font-bold">Advertise</h1>
-      <p className="text-sm text-muted-foreground">
-        Promote your products inside the store and reach people browsing for local software.
-      </p>
-
-      <div className="mt-4">
-        <PortalTabs />
-      </div>
+    <ConsoleShell
+      title="Advertise"
+      description="Promote your products inside the store and reach people browsing for local software."
+      breadcrumbs={[{ label: "Console", to: "/console" }, { label: "Advertise" }]}
+    >
 
       {founding.data?.enabled && founding.data.promo_credit_mwk > 0 && (
         <section className="surface-card mb-4 border-l-4 border-l-brand-green p-4">
