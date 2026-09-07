@@ -4,8 +4,7 @@ import { BadgeCheck } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { AppShell } from "@/components/AppShell";
-import { PortalTabs } from "@/components/PortalTabs";
+import { ConsoleShell } from "@/components/console/ConsoleShell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
