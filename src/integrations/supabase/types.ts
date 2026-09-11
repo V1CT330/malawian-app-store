@@ -308,6 +308,145 @@ export type Database = {
         }
         Relationships: []
       }
+      hosting_deployments: {
+        Row: {
+          build_log: string | null
+          commit_message: string | null
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          owner_id: string
+          project_id: string
+          source: string
+          status: string
+          url: string | null
+        }
+        Insert: {
+          build_log?: string | null
+          commit_message?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          owner_id: string
+          project_id: string
+          source?: string
+          status?: string
+          url?: string | null
+        }
+        Update: {
+          build_log?: string | null
+          commit_message?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          owner_id?: string
+          project_id?: string
+          source?: string
+          status?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hosting_deployments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "hosting_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hosting_domains: {
+        Row: {
+          created_at: string
+          domain: string
+          id: string
+          is_primary: boolean
+          owner_id: string
+          project_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          domain: string
+          id?: string
+          is_primary?: boolean
+          owner_id: string
+          project_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          domain?: string
+          id?: string
+          is_primary?: boolean
+          owner_id?: string
+          project_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hosting_domains_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "hosting_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hosting_projects: {
+        Row: {
+          bandwidth_mb: number
+          branch: string
+          created_at: string
+          framework: string
+          id: string
+          last_deployed_at: string | null
+          name: string
+          owner_id: string
+          provider: string
+          repo_url: string | null
+          slug: string
+          source: string
+          status: string
+          updated_at: string
+          visits: number
+        }
+        Insert: {
+          bandwidth_mb?: number
+          branch?: string
+          created_at?: string
+          framework?: string
+          id?: string
+          last_deployed_at?: string | null
+          name: string
+          owner_id: string
+          provider?: string
+          repo_url?: string | null
+          slug: string
+          source?: string
+          status?: string
+          updated_at?: string
+          visits?: number
+        }
+        Update: {
+          bandwidth_mb?: number
+          branch?: string
+          created_at?: string
+          framework?: string
+          id?: string
+          last_deployed_at?: string | null
+          name?: string
+          owner_id?: string
+          provider?: string
+          repo_url?: string | null
+          slug?: string
+          source?: string
+          status?: string
+          updated_at?: string
+          visits?: number
+        }
+        Relationships: []
+      }
       install_events: {
         Row: {
           country: string | null
