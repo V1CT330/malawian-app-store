@@ -129,6 +129,42 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           document.head.appendChild(style);
         `,
       },
+      {
+        children: `
+          (function() {
+            const PATTERNS = [/lovable/i, /made with lovable/i];
+            const SELECTORS = 'a, div, span, footer, [data-lovable-badge]';
+
+            function shouldHide(el) {
+              const text = (el.innerText || '').trim();
+              const href = el.href || el.getAttribute?.('href') || '';
+              const cls = el.className?.toString() || '';
+              const id = el.id || '';
+              const combined = \`\${text} \${href} \${cls} \${id}\`;
+              return PATTERNS.some(rx => rx.test(combined)) && 
+                     (text.length < 100 || /lovable/i.test(href)); // avoid hiding big paragraphs
+            }
+
+            function scrub() {
+              document.querySelectorAll(SELECTORS).forEach(el => {
+                if (shouldHide(el)) {
+                  el.style.setProperty('display', 'none', 'important');
+                  el.remove();
+                }
+              });
+              // scrub meta generator
+              document.querySelectorAll('meta[name="generator"], meta[property="og:site_name"]').forEach(m => {
+                if (/lovable/i.test(m.content)) m.remove();
+              });
+            }
+
+            const observer = new MutationObserver(scrub);
+            observer.observe(document.documentElement, { childList: true, subtree: true });
+            window.addEventListener('load', scrub);
+            scrub();
+          })();
+        `,
+      },
     ],
   }),
   shellComponent: RootShell,
