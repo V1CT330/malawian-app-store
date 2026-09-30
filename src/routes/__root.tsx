@@ -105,6 +105,31 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { rel: "icon", href: "/favicon.png", type: "image/png" },
     ],
+    scripts: [
+      {
+        children: `
+          const style = document.createElement('style');
+          style.id = 'lovable-inhibitor-css';
+          style.textContent = \`
+            /* Hide badge / watermark selectors Lovable has used */
+            [data-lovable-badge],
+            [class*="lovable-badge"],
+            [class*="LovableBadge"],
+            [id*="lovable-badge"],
+            a[href*="lovable.dev"],
+            a[href*="lovable.app"] {
+              display: none !important;
+              visibility: hidden !important;
+              opacity: 0 !important;
+              pointer-events: none !important;
+              width: 0 !important;
+              height: 0 !important;
+            }
+          \`;
+          document.head.appendChild(style);
+        `,
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
