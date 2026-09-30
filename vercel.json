@@ -1,0 +1,23 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".output/public",
+  "nodeVersion": "20.x",
+  "framework": "other",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/server"
+    }
+  ],
+  "env": {
+    "SUPABASE_URL": "@supabase_url",
+    "SUPABASE_PUBLISHABLE_KEY": "@supabase_publishable_key",
+    "SUPABASE_PROJECT_ID": "@supabase_project_id",
+    "VITE_SUPABASE_URL": "@supabase_url",
+    "VITE_SUPABASE_PUBLISHABLE_KEY": "@supabase_publishable_key",
+    "VITE_SUPABASE_PROJECT_ID": "@supabase_project_id"
+  },
+  "git": {
+    "silent": false
+  }
+}
