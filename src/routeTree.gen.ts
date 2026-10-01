@@ -9,61 +9,60 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as McpRouteImport } from './routes/mcp'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as DevelopersIdRouteImport } from './routes/developers.$id'
-import { Route as AppsSlugRouteImport } from './routes/apps.$slug'
-import { Route as AuthenticatedVerificationRouteImport } from './routes/_authenticated/verification'
-import { Route as AuthenticatedUploadRouteImport } from './routes/_authenticated/upload'
-import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated/team'
-import { Route as AuthenticatedSpotlightRouteImport } from './routes/_authenticated/spotlight'
-import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
-import { Route as AuthenticatedSecurityRouteImport } from './routes/_authenticated/security'
-import { Route as AuthenticatedResourcesRouteImport } from './routes/_authenticated/resources'
-import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
-import { Route as AuthenticatedProRouteImport } from './routes/_authenticated/pro'
-import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
-import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedAssistantRouteImport } from './routes/_authenticated/assistant'
-import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
-import { Route as AuthenticatedAdvertiseRouteImport } from './routes/_authenticated/advertise'
-import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
-import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as McpRouteImport } from './routes/mcp'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
-import { Route as AuthenticatedConsoleIndexRouteImport } from './routes/_authenticated/console.index'
-import { Route as AuthenticatedManageIdRouteImport } from './routes/_authenticated/manage.$id'
-import { Route as AuthenticatedConsoleVerificationRouteImport } from './routes/_authenticated/console.verification'
-import { Route as AuthenticatedConsoleTestingRouteImport } from './routes/_authenticated/console.testing'
-import { Route as AuthenticatedConsoleSubscriptionRouteImport } from './routes/_authenticated/console.subscription'
-import { Route as AuthenticatedConsoleStoreRouteImport } from './routes/_authenticated/console.store'
-import { Route as AuthenticatedConsoleSettingsRouteImport } from './routes/_authenticated/console.settings'
-import { Route as AuthenticatedConsoleSecurityRouteImport } from './routes/_authenticated/console.security'
-import { Route as AuthenticatedConsoleReviewsRouteImport } from './routes/_authenticated/console.reviews'
-import { Route as AuthenticatedConsoleResourcesRouteImport } from './routes/_authenticated/console.resources'
-import { Route as AuthenticatedConsoleQualityRouteImport } from './routes/_authenticated/console.quality'
-import { Route as AuthenticatedConsolePublishingRouteImport } from './routes/_authenticated/console.publishing'
-import { Route as AuthenticatedConsoleManageRouteImport } from './routes/_authenticated/console.manage'
-import { Route as AuthenticatedConsoleAssistantRouteImport } from './routes/_authenticated/console.assistant'
-import { Route as AuthenticatedConsoleAnalyticsRouteImport } from './routes/_authenticated/console.analytics'
-import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAdvertiseRouteImport } from './routes/_authenticated/advertise'
+import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
+import { Route as AuthenticatedAssistantRouteImport } from './routes/_authenticated/assistant'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
+import { Route as AuthenticatedProRouteImport } from './routes/_authenticated/pro'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedResourcesRouteImport } from './routes/_authenticated/resources'
+import { Route as AuthenticatedSecurityRouteImport } from './routes/_authenticated/security'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedSpotlightRouteImport } from './routes/_authenticated/spotlight'
+import { Route as AuthenticatedTeamRouteImport } from './routes/_authenticated/team'
+import { Route as AuthenticatedUploadRouteImport } from './routes/_authenticated/upload'
+import { Route as AuthenticatedVerificationRouteImport } from './routes/_authenticated/verification'
+import { Route as AppsSlugRouteImport } from './routes/apps.$slug'
+import { Route as DevelopersIdRouteImport } from './routes/developers.$id'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
-import { Route as AuthenticatedConsoleProductsIndexRouteImport } from './routes/_authenticated/console.products.index'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as AuthenticatedConsoleIndexRouteImport } from './routes/_authenticated/console.index'
+import { Route as AuthenticatedConsoleAnalyticsRouteImport } from './routes/_authenticated/console.analytics'
+import { Route as AuthenticatedConsoleAssistantRouteImport } from './routes/_authenticated/console.assistant'
+import { Route as AuthenticatedConsoleManageRouteImport } from './routes/_authenticated/console.manage'
+import { Route as AuthenticatedConsolePublishingRouteImport } from './routes/_authenticated/console.publishing'
+import { Route as AuthenticatedConsoleQualityRouteImport } from './routes/_authenticated/console.quality'
+import { Route as AuthenticatedConsoleResourcesRouteImport } from './routes/_authenticated/console.resources'
+import { Route as AuthenticatedConsoleReviewsRouteImport } from './routes/_authenticated/console.reviews'
+import { Route as AuthenticatedConsoleSecurityRouteImport } from './routes/_authenticated/console.security'
+import { Route as AuthenticatedConsoleSettingsRouteImport } from './routes/_authenticated/console.settings'
+import { Route as AuthenticatedConsoleStoreRouteImport } from './routes/_authenticated/console.store'
+import { Route as AuthenticatedConsoleSubscriptionRouteImport } from './routes/_authenticated/console.subscription'
+import { Route as AuthenticatedConsoleTestingRouteImport } from './routes/_authenticated/console.testing'
+import { Route as AuthenticatedConsoleVerificationRouteImport } from './routes/_authenticated/console.verification'
+import { Route as AuthenticatedManageIdRouteImport } from './routes/_authenticated/manage.$id'
 import { Route as AuthenticatedConsoleHostingIndexRouteImport } from './routes/_authenticated/console.hosting.index'
-import { Route as AuthenticatedConsoleProductsIdRouteImport } from './routes/_authenticated/console.products.$id'
 import { Route as AuthenticatedConsoleHostingIdRouteImport } from './routes/_authenticated/console.hosting.$id'
+import { Route as AuthenticatedConsoleProductsIndexRouteImport } from './routes/_authenticated/console.products.index'
+import { Route as AuthenticatedConsoleProductsIdRouteImport } from './routes/_authenticated/console.products.$id'
 
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const McpRoute = McpRouteImport.update({
-  id: '/mcp',
-  path: '/mcp',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -71,69 +70,56 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DevelopersIdRoute = DevelopersIdRouteImport.update({
-  id: '/developers/$id',
-  path: '/developers/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppsSlugRoute = AppsSlugRouteImport.update({
-  id: '/apps/$slug',
-  path: '/apps/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedVerificationRoute =
-  AuthenticatedVerificationRouteImport.update({
-    id: '/verification',
-    path: '/verification',
-    getParentRoute: () => AuthenticatedRouteRoute,
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
+    getParentRoute: () => rootRouteImport,
   } as any)
-const AuthenticatedUploadRoute = AuthenticatedUploadRouteImport.update({
-  id: '/upload',
-  path: '/upload',
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedTeamRoute = AuthenticatedTeamRouteImport.update({
-  id: '/team',
-  path: '/team',
+const AuthenticatedAdvertiseRoute = AuthenticatedAdvertiseRouteImport.update({
+  id: '/advertise',
+  path: '/advertise',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedSpotlightRoute = AuthenticatedSpotlightRouteImport.update({
-  id: '/spotlight',
-  path: '/spotlight',
+const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
+const AuthenticatedAssistantRoute = AuthenticatedAssistantRouteImport.update({
+  id: '/assistant',
+  path: '/assistant',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedSecurityRoute = AuthenticatedSecurityRouteImport.update({
-  id: '/security',
-  path: '/security',
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedResourcesRoute = AuthenticatedResourcesRouteImport.update({
-  id: '/resources',
-  path: '/resources',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedProRoute = AuthenticatedProRouteImport.update({
-  id: '/pro',
-  path: '/pro',
+const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedNotificationsRoute =
@@ -142,46 +128,71 @@ const AuthenticatedNotificationsRoute =
     path: '/notifications',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
-  id: '/library',
-  path: '/library',
+const AuthenticatedProRoute = AuthenticatedProRouteImport.update({
+  id: '/pro',
+  path: '/pro',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAssistantRoute = AuthenticatedAssistantRouteImport.update({
-  id: '/assistant',
-  path: '/assistant',
+const AuthenticatedResourcesRoute = AuthenticatedResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
-  id: '/analytics',
-  path: '/analytics',
+const AuthenticatedSecurityRoute = AuthenticatedSecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAdvertiseRoute = AuthenticatedAdvertiseRouteImport.update({
-  id: '/advertise',
-  path: '/advertise',
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const AuthenticatedSpotlightRoute = AuthenticatedSpotlightRouteImport.update({
+  id: '/spotlight',
+  path: '/spotlight',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const Char91DotwellKnownChar93OauthProtectedResourceRoute =
-  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
-    id: '/.well-known/oauth-protected-resource',
-    path: '/.well-known/oauth-protected-resource',
-    getParentRoute: () => rootRouteImport,
+const AuthenticatedTeamRoute = AuthenticatedTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedUploadRoute = AuthenticatedUploadRouteImport.update({
+  id: '/upload',
+  path: '/upload',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedVerificationRoute =
+  AuthenticatedVerificationRouteImport.update({
+    id: '/verification',
+    path: '/verification',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const Char91DotmcpChar93ListToolsRoute =
-  Char91DotmcpChar93ListToolsRouteImport.update({
-    id: '/.mcp/list-tools',
-    path: '/.mcp/list-tools',
+const AppsSlugRoute = AppsSlugRouteImport.update({
+  id: '/apps/$slug',
+  path: '/apps/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DevelopersIdRoute = DevelopersIdRouteImport.update({
+  id: '/developers/$id',
+  path: '/developers/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
     getParentRoute: () => rootRouteImport,
   } as any)
 const AuthenticatedConsoleIndexRoute =
@@ -190,75 +201,10 @@ const AuthenticatedConsoleIndexRoute =
     path: '/console/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedManageIdRoute = AuthenticatedManageIdRouteImport.update({
-  id: '/manage/$id',
-  path: '/manage/$id',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedConsoleVerificationRoute =
-  AuthenticatedConsoleVerificationRouteImport.update({
-    id: '/console/verification',
-    path: '/console/verification',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedConsoleTestingRoute =
-  AuthenticatedConsoleTestingRouteImport.update({
-    id: '/console/testing',
-    path: '/console/testing',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedConsoleSubscriptionRoute =
-  AuthenticatedConsoleSubscriptionRouteImport.update({
-    id: '/console/subscription',
-    path: '/console/subscription',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedConsoleStoreRoute =
-  AuthenticatedConsoleStoreRouteImport.update({
-    id: '/console/store',
-    path: '/console/store',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedConsoleSettingsRoute =
-  AuthenticatedConsoleSettingsRouteImport.update({
-    id: '/console/settings',
-    path: '/console/settings',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedConsoleSecurityRoute =
-  AuthenticatedConsoleSecurityRouteImport.update({
-    id: '/console/security',
-    path: '/console/security',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedConsoleReviewsRoute =
-  AuthenticatedConsoleReviewsRouteImport.update({
-    id: '/console/reviews',
-    path: '/console/reviews',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedConsoleResourcesRoute =
-  AuthenticatedConsoleResourcesRouteImport.update({
-    id: '/console/resources',
-    path: '/console/resources',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedConsoleQualityRoute =
-  AuthenticatedConsoleQualityRouteImport.update({
-    id: '/console/quality',
-    path: '/console/quality',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedConsolePublishingRoute =
-  AuthenticatedConsolePublishingRouteImport.update({
-    id: '/console/publishing',
-    path: '/console/publishing',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedConsoleManageRoute =
-  AuthenticatedConsoleManageRouteImport.update({
-    id: '/console/manage',
-    path: '/console/manage',
+const AuthenticatedConsoleAnalyticsRoute =
+  AuthenticatedConsoleAnalyticsRouteImport.update({
+    id: '/console/analytics',
+    path: '/console/analytics',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedConsoleAssistantRoute =
@@ -267,45 +213,99 @@ const AuthenticatedConsoleAssistantRoute =
     path: '/console/assistant',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedConsoleAnalyticsRoute =
-  AuthenticatedConsoleAnalyticsRouteImport.update({
-    id: '/console/analytics',
-    path: '/console/analytics',
+const AuthenticatedConsoleManageRoute =
+  AuthenticatedConsoleManageRouteImport.update({
+    id: '/console/manage',
+    path: '/console/manage',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const Char91DotmcpChar93InvokeToolToolRoute =
-  Char91DotmcpChar93InvokeToolToolRouteImport.update({
-    id: '/.mcp/invoke-tool/$tool',
-    path: '/.mcp/invoke-tool/$tool',
-    getParentRoute: () => rootRouteImport,
+const AuthenticatedConsolePublishingRoute =
+  AuthenticatedConsolePublishingRouteImport.update({
+    id: '/console/publishing',
+    path: '/console/publishing',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
-  id: '/.lovable/oauth/consent',
-  path: '/.lovable/oauth/consent',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedConsoleQualityRoute =
+  AuthenticatedConsoleQualityRouteImport.update({
+    id: '/console/quality',
+    path: '/console/quality',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleResourcesRoute =
+  AuthenticatedConsoleResourcesRouteImport.update({
+    id: '/console/resources',
+    path: '/console/resources',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleReviewsRoute =
+  AuthenticatedConsoleReviewsRouteImport.update({
+    id: '/console/reviews',
+    path: '/console/reviews',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleSecurityRoute =
+  AuthenticatedConsoleSecurityRouteImport.update({
+    id: '/console/security',
+    path: '/console/security',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleSettingsRoute =
+  AuthenticatedConsoleSettingsRouteImport.update({
+    id: '/console/settings',
+    path: '/console/settings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleStoreRoute =
+  AuthenticatedConsoleStoreRouteImport.update({
+    id: '/console/store',
+    path: '/console/store',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleSubscriptionRoute =
+  AuthenticatedConsoleSubscriptionRouteImport.update({
+    id: '/console/subscription',
+    path: '/console/subscription',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleTestingRoute =
+  AuthenticatedConsoleTestingRouteImport.update({
+    id: '/console/testing',
+    path: '/console/testing',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleVerificationRoute =
+  AuthenticatedConsoleVerificationRouteImport.update({
+    id: '/console/verification',
+    path: '/console/verification',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedManageIdRoute = AuthenticatedManageIdRouteImport.update({
+  id: '/manage/$id',
+  path: '/manage/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedConsoleProductsIndexRoute =
-  AuthenticatedConsoleProductsIndexRouteImport.update({
-    id: '/console/products/',
-    path: '/console/products/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedConsoleHostingIndexRoute =
   AuthenticatedConsoleHostingIndexRouteImport.update({
     id: '/console/hosting/',
     path: '/console/hosting/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedConsoleProductsIdRoute =
-  AuthenticatedConsoleProductsIdRouteImport.update({
-    id: '/console/products/$id',
-    path: '/console/products/$id',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedConsoleHostingIdRoute =
   AuthenticatedConsoleHostingIdRouteImport.update({
     id: '/console/hosting/$id',
     path: '/console/hosting/$id',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleProductsIndexRoute =
+  AuthenticatedConsoleProductsIndexRouteImport.update({
+    id: '/console/products/',
+    path: '/console/products/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedConsoleProductsIdRoute =
+  AuthenticatedConsoleProductsIdRouteImport.update({
+    id: '/console/products/$id',
+    path: '/console/products/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
@@ -613,25 +613,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mcp': {
-      id: '/mcp'
-      path: '/mcp'
-      fullPath: '/mcp'
-      preLoaderRoute: typeof McpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -641,144 +627,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/developers/$id': {
-      id: '/developers/$id'
-      path: '/developers/$id'
-      fullPath: '/developers/$id'
-      preLoaderRoute: typeof DevelopersIdRouteImport
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/apps/$slug': {
-      id: '/apps/$slug'
-      path: '/apps/$slug'
-      fullPath: '/apps/$slug'
-      preLoaderRoute: typeof AppsSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/verification': {
-      id: '/_authenticated/verification'
-      path: '/verification'
-      fullPath: '/verification'
-      preLoaderRoute: typeof AuthenticatedVerificationRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/upload': {
-      id: '/_authenticated/upload'
-      path: '/upload'
-      fullPath: '/upload'
-      preLoaderRoute: typeof AuthenticatedUploadRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/team': {
-      id: '/_authenticated/team'
-      path: '/team'
-      fullPath: '/team'
-      preLoaderRoute: typeof AuthenticatedTeamRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/spotlight': {
-      id: '/_authenticated/spotlight'
-      path: '/spotlight'
-      fullPath: '/spotlight'
-      preLoaderRoute: typeof AuthenticatedSpotlightRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/settings': {
-      id: '/_authenticated/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/security': {
-      id: '/_authenticated/security'
-      path: '/security'
-      fullPath: '/security'
-      preLoaderRoute: typeof AuthenticatedSecurityRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/resources': {
-      id: '/_authenticated/resources'
-      path: '/resources'
-      fullPath: '/resources'
-      preLoaderRoute: typeof AuthenticatedResourcesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/profile': {
-      id: '/_authenticated/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof AuthenticatedProfileRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/pro': {
-      id: '/_authenticated/pro'
-      path: '/pro'
-      fullPath: '/pro'
-      preLoaderRoute: typeof AuthenticatedProRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/notifications': {
-      id: '/_authenticated/notifications'
-      path: '/notifications'
-      fullPath: '/notifications'
-      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/library': {
-      id: '/_authenticated/library'
-      path: '/library'
-      fullPath: '/library'
-      preLoaderRoute: typeof AuthenticatedLibraryRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/assistant': {
-      id: '/_authenticated/assistant'
-      path: '/assistant'
-      fullPath: '/assistant'
-      preLoaderRoute: typeof AuthenticatedAssistantRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/analytics': {
-      id: '/_authenticated/analytics'
-      path: '/analytics'
-      fullPath: '/analytics'
-      preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/advertise': {
-      id: '/_authenticated/advertise'
-      path: '/advertise'
-      fullPath: '/advertise'
-      preLoaderRoute: typeof AuthenticatedAdvertiseRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/.well-known/oauth-protected-resource': {
-      id: '/.well-known/oauth-protected-resource'
-      path: '/.well-known/oauth-protected-resource'
-      fullPath: '/.well-known/oauth-protected-resource'
-      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.mcp/list-tools': {
@@ -788,116 +655,137 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/console/': {
-      id: '/_authenticated/console/'
-      path: '/console'
-      fullPath: '/console/'
-      preLoaderRoute: typeof AuthenticatedConsoleIndexRouteImport
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/manage/$id': {
-      id: '/_authenticated/manage/$id'
-      path: '/manage/$id'
-      fullPath: '/manage/$id'
-      preLoaderRoute: typeof AuthenticatedManageIdRouteImport
+    '/_authenticated/advertise': {
+      id: '/_authenticated/advertise'
+      path: '/advertise'
+      fullPath: '/advertise'
+      preLoaderRoute: typeof AuthenticatedAdvertiseRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/console/verification': {
-      id: '/_authenticated/console/verification'
-      path: '/console/verification'
-      fullPath: '/console/verification'
-      preLoaderRoute: typeof AuthenticatedConsoleVerificationRouteImport
+    '/_authenticated/analytics': {
+      id: '/_authenticated/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/console/testing': {
-      id: '/_authenticated/console/testing'
-      path: '/console/testing'
-      fullPath: '/console/testing'
-      preLoaderRoute: typeof AuthenticatedConsoleTestingRouteImport
+    '/_authenticated/assistant': {
+      id: '/_authenticated/assistant'
+      path: '/assistant'
+      fullPath: '/assistant'
+      preLoaderRoute: typeof AuthenticatedAssistantRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/console/subscription': {
-      id: '/_authenticated/console/subscription'
-      path: '/console/subscription'
-      fullPath: '/console/subscription'
-      preLoaderRoute: typeof AuthenticatedConsoleSubscriptionRouteImport
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/console/store': {
-      id: '/_authenticated/console/store'
-      path: '/console/store'
-      fullPath: '/console/store'
-      preLoaderRoute: typeof AuthenticatedConsoleStoreRouteImport
+    '/_authenticated/library': {
+      id: '/_authenticated/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof AuthenticatedLibraryRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/console/settings': {
-      id: '/_authenticated/console/settings'
-      path: '/console/settings'
-      fullPath: '/console/settings'
-      preLoaderRoute: typeof AuthenticatedConsoleSettingsRouteImport
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/console/security': {
-      id: '/_authenticated/console/security'
-      path: '/console/security'
-      fullPath: '/console/security'
-      preLoaderRoute: typeof AuthenticatedConsoleSecurityRouteImport
+    '/_authenticated/pro': {
+      id: '/_authenticated/pro'
+      path: '/pro'
+      fullPath: '/pro'
+      preLoaderRoute: typeof AuthenticatedProRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/console/reviews': {
-      id: '/_authenticated/console/reviews'
-      path: '/console/reviews'
-      fullPath: '/console/reviews'
-      preLoaderRoute: typeof AuthenticatedConsoleReviewsRouteImport
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/console/resources': {
-      id: '/_authenticated/console/resources'
-      path: '/console/resources'
-      fullPath: '/console/resources'
-      preLoaderRoute: typeof AuthenticatedConsoleResourcesRouteImport
+    '/_authenticated/resources': {
+      id: '/_authenticated/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof AuthenticatedResourcesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/console/quality': {
-      id: '/_authenticated/console/quality'
-      path: '/console/quality'
-      fullPath: '/console/quality'
-      preLoaderRoute: typeof AuthenticatedConsoleQualityRouteImport
+    '/_authenticated/security': {
+      id: '/_authenticated/security'
+      path: '/security'
+      fullPath: '/security'
+      preLoaderRoute: typeof AuthenticatedSecurityRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/console/publishing': {
-      id: '/_authenticated/console/publishing'
-      path: '/console/publishing'
-      fullPath: '/console/publishing'
-      preLoaderRoute: typeof AuthenticatedConsolePublishingRouteImport
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/console/manage': {
-      id: '/_authenticated/console/manage'
-      path: '/console/manage'
-      fullPath: '/console/manage'
-      preLoaderRoute: typeof AuthenticatedConsoleManageRouteImport
+    '/_authenticated/spotlight': {
+      id: '/_authenticated/spotlight'
+      path: '/spotlight'
+      fullPath: '/spotlight'
+      preLoaderRoute: typeof AuthenticatedSpotlightRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/console/assistant': {
-      id: '/_authenticated/console/assistant'
-      path: '/console/assistant'
-      fullPath: '/console/assistant'
-      preLoaderRoute: typeof AuthenticatedConsoleAssistantRouteImport
+    '/_authenticated/team': {
+      id: '/_authenticated/team'
+      path: '/team'
+      fullPath: '/team'
+      preLoaderRoute: typeof AuthenticatedTeamRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/console/analytics': {
-      id: '/_authenticated/console/analytics'
-      path: '/console/analytics'
-      fullPath: '/console/analytics'
-      preLoaderRoute: typeof AuthenticatedConsoleAnalyticsRouteImport
+    '/_authenticated/upload': {
+      id: '/_authenticated/upload'
+      path: '/upload'
+      fullPath: '/upload'
+      preLoaderRoute: typeof AuthenticatedUploadRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/.mcp/invoke-tool/$tool': {
-      id: '/.mcp/invoke-tool/$tool'
-      path: '/.mcp/invoke-tool/$tool'
-      fullPath: '/.mcp/invoke-tool/$tool'
-      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+    '/_authenticated/verification': {
+      id: '/_authenticated/verification'
+      path: '/verification'
+      fullPath: '/verification'
+      preLoaderRoute: typeof AuthenticatedVerificationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/apps/$slug': {
+      id: '/apps/$slug'
+      path: '/apps/$slug'
+      fullPath: '/apps/$slug'
+      preLoaderRoute: typeof AppsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/developers/$id': {
+      id: '/developers/$id'
+      path: '/developers/$id'
+      fullPath: '/developers/$id'
+      preLoaderRoute: typeof DevelopersIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.lovable/oauth/consent': {
@@ -907,11 +795,116 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/console/products/': {
-      id: '/_authenticated/console/products/'
-      path: '/console/products'
-      fullPath: '/console/products/'
-      preLoaderRoute: typeof AuthenticatedConsoleProductsIndexRouteImport
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/console/': {
+      id: '/_authenticated/console/'
+      path: '/console'
+      fullPath: '/console/'
+      preLoaderRoute: typeof AuthenticatedConsoleIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/analytics': {
+      id: '/_authenticated/console/analytics'
+      path: '/console/analytics'
+      fullPath: '/console/analytics'
+      preLoaderRoute: typeof AuthenticatedConsoleAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/assistant': {
+      id: '/_authenticated/console/assistant'
+      path: '/console/assistant'
+      fullPath: '/console/assistant'
+      preLoaderRoute: typeof AuthenticatedConsoleAssistantRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/manage': {
+      id: '/_authenticated/console/manage'
+      path: '/console/manage'
+      fullPath: '/console/manage'
+      preLoaderRoute: typeof AuthenticatedConsoleManageRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/publishing': {
+      id: '/_authenticated/console/publishing'
+      path: '/console/publishing'
+      fullPath: '/console/publishing'
+      preLoaderRoute: typeof AuthenticatedConsolePublishingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/quality': {
+      id: '/_authenticated/console/quality'
+      path: '/console/quality'
+      fullPath: '/console/quality'
+      preLoaderRoute: typeof AuthenticatedConsoleQualityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/resources': {
+      id: '/_authenticated/console/resources'
+      path: '/console/resources'
+      fullPath: '/console/resources'
+      preLoaderRoute: typeof AuthenticatedConsoleResourcesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/reviews': {
+      id: '/_authenticated/console/reviews'
+      path: '/console/reviews'
+      fullPath: '/console/reviews'
+      preLoaderRoute: typeof AuthenticatedConsoleReviewsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/security': {
+      id: '/_authenticated/console/security'
+      path: '/console/security'
+      fullPath: '/console/security'
+      preLoaderRoute: typeof AuthenticatedConsoleSecurityRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/settings': {
+      id: '/_authenticated/console/settings'
+      path: '/console/settings'
+      fullPath: '/console/settings'
+      preLoaderRoute: typeof AuthenticatedConsoleSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/store': {
+      id: '/_authenticated/console/store'
+      path: '/console/store'
+      fullPath: '/console/store'
+      preLoaderRoute: typeof AuthenticatedConsoleStoreRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/subscription': {
+      id: '/_authenticated/console/subscription'
+      path: '/console/subscription'
+      fullPath: '/console/subscription'
+      preLoaderRoute: typeof AuthenticatedConsoleSubscriptionRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/testing': {
+      id: '/_authenticated/console/testing'
+      path: '/console/testing'
+      fullPath: '/console/testing'
+      preLoaderRoute: typeof AuthenticatedConsoleTestingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/verification': {
+      id: '/_authenticated/console/verification'
+      path: '/console/verification'
+      fullPath: '/console/verification'
+      preLoaderRoute: typeof AuthenticatedConsoleVerificationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/manage/$id': {
+      id: '/_authenticated/manage/$id'
+      path: '/manage/$id'
+      fullPath: '/manage/$id'
+      preLoaderRoute: typeof AuthenticatedManageIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/console/hosting/': {
@@ -921,18 +914,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConsoleHostingIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/console/products/$id': {
-      id: '/_authenticated/console/products/$id'
-      path: '/console/products/$id'
-      fullPath: '/console/products/$id'
-      preLoaderRoute: typeof AuthenticatedConsoleProductsIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/console/hosting/$id': {
       id: '/_authenticated/console/hosting/$id'
       path: '/console/hosting/$id'
       fullPath: '/console/hosting/$id'
       preLoaderRoute: typeof AuthenticatedConsoleHostingIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/products/': {
+      id: '/_authenticated/console/products/'
+      path: '/console/products'
+      fullPath: '/console/products/'
+      preLoaderRoute: typeof AuthenticatedConsoleProductsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/console/products/$id': {
+      id: '/_authenticated/console/products/$id'
+      path: '/console/products/$id'
+      fullPath: '/console/products/$id'
+      preLoaderRoute: typeof AuthenticatedConsoleProductsIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
   }
