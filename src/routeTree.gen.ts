@@ -55,6 +55,8 @@ import { Route as AuthenticatedConsoleHostingIndexRouteImport } from './routes/_
 import { Route as AuthenticatedConsoleHostingIdRouteImport } from './routes/_authenticated/console.hosting.$id'
 import { Route as AuthenticatedConsoleProductsIndexRouteImport } from './routes/_authenticated/console.products.index'
 import { Route as AuthenticatedConsoleProductsIdRouteImport } from './routes/_authenticated/console.products.$id'
+import { Route as ApiPublicPaymentsReturnRouteImport } from './routes/api/public/payments/return'
+import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -308,6 +310,17 @@ const AuthenticatedConsoleProductsIdRoute =
     path: '/console/products/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicPaymentsReturnRoute = ApiPublicPaymentsReturnRouteImport.update({
+  id: '/api/public/payments/return',
+  path: '/api/public/payments/return',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicPaymentsWebhookRoute =
+  ApiPublicPaymentsWebhookRouteImport.update({
+    id: '/api/public/payments/webhook',
+    path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -353,6 +366,8 @@ export interface FileRoutesByFullPath {
   '/console/': typeof AuthenticatedConsoleIndexRoute
   '/console/hosting/$id': typeof AuthenticatedConsoleHostingIdRoute
   '/console/products/$id': typeof AuthenticatedConsoleProductsIdRoute
+  '/api/public/payments/return': typeof ApiPublicPaymentsReturnRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/console/hosting/': typeof AuthenticatedConsoleHostingIndexRoute
   '/console/products/': typeof AuthenticatedConsoleProductsIndexRoute
 }
@@ -400,6 +415,8 @@ export interface FileRoutesByTo {
   '/console': typeof AuthenticatedConsoleIndexRoute
   '/console/hosting/$id': typeof AuthenticatedConsoleHostingIdRoute
   '/console/products/$id': typeof AuthenticatedConsoleProductsIdRoute
+  '/api/public/payments/return': typeof ApiPublicPaymentsReturnRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/console/hosting': typeof AuthenticatedConsoleHostingIndexRoute
   '/console/products': typeof AuthenticatedConsoleProductsIndexRoute
 }
@@ -449,6 +466,8 @@ export interface FileRoutesById {
   '/_authenticated/console/': typeof AuthenticatedConsoleIndexRoute
   '/_authenticated/console/hosting/$id': typeof AuthenticatedConsoleHostingIdRoute
   '/_authenticated/console/products/$id': typeof AuthenticatedConsoleProductsIdRoute
+  '/api/public/payments/return': typeof ApiPublicPaymentsReturnRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/_authenticated/console/hosting/': typeof AuthenticatedConsoleHostingIndexRoute
   '/_authenticated/console/products/': typeof AuthenticatedConsoleProductsIndexRoute
 }
@@ -498,6 +517,8 @@ export interface FileRouteTypes {
     | '/console/'
     | '/console/hosting/$id'
     | '/console/products/$id'
+    | '/api/public/payments/return'
+    | '/api/public/payments/webhook'
     | '/console/hosting/'
     | '/console/products/'
   fileRoutesByTo: FileRoutesByTo
@@ -545,6 +566,8 @@ export interface FileRouteTypes {
     | '/console'
     | '/console/hosting/$id'
     | '/console/products/$id'
+    | '/api/public/payments/return'
+    | '/api/public/payments/webhook'
     | '/console/hosting'
     | '/console/products'
   id:
@@ -593,6 +616,8 @@ export interface FileRouteTypes {
     | '/_authenticated/console/'
     | '/_authenticated/console/hosting/$id'
     | '/_authenticated/console/products/$id'
+    | '/api/public/payments/return'
+    | '/api/public/payments/webhook'
     | '/_authenticated/console/hosting/'
     | '/_authenticated/console/products/'
   fileRoutesById: FileRoutesById
@@ -609,6 +634,8 @@ export interface RootRouteChildren {
   DevelopersIdRoute: typeof DevelopersIdRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
+  ApiPublicPaymentsReturnRoute: typeof ApiPublicPaymentsReturnRoute
+  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -935,6 +962,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConsoleProductsIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/payments/return': {
+      id: '/api/public/payments/return'
+      path: '/api/public/payments/return'
+      fullPath: '/api/public/payments/return'
+      preLoaderRoute: typeof ApiPublicPaymentsReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1031,6 +1072,8 @@ const rootRouteChildren: RootRouteChildren = {
   DevelopersIdRoute: DevelopersIdRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
+  ApiPublicPaymentsReturnRoute: ApiPublicPaymentsReturnRoute,
+  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
