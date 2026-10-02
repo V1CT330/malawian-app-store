@@ -58,6 +58,7 @@ import { Route as AuthenticatedConsoleProductsIdRouteImport } from './routes/_au
 import { Route as ApiPublicPaymentsReturnRouteImport } from './routes/api/public/payments/return'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicWebhooksDiditRouteImport } from './routes/api/public/webhooks/didit'
+import { Route as ApiPublicPaychanguWebhookTestRouteImport } from './routes/api/public/paychangu/webhook/test'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -327,6 +328,12 @@ const ApiPublicWebhooksDiditRoute = ApiPublicWebhooksDiditRouteImport.update({
   path: '/api/public/webhooks/didit',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicPaychanguWebhookTestRoute =
+  ApiPublicPaychanguWebhookTestRouteImport.update({
+    id: '/api/public/paychangu/webhook/test',
+    path: '/api/public/paychangu/webhook/test',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -377,6 +384,7 @@ export interface FileRoutesByFullPath {
   '/api/public/webhooks/didit': typeof ApiPublicWebhooksDiditRoute
   '/console/hosting/': typeof AuthenticatedConsoleHostingIndexRoute
   '/console/products/': typeof AuthenticatedConsoleProductsIndexRoute
+  '/api/public/paychangu/webhook/test': typeof ApiPublicPaychanguWebhookTestRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -427,6 +435,7 @@ export interface FileRoutesByTo {
   '/api/public/webhooks/didit': typeof ApiPublicWebhooksDiditRoute
   '/console/hosting': typeof AuthenticatedConsoleHostingIndexRoute
   '/console/products': typeof AuthenticatedConsoleProductsIndexRoute
+  '/api/public/paychangu/webhook/test': typeof ApiPublicPaychanguWebhookTestRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -479,6 +488,7 @@ export interface FileRoutesById {
   '/api/public/webhooks/didit': typeof ApiPublicWebhooksDiditRoute
   '/_authenticated/console/hosting/': typeof AuthenticatedConsoleHostingIndexRoute
   '/_authenticated/console/products/': typeof AuthenticatedConsoleProductsIndexRoute
+  '/api/public/paychangu/webhook/test': typeof ApiPublicPaychanguWebhookTestRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -531,6 +541,7 @@ export interface FileRouteTypes {
     | '/api/public/webhooks/didit'
     | '/console/hosting/'
     | '/console/products/'
+    | '/api/public/paychangu/webhook/test'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -581,6 +592,7 @@ export interface FileRouteTypes {
     | '/api/public/webhooks/didit'
     | '/console/hosting'
     | '/console/products'
+    | '/api/public/paychangu/webhook/test'
   id:
     | '__root__'
     | '/'
@@ -632,6 +644,7 @@ export interface FileRouteTypes {
     | '/api/public/webhooks/didit'
     | '/_authenticated/console/hosting/'
     | '/_authenticated/console/products/'
+    | '/api/public/paychangu/webhook/test'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -649,6 +662,7 @@ export interface RootRouteChildren {
   ApiPublicPaymentsReturnRoute: typeof ApiPublicPaymentsReturnRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiPublicWebhooksDiditRoute: typeof ApiPublicWebhooksDiditRoute
+  ApiPublicPaychanguWebhookTestRoute: typeof ApiPublicPaychanguWebhookTestRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -996,6 +1010,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicWebhooksDiditRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/paychangu/webhook/test': {
+      id: '/api/public/paychangu/webhook/test'
+      path: '/api/public/paychangu/webhook/test'
+      fullPath: '/api/public/paychangu/webhook/test'
+      preLoaderRoute: typeof ApiPublicPaychanguWebhookTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1095,6 +1116,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicPaymentsReturnRoute: ApiPublicPaymentsReturnRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiPublicWebhooksDiditRoute: ApiPublicWebhooksDiditRoute,
+  ApiPublicPaychanguWebhookTestRoute: ApiPublicPaychanguWebhookTestRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
