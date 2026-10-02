@@ -21,6 +21,8 @@ import {
   WHY_PRO_CLOSING,
 } from "@/lib/pro";
 import { formatMwk } from "@/lib/store";
+import { startProCheckout } from "@/lib/payments.functions";
+import { useServerFn } from "@tanstack/react-start";
 
 export const Route = createFileRoute("/_authenticated/console/subscription")({
   head: () => ({
@@ -64,24 +66,11 @@ function ProPage() {
 
   const active = subscription.data?.status === "active";
 
+  const startCheckout = useServerFn(startProCheckout);
   const activate = useMutation({
-    mutationFn: async () => {
-      const renews = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-      const { error } = await supabase.from("subscriptions").upsert(
-        {
-          user_id: userId!,
-          plan: "developer_pro",
-          status: "active",
-          amount_mwk: PRO_PRICE_MWK,
-          current_period_end: renews.toISOString(),
-        },
-        { onConflict: "user_id" },
-      );
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      toast.success("Developer Pro is active");
-      queryClient.invalidateQueries({ queryKey: ["subscription", userId] });
+    mutationFn: () => startCheckout(),
+    onSuccess: ({ checkoutUrl }) => {
+      window.location.href = checkoutUrl;
     },
     onError: (e: Error) => toast.error(e.message),
   });
