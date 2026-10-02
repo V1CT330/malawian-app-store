@@ -447,6 +447,39 @@ export type Database = {
         }
         Relationships: []
       }
+      identity_verification_events: {
+        Row: {
+          created_at: string
+          event_key: string
+          id: string
+          payload: Json
+          session_id: string | null
+          status: string | null
+          user_id: string | null
+          webhook_type: string
+        }
+        Insert: {
+          created_at?: string
+          event_key: string
+          id?: string
+          payload: Json
+          session_id?: string | null
+          status?: string | null
+          user_id?: string | null
+          webhook_type: string
+        }
+        Update: {
+          created_at?: string
+          event_key?: string
+          id?: string
+          payload?: Json
+          session_id?: string | null
+          status?: string | null
+          user_id?: string | null
+          webhook_type?: string
+        }
+        Relationships: []
+      }
       install_events: {
         Row: {
           country: string | null

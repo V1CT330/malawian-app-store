@@ -9,3 +9,4 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 - Payments go through PayChangu via a server function (checkout) and /api/public/payments/* routes that re-verify each transaction with the provider before activating; only server code writes payment_sessions/subscriptions. Why: browser can never mark a payment paid.
+- Identity verification events arrive at /api/public/webhooks/didit, are signature- and timestamp-checked, logged once per event in identity_verification_events, then mapped to profiles.kyc_status via vendor_data (user id). Why: idempotent, server-only KYC updates.

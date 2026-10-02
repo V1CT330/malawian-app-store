@@ -57,6 +57,7 @@ import { Route as AuthenticatedConsoleProductsIndexRouteImport } from './routes/
 import { Route as AuthenticatedConsoleProductsIdRouteImport } from './routes/_authenticated/console.products.$id'
 import { Route as ApiPublicPaymentsReturnRouteImport } from './routes/api/public/payments/return'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as ApiPublicWebhooksDiditRouteImport } from './routes/api/public/webhooks/didit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -321,6 +322,11 @@ const ApiPublicPaymentsWebhookRoute =
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicWebhooksDiditRoute = ApiPublicWebhooksDiditRouteImport.update({
+  id: '/api/public/webhooks/didit',
+  path: '/api/public/webhooks/didit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -368,6 +374,7 @@ export interface FileRoutesByFullPath {
   '/console/products/$id': typeof AuthenticatedConsoleProductsIdRoute
   '/api/public/payments/return': typeof ApiPublicPaymentsReturnRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/webhooks/didit': typeof ApiPublicWebhooksDiditRoute
   '/console/hosting/': typeof AuthenticatedConsoleHostingIndexRoute
   '/console/products/': typeof AuthenticatedConsoleProductsIndexRoute
 }
@@ -417,6 +424,7 @@ export interface FileRoutesByTo {
   '/console/products/$id': typeof AuthenticatedConsoleProductsIdRoute
   '/api/public/payments/return': typeof ApiPublicPaymentsReturnRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/webhooks/didit': typeof ApiPublicWebhooksDiditRoute
   '/console/hosting': typeof AuthenticatedConsoleHostingIndexRoute
   '/console/products': typeof AuthenticatedConsoleProductsIndexRoute
 }
@@ -468,6 +476,7 @@ export interface FileRoutesById {
   '/_authenticated/console/products/$id': typeof AuthenticatedConsoleProductsIdRoute
   '/api/public/payments/return': typeof ApiPublicPaymentsReturnRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/public/webhooks/didit': typeof ApiPublicWebhooksDiditRoute
   '/_authenticated/console/hosting/': typeof AuthenticatedConsoleHostingIndexRoute
   '/_authenticated/console/products/': typeof AuthenticatedConsoleProductsIndexRoute
 }
@@ -519,6 +528,7 @@ export interface FileRouteTypes {
     | '/console/products/$id'
     | '/api/public/payments/return'
     | '/api/public/payments/webhook'
+    | '/api/public/webhooks/didit'
     | '/console/hosting/'
     | '/console/products/'
   fileRoutesByTo: FileRoutesByTo
@@ -568,6 +578,7 @@ export interface FileRouteTypes {
     | '/console/products/$id'
     | '/api/public/payments/return'
     | '/api/public/payments/webhook'
+    | '/api/public/webhooks/didit'
     | '/console/hosting'
     | '/console/products'
   id:
@@ -618,6 +629,7 @@ export interface FileRouteTypes {
     | '/_authenticated/console/products/$id'
     | '/api/public/payments/return'
     | '/api/public/payments/webhook'
+    | '/api/public/webhooks/didit'
     | '/_authenticated/console/hosting/'
     | '/_authenticated/console/products/'
   fileRoutesById: FileRoutesById
@@ -636,6 +648,7 @@ export interface RootRouteChildren {
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicPaymentsReturnRoute: typeof ApiPublicPaymentsReturnRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
+  ApiPublicWebhooksDiditRoute: typeof ApiPublicWebhooksDiditRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -976,6 +989,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/webhooks/didit': {
+      id: '/api/public/webhooks/didit'
+      path: '/api/public/webhooks/didit'
+      fullPath: '/api/public/webhooks/didit'
+      preLoaderRoute: typeof ApiPublicWebhooksDiditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1074,6 +1094,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicPaymentsReturnRoute: ApiPublicPaymentsReturnRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
+  ApiPublicWebhooksDiditRoute: ApiPublicWebhooksDiditRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
