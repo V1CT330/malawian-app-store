@@ -810,6 +810,54 @@ export type Database = {
           },
         ]
       }
+      payment_sessions: {
+        Row: {
+          amount_mwk: number
+          checkout_url: string | null
+          created_at: string
+          currency: string
+          id: string
+          paid_at: string | null
+          provider: string
+          provider_reference: string | null
+          purpose: string
+          status: string
+          tx_ref: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_mwk: number
+          checkout_url?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          paid_at?: string | null
+          provider?: string
+          provider_reference?: string | null
+          purpose?: string
+          status?: string
+          tx_ref: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_mwk?: number
+          checkout_url?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          paid_at?: string | null
+          provider?: string
+          provider_reference?: string | null
+          purpose?: string
+          status?: string
+          tx_ref?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       payout_methods: {
         Row: {
           created_at: string
