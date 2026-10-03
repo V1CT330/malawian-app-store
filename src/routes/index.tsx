@@ -77,15 +77,17 @@ function StorePage() {
   const { data, isLoading } = useQuery({
     queryKey: ["listings", "published"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("listings")
-        .select("*, profiles!listings_developer_id_fkey(developer_name,display_name)")
-        .eq("status", "published")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return (data ?? []) as (Listing & {
-        profiles?: { developer_name: string | null; display_name: string | null } | null;
-      })[];
+      const [listingsResult, profilesResult] = await Promise.all([
+        supabase.from("listings").select("*").eq("status", "published").order("created_at", { ascending: false }),
+        supabase.from("profiles").select("id,developer_name,display_name"),
+      ]);
+      if (listingsResult.error) throw listingsResult.error;
+      if (profilesResult.error) throw profilesResult.error;
+      const developers = new Map((profilesResult.data ?? []).map((profile) => [profile.id, profile]));
+      return (listingsResult.data ?? []).map((listing) => ({
+        ...(listing as Listing),
+        developer: developers.get(listing.developer_id) ?? null,
+      }));
     },
   });
 
@@ -98,7 +100,7 @@ function StorePage() {
       (l.description ?? "").toLowerCase().includes(q) ||
       l.category.toLowerCase().includes(q) ||
       l.kind.toLowerCase().includes(q) ||
-      (l.profiles?.developer_name ?? l.profiles?.display_name ?? "").toLowerCase().includes(q);
+      (l.developer?.developer_name ?? l.developer?.display_name ?? "").toLowerCase().includes(q);
     const matchesKind = kind === "all" || l.kind === kind;
     const matchesCategory = category === "All" || l.category === category;
     return matchesSearch && matchesKind && matchesCategory;

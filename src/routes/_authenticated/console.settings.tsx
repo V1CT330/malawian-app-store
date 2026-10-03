@@ -3,7 +3,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ConsoleShell } from "@/components/console/ConsoleShell";
 import { SectionCard } from "@/components/console/primitives";
 import { Button } from "@/components/ui/button";
-import { useProfile } from "@/hooks/useSession";
 import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 
 export const Route = createFileRoute("/_authenticated/console/settings")({
@@ -26,7 +25,6 @@ export const Route = createFileRoute("/_authenticated/console/settings")({
 
 function ConsoleSettingsPage() {
   useRequireDeveloper();
-  const { profile } = useProfile();
 
   return (
     <ConsoleShell
