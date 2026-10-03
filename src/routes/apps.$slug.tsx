@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Download, ExternalLink, ShieldCheck, Star } from "lucide-react";
+import { Download, ExternalLink, RefreshCw, ShieldCheck, Star } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -83,6 +83,22 @@ function ListingDetail() {
   const latest = versionsQuery.data?.[0];
   const fileUrl = useSignedUrl(latest?.file_url ?? null);
 
+  const installedQuery = useQuery({
+    queryKey: ["installed-app", userId, listing?.id],
+    enabled: Boolean(userId && listing?.id && listing?.kind === "app"),
+    queryFn: async () => {
+      if (!userId || !listing) return null;
+      const { data, error } = await supabase
+        .from("installed_apps")
+        .select("id,installed_version_id")
+        .eq("user_id", userId)
+        .eq("listing_id", listing.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const submitReview = useMutation({
     mutationFn: async () => {
       const { error } = await supabase
@@ -154,26 +170,50 @@ function ListingDetail() {
 
   const install = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.rpc("register_install", {
-        _listing_id: listing!.id,
+      if (!listing) throw new Error("Listing unavailable");
+      const { error: eventError } = await supabase.rpc("register_install", {
+        _listing_id: listing.id,
         _device: typeof navigator !== "undefined" ? navigator.platform : undefined,
       });
-
-      if (error) throw error;
+      if (eventError) throw eventError;
+      if (listing.kind === "app" && userId) {
+        const { error } = await supabase.from("installed_apps").upsert(
+          {
+            user_id: userId,
+            listing_id: listing.id,
+            installed_version_id: latest?.id ?? null,
+          },
+          { onConflict: "user_id,listing_id" },
+        );
+        if (error) throw error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["listing", slug] });
       queryClient.invalidateQueries({ queryKey: ["install-history", userId] });
+      queryClient.invalidateQueries({ queryKey: ["installed-app", userId, listing?.id] });
+      queryClient.invalidateQueries({ queryKey: ["installed-apps", userId] });
     },
+    onError: (error: Error) => toast.error(error.message),
   });
 
   async function handleGet() {
     if (!listing) return;
-    install.mutate();
     if (listing.kind === "website" && listing.website_url) {
+      install.mutate();
       window.open(listing.website_url, "_blank", "noopener");
       return;
     }
+    if (!userId) {
+      window.location.href = `/auth?redirect=${encodeURIComponent(`/apps/${listing.slug}`)}`;
+      return;
+    }
+    if (installedQuery.data && installedQuery.data.installed_version_id === latest?.id) {
+      if (fileUrl) window.open(fileUrl, "_blank", "noopener");
+      else toast.info("This app is installed, but no download file is available.");
+      return;
+    }
+    install.mutate();
     if (fileUrl) {
       window.open(fileUrl, "_blank", "noopener");
       return;
@@ -235,14 +275,20 @@ function ListingDetail() {
           </div>
         </div>
 
-        <Button className="w-full" size="lg" onClick={handleGet}>
+        <Button className="w-full" size="lg" disabled={install.isPending} onClick={handleGet}>
           {listing.kind === "website" ? (
             <>
               <ExternalLink className="mr-2 h-4 w-4" /> Open website
             </>
           ) : (
             <>
-              <Download className="mr-2 h-4 w-4" /> Install
+              {installedQuery.data && installedQuery.data.installed_version_id !== latest?.id ? (
+                <><RefreshCw className="mr-2 h-4 w-4" /> Update</>
+              ) : installedQuery.data ? (
+                <><ExternalLink className="mr-2 h-4 w-4" /> Open</>
+              ) : (
+                <><Download className="mr-2 h-4 w-4" /> Install</>
+              )}
             </>
           )}
         </Button>

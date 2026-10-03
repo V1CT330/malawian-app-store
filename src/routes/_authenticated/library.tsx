@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Bookmark, Download, History } from "lucide-react";
+import { Bookmark, Download, ExternalLink, History, RefreshCw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
-import type { Listing } from "@/lib/store";
+import { signedAssetUrl, type Listing } from "@/lib/store";
 
 export const Route = createFileRoute("/_authenticated/library")({
   head: () => ({
@@ -48,17 +48,19 @@ function LibraryPage() {
     },
   });
 
-  /** Unique listings the user has installed, newest first. */
-  const installed = (() => {
-    const seen = new Set<string>();
-    const rows: { listing: Listing; created_at: string }[] = [];
-    for (const row of history.data ?? []) {
-      if (!row.listings || seen.has(row.listings.id)) continue;
-      seen.add(row.listings.id);
-      rows.push({ listing: row.listings, created_at: row.created_at });
-    }
-    return rows;
-  })();
+  const installed = useQuery({
+    queryKey: ["installed-apps", userId],
+    enabled: Boolean(userId),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("installed_apps")
+        .select("id,listing_id,installed_version_id,installed_at,updated_at,listings(*,listing_versions(*))")
+        .eq("user_id", userId!)
+        .order("updated_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
 
   const saved = useQuery({
     queryKey: ["wishlist", userId],
@@ -90,6 +92,49 @@ function LibraryPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const uninstall = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("installed_apps").delete().eq("id", id).eq("user_id", userId!);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("App uninstalled");
+      queryClient.invalidateQueries({ queryKey: ["installed-apps", userId] });
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const updateApp = useMutation({
+    mutationFn: async ({ id, listingId, versionId, fileUrl }: { id: string; listingId: string; versionId: string; fileUrl: string | null }) => {
+      const { error } = await supabase
+        .from("installed_apps")
+        .update({ installed_version_id: versionId })
+        .eq("id", id)
+        .eq("user_id", userId!);
+      if (error) throw error;
+      await supabase.rpc("register_install", { _listing_id: listingId, _device: navigator.platform });
+      if (fileUrl) {
+        const url = await signedAssetUrl(fileUrl);
+        if (url) window.open(url, "_blank", "noopener");
+      }
+    },
+    onSuccess: () => {
+      toast.success("App updated");
+      queryClient.invalidateQueries({ queryKey: ["installed-apps", userId] });
+      queryClient.invalidateQueries({ queryKey: ["install-history", userId] });
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  async function openApp(fileUrl: string | null) {
+    if (!fileUrl) {
+      toast.info("The developer has not published a download file yet.");
+      return;
+    }
+    const url = await signedAssetUrl(fileUrl);
+    if (url) window.open(url, "_blank", "noopener");
+  }
+
   return (
     <AppShell>
       <h1 className="font-display text-2xl font-bold">My library</h1>
@@ -107,20 +152,42 @@ function LibraryPage() {
         </TabsList>
 
         <TabsContent value="installed" className="mt-4 space-y-3">
-          {history.isLoading ? (
+          {installed.isLoading ? (
             <Skeleton className="h-20 w-full rounded-2xl" />
-          ) : installed.length ? (
-            installed.map((row) => (
-              <div key={row.listing.id} className="space-y-1">
-                <ListingCard listing={row.listing} />
-                <p className="px-1 text-xs text-muted-foreground">
-                  Installed {new Date(row.created_at).toLocaleDateString()}
-                </p>
-              </div>
-            ))
+          ) : installed.data?.length ? (
+            installed.data.map((row) => {
+              const listing = row.listings as (Listing & { listing_versions?: Array<{ id: string; file_url: string | null; created_at: string; status: string }> }) | null;
+              if (!listing) return null;
+              const latest = [...(listing.listing_versions ?? [])]
+                .filter((version) => version.status === "published")
+                .sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
+              const updateAvailable = Boolean(latest && latest.id !== row.installed_version_id);
+              return (
+                <div key={row.id} className="surface-card p-3">
+                  <ListingCard listing={listing} />
+                  <p className="px-1 text-xs text-muted-foreground">
+                    Installed {new Date(row.installed_at).toLocaleDateString()}
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2 px-1">
+                    {updateAvailable && latest ? (
+                      <Button size="sm" disabled={updateApp.isPending} onClick={() => updateApp.mutate({ id: row.id, listingId: row.listing_id, versionId: latest.id, fileUrl: latest.file_url })}>
+                        <RefreshCw className="mr-1.5 h-4 w-4" /> Update
+                      </Button>
+                    ) : (
+                      <Button size="sm" variant="outline" onClick={() => void openApp(latest?.file_url ?? null)}>
+                        <ExternalLink className="mr-1.5 h-4 w-4" /> Open
+                      </Button>
+                    )}
+                    <Button size="sm" variant="ghost" disabled={uninstall.isPending} onClick={() => uninstall.mutate(row.id)}>
+                      <Trash2 className="mr-1.5 h-4 w-4" /> Uninstall
+                    </Button>
+                  </div>
+                </div>
+              );
+            })
           ) : (
             <p className="surface-card p-6 text-center text-sm text-muted-foreground">
-              Apps and websites you install will appear here.
+              Apps you install will appear here.
             </p>
           )}
         </TabsContent>
