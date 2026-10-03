@@ -31,16 +31,14 @@ function ConsoleSettingsPage() {
   return (
     <ConsoleShell
       title="Settings"
-      description="Your developer account, verification and subscription."
+      description="Open each dedicated area without repeating its controls here."
       breadcrumbs={[{ label: "Console", to: "/console" }, { label: "Settings" }]}
     >
       <div className="grid gap-4 lg:grid-cols-2">
-        <SectionCard title="Developer account">
-          <ul className="space-y-1 text-sm text-muted-foreground">
-            <li>Name: {profile?.developer_name || profile?.display_name || "Not set"}</li>
-            <li>Verification: {profile?.kyc_status ?? "none"}</li>
-            <li>Phone verified: {profile?.phone_verified ? "yes" : "no"}</li>
-          </ul>
+        <SectionCard title="Account preferences">
+          <p className="text-sm text-muted-foreground">
+            Profile details, appearance, developer mode and sign-out are managed in Account settings.
+          </p>
           <Button asChild size="sm" variant="outline" className="mt-3">
             <Link to="/settings">Open account settings</Link>
           </Button>
@@ -70,6 +68,15 @@ function ConsoleSettingsPage() {
           </p>
           <Button asChild size="sm" variant="outline" className="mt-3">
             <Link to="/console/store">Open store listing</Link>
+          </Button>
+        </SectionCard>
+
+        <SectionCard title="Security">
+          <p className="text-sm text-muted-foreground">
+            Review account protection and active sessions.
+          </p>
+          <Button asChild size="sm" variant="outline" className="mt-3">
+            <Link to="/console/security">Open security</Link>
           </Button>
         </SectionCard>
       </div>

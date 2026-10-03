@@ -11,6 +11,9 @@ import { CATEGORIES, type Listing } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    q: typeof search.q === "string" ? search.q.slice(0, 120) : "",
+  }),
   head: () => ({
     meta: [
       { title: "Malawian App Store — Apps & Websites Built in Malawi" },
@@ -66,7 +69,8 @@ function Shelf({
 }
 
 function StorePage() {
-  const [search, setSearch] = useState("");
+  const routeSearch = Route.useSearch();
+  const [search, setSearch] = useState(routeSearch.q);
   const [kind, setKind] = useState<"all" | "app" | "website">("all");
   const [category, setCategory] = useState<string>("All");
 
@@ -75,11 +79,13 @@ function StorePage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("listings")
-        .select("*")
+        .select("*, profiles!listings_developer_id_fkey(developer_name,display_name)")
         .eq("status", "published")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as Listing[];
+      return (data ?? []) as (Listing & {
+        profiles?: { developer_name: string | null; display_name: string | null } | null;
+      })[];
     },
   });
 
@@ -89,7 +95,10 @@ function StorePage() {
       !q ||
       l.name.toLowerCase().includes(q) ||
       (l.tagline ?? "").toLowerCase().includes(q) ||
-      l.category.toLowerCase().includes(q);
+      (l.description ?? "").toLowerCase().includes(q) ||
+      l.category.toLowerCase().includes(q) ||
+      l.kind.toLowerCase().includes(q) ||
+      (l.profiles?.developer_name ?? l.profiles?.display_name ?? "").toLowerCase().includes(q);
     const matchesKind = kind === "all" || l.kind === kind;
     const matchesCategory = category === "All" || l.category === category;
     return matchesSearch && matchesKind && matchesCategory;
@@ -152,9 +161,9 @@ function StorePage() {
         </div>
       ) : listings.length === 0 ? (
         <div className="rounded-2xl border border-border p-8 text-center">
-          <h2 className="font-display text-lg font-semibold">Nothing here yet</h2>
+          <h2 className="font-display text-lg font-semibold">{search ? "No matching products" : "Nothing here yet"}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Be the first developer to publish on the Malawian App Store.
+            {search ? "Try another app name, developer, category, or keyword." : "Be the first developer to publish on the Malawian App Store."}
           </p>
         </div>
       ) : (

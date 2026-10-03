@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
-import { LogOut, Moon, Shield } from "lucide-react";
+import { Check, LogOut, Moon, Palette, Shield } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsAdmin, useMode, useProfile } from "@/hooks/useSession";
-import { useTheme } from "@/hooks/useTheme";
+import { ACCENT_PRESETS, useTheme } from "@/hooks/useTheme";
 import { supabase } from "@/integrations/supabase/client";
 import { PRO_NAME, PRO_PRICE_MWK } from "@/lib/pro";
 import { formatMwk } from "@/lib/store";
@@ -41,7 +41,7 @@ function SettingsPage() {
   const navigate = useNavigate();
   const mode = useMode();
   const isAdmin = useIsAdmin();
-  const { dark, setTheme } = useTheme();
+  const { dark, setTheme, accent, setAccent } = useTheme();
   const [termsOpen, setTermsOpen] = useState(false);
 
   const [displayName, setDisplayName] = useState<string | null>(null);
@@ -183,6 +183,42 @@ function SettingsPage() {
             </Button>
           </div>
         )}
+      </section>
+
+      <section className="surface-card mt-4 space-y-3 p-4">
+        <div className="flex items-center gap-2">
+          <Palette className="h-4 w-4 text-muted-foreground" />
+          <div>
+            <h2 className="font-display text-base font-semibold">Accent color</h2>
+            <p className="text-xs text-muted-foreground">Choose the color used for actions and highlights.</p>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          {ACCENT_PRESETS.map((preset) => (
+            <button
+              key={preset.value}
+              type="button"
+              title={preset.name}
+              aria-label={`Use ${preset.name}`}
+              aria-pressed={accent === preset.value}
+              onClick={() => setAccent(preset.value)}
+              className="relative h-10 w-10 rounded-full border-2 border-background shadow-sm ring-1 ring-border"
+              style={{ backgroundColor: preset.value }}
+            >
+              {accent === preset.value && <Check className="absolute inset-0 m-auto h-5 w-5 text-primary-foreground" />}
+            </button>
+          ))}
+          <label className="relative flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-border bg-secondary" title="Custom color">
+            <Palette className="h-4 w-4" />
+            <input
+              type="color"
+              value={accent}
+              onChange={(event) => setAccent(event.target.value)}
+              aria-label="Choose a custom accent color"
+              className="absolute inset-0 cursor-pointer opacity-0"
+            />
+          </label>
+        </div>
       </section>
 
       <section className="surface-card mt-4 space-y-3 p-4">

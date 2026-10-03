@@ -60,9 +60,13 @@ export function AppShell({
             <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
             <input
               value={search ?? ""}
-              onChange={(e) => (onSearchChange ? onSearchChange(e.target.value) : navigate({ to: "/" }))}
+              onChange={(e) =>
+                onSearchChange
+                  ? onSearchChange(e.target.value)
+                  : navigate({ to: "/", search: { q: e.target.value } })
+              }
               onFocus={() => {
-                if (!onSearchChange) navigate({ to: "/" });
+                if (!onSearchChange) navigate({ to: "/", search: { q: "" } });
               }}
               placeholder="Search apps & websites"
               aria-label="Search apps and websites"
