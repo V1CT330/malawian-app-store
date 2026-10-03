@@ -515,6 +515,48 @@ export type Database = {
           },
         ]
       }
+      installed_apps: {
+        Row: {
+          id: string
+          installed_at: string
+          installed_version_id: string | null
+          listing_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          installed_at?: string
+          installed_version_id?: string | null
+          listing_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          installed_at?: string
+          installed_version_id?: string | null
+          listing_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "installed_apps_installed_version_id_fkey"
+            columns: ["installed_version_id"]
+            isOneToOne: false
+            referencedRelation: "listing_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "installed_apps_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       kyc_submissions: {
         Row: {
           created_at: string
