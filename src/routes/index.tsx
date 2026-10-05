@@ -70,7 +70,7 @@ function Shelf({
 
 function StorePage() {
   const routeSearch = Route.useSearch();
-  const [search, setSearch] = useState(routeSearch.q);
+  const [search, setSearch] = useState(routeSearch.q ?? "");
   const [kind, setKind] = useState<"all" | "app" | "website">("all");
   const [category, setCategory] = useState<string>("All");
 
