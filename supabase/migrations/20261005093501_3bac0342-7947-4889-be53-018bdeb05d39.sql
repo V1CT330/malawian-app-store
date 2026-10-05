@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS public.hosting_domains; DROP TABLE IF EXISTS public.hosting_deployments; DROP TABLE IF EXISTS public.hosting_projects;
