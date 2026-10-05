@@ -51,8 +51,6 @@ import { Route as AuthenticatedConsoleSubscriptionRouteImport } from './routes/_
 import { Route as AuthenticatedConsoleTestingRouteImport } from './routes/_authenticated/console.testing'
 import { Route as AuthenticatedConsoleVerificationRouteImport } from './routes/_authenticated/console.verification'
 import { Route as AuthenticatedManageIdRouteImport } from './routes/_authenticated/manage.$id'
-import { Route as AuthenticatedConsoleHostingIndexRouteImport } from './routes/_authenticated/console.hosting.index'
-import { Route as AuthenticatedConsoleHostingIdRouteImport } from './routes/_authenticated/console.hosting.$id'
 import { Route as AuthenticatedConsoleProductsIndexRouteImport } from './routes/_authenticated/console.products.index'
 import { Route as AuthenticatedConsoleProductsIdRouteImport } from './routes/_authenticated/console.products.$id'
 import { Route as ApiPublicPaymentsReturnRouteImport } from './routes/api/public/payments/return'
@@ -288,18 +286,6 @@ const AuthenticatedManageIdRoute = AuthenticatedManageIdRouteImport.update({
   path: '/manage/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedConsoleHostingIndexRoute =
-  AuthenticatedConsoleHostingIndexRouteImport.update({
-    id: '/console/hosting/',
-    path: '/console/hosting/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedConsoleHostingIdRoute =
-  AuthenticatedConsoleHostingIdRouteImport.update({
-    id: '/console/hosting/$id',
-    path: '/console/hosting/$id',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedConsoleProductsIndexRoute =
   AuthenticatedConsoleProductsIndexRouteImport.update({
     id: '/console/products/',
@@ -377,12 +363,10 @@ export interface FileRoutesByFullPath {
   '/console/verification': typeof AuthenticatedConsoleVerificationRoute
   '/manage/$id': typeof AuthenticatedManageIdRoute
   '/console/': typeof AuthenticatedConsoleIndexRoute
-  '/console/hosting/$id': typeof AuthenticatedConsoleHostingIdRoute
   '/console/products/$id': typeof AuthenticatedConsoleProductsIdRoute
   '/api/public/payments/return': typeof ApiPublicPaymentsReturnRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/webhooks/didit': typeof ApiPublicWebhooksDiditRoute
-  '/console/hosting/': typeof AuthenticatedConsoleHostingIndexRoute
   '/console/products/': typeof AuthenticatedConsoleProductsIndexRoute
   '/api/public/paychangu/webhook/test': typeof ApiPublicPaychanguWebhookTestRoute
 }
@@ -428,12 +412,10 @@ export interface FileRoutesByTo {
   '/console/verification': typeof AuthenticatedConsoleVerificationRoute
   '/manage/$id': typeof AuthenticatedManageIdRoute
   '/console': typeof AuthenticatedConsoleIndexRoute
-  '/console/hosting/$id': typeof AuthenticatedConsoleHostingIdRoute
   '/console/products/$id': typeof AuthenticatedConsoleProductsIdRoute
   '/api/public/payments/return': typeof ApiPublicPaymentsReturnRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/webhooks/didit': typeof ApiPublicWebhooksDiditRoute
-  '/console/hosting': typeof AuthenticatedConsoleHostingIndexRoute
   '/console/products': typeof AuthenticatedConsoleProductsIndexRoute
   '/api/public/paychangu/webhook/test': typeof ApiPublicPaychanguWebhookTestRoute
 }
@@ -481,12 +463,10 @@ export interface FileRoutesById {
   '/_authenticated/console/verification': typeof AuthenticatedConsoleVerificationRoute
   '/_authenticated/manage/$id': typeof AuthenticatedManageIdRoute
   '/_authenticated/console/': typeof AuthenticatedConsoleIndexRoute
-  '/_authenticated/console/hosting/$id': typeof AuthenticatedConsoleHostingIdRoute
   '/_authenticated/console/products/$id': typeof AuthenticatedConsoleProductsIdRoute
   '/api/public/payments/return': typeof ApiPublicPaymentsReturnRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/public/webhooks/didit': typeof ApiPublicWebhooksDiditRoute
-  '/_authenticated/console/hosting/': typeof AuthenticatedConsoleHostingIndexRoute
   '/_authenticated/console/products/': typeof AuthenticatedConsoleProductsIndexRoute
   '/api/public/paychangu/webhook/test': typeof ApiPublicPaychanguWebhookTestRoute
 }
@@ -534,12 +514,10 @@ export interface FileRouteTypes {
     | '/console/verification'
     | '/manage/$id'
     | '/console/'
-    | '/console/hosting/$id'
     | '/console/products/$id'
     | '/api/public/payments/return'
     | '/api/public/payments/webhook'
     | '/api/public/webhooks/didit'
-    | '/console/hosting/'
     | '/console/products/'
     | '/api/public/paychangu/webhook/test'
   fileRoutesByTo: FileRoutesByTo
@@ -585,12 +563,10 @@ export interface FileRouteTypes {
     | '/console/verification'
     | '/manage/$id'
     | '/console'
-    | '/console/hosting/$id'
     | '/console/products/$id'
     | '/api/public/payments/return'
     | '/api/public/payments/webhook'
     | '/api/public/webhooks/didit'
-    | '/console/hosting'
     | '/console/products'
     | '/api/public/paychangu/webhook/test'
   id:
@@ -637,12 +613,10 @@ export interface FileRouteTypes {
     | '/_authenticated/console/verification'
     | '/_authenticated/manage/$id'
     | '/_authenticated/console/'
-    | '/_authenticated/console/hosting/$id'
     | '/_authenticated/console/products/$id'
     | '/api/public/payments/return'
     | '/api/public/payments/webhook'
     | '/api/public/webhooks/didit'
-    | '/_authenticated/console/hosting/'
     | '/_authenticated/console/products/'
     | '/api/public/paychangu/webhook/test'
   fileRoutesById: FileRoutesById
@@ -961,20 +935,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedManageIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/console/hosting/': {
-      id: '/_authenticated/console/hosting/'
-      path: '/console/hosting'
-      fullPath: '/console/hosting/'
-      preLoaderRoute: typeof AuthenticatedConsoleHostingIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/console/hosting/$id': {
-      id: '/_authenticated/console/hosting/$id'
-      path: '/console/hosting/$id'
-      fullPath: '/console/hosting/$id'
-      preLoaderRoute: typeof AuthenticatedConsoleHostingIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/console/products/': {
       id: '/_authenticated/console/products/'
       path: '/console/products'
@@ -1052,9 +1012,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedConsoleVerificationRoute: typeof AuthenticatedConsoleVerificationRoute
   AuthenticatedManageIdRoute: typeof AuthenticatedManageIdRoute
   AuthenticatedConsoleIndexRoute: typeof AuthenticatedConsoleIndexRoute
-  AuthenticatedConsoleHostingIdRoute: typeof AuthenticatedConsoleHostingIdRoute
   AuthenticatedConsoleProductsIdRoute: typeof AuthenticatedConsoleProductsIdRoute
-  AuthenticatedConsoleHostingIndexRoute: typeof AuthenticatedConsoleHostingIndexRoute
   AuthenticatedConsoleProductsIndexRoute: typeof AuthenticatedConsoleProductsIndexRoute
 }
 
@@ -1090,9 +1048,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedConsoleVerificationRoute: AuthenticatedConsoleVerificationRoute,
   AuthenticatedManageIdRoute: AuthenticatedManageIdRoute,
   AuthenticatedConsoleIndexRoute: AuthenticatedConsoleIndexRoute,
-  AuthenticatedConsoleHostingIdRoute: AuthenticatedConsoleHostingIdRoute,
   AuthenticatedConsoleProductsIdRoute: AuthenticatedConsoleProductsIdRoute,
-  AuthenticatedConsoleHostingIndexRoute: AuthenticatedConsoleHostingIndexRoute,
   AuthenticatedConsoleProductsIndexRoute:
     AuthenticatedConsoleProductsIndexRoute,
 }
