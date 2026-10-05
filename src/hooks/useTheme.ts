@@ -49,7 +49,7 @@ function applyAccent(hex: string) {
 /** Dark-mode preference persisted to localStorage. */
 export function useTheme() {
   const [dark, setDark] = useState(false);
-  const [accent, setAccentState] = useState(DEFAULT_ACCENT);
+  const [accent, setAccentState] = useState<string>(DEFAULT_ACCENT);
 
   useEffect(() => {
     const stored = localStorage.getItem("mas:theme");

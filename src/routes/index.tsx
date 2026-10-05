@@ -11,8 +11,8 @@ import { CATEGORIES, type Listing } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    q: typeof search.q === "string" ? search.q.slice(0, 120) : "",
+  validateSearch: (search: Record<string, unknown>): { q?: string } => ({
+    q: typeof search.q === "string" ? search.q.slice(0, 120) : undefined,
   }),
   head: () => ({
     meta: [
