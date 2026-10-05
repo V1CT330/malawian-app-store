@@ -908,6 +908,89 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_cards: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          company_name: string | null
+          created_at: string
+          developer_name: string | null
+          display_name: string | null
+          facebook_url: string | null
+          follower_count: number
+          github_url: string | null
+          id: string
+          instagram_url: string | null
+          is_developer: boolean
+          kyc_status: Database["public"]["Enums"]["kyc_status"]
+          linkedin_url: string | null
+          location: string | null
+          portfolio_url: string | null
+          reputation_score: number
+          skills: string[]
+          suspended: boolean
+          website_url: string | null
+          x_url: string | null
+          youtube_url: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          company_name?: string | null
+          created_at?: string
+          developer_name?: string | null
+          display_name?: string | null
+          facebook_url?: string | null
+          follower_count?: number
+          github_url?: string | null
+          id: string
+          instagram_url?: string | null
+          is_developer?: boolean
+          kyc_status?: Database["public"]["Enums"]["kyc_status"]
+          linkedin_url?: string | null
+          location?: string | null
+          portfolio_url?: string | null
+          reputation_score?: number
+          skills?: string[]
+          suspended?: boolean
+          website_url?: string | null
+          x_url?: string | null
+          youtube_url?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          company_name?: string | null
+          created_at?: string
+          developer_name?: string | null
+          display_name?: string | null
+          facebook_url?: string | null
+          follower_count?: number
+          github_url?: string | null
+          id?: string
+          instagram_url?: string | null
+          is_developer?: boolean
+          kyc_status?: Database["public"]["Enums"]["kyc_status"]
+          linkedin_url?: string | null
+          location?: string | null
+          portfolio_url?: string | null
+          reputation_score?: number
+          skills?: string[]
+          suspended?: boolean
+          website_url?: string | null
+          x_url?: string | null
+          youtube_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_cards_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profile_views: {
         Row: {
           created_at: string
@@ -1572,7 +1655,15 @@ export type Database = {
           x_url?: string | null
           youtube_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profile_cards_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
