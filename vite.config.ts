@@ -14,9 +14,8 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
-  nitro: {
-    // Configure Nitro for Node.js runtime (Vercel, etc.)
-    // instead of the default Cloudflare Workers target
-    preset: "node",
-  },
+  // No nitro preset override: Nitro auto-detects the Vercel environment at
+  // build time and uses its "vercel" preset, emitting .vercel/output with the
+  // correct static + serverless function layout. Locally it falls back to the
+  // default Node server build.
 });
