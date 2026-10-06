@@ -18,7 +18,8 @@ export const Route = createFileRoute("/auth")({
       { title: "Sign in — Malawian App Store" },
       {
         name: "description",
-        content: "Sign in with Google or email to install apps, post reviews and publish your own listings.",
+        content:
+          "Sign in with Google or email to install apps, post reviews and publish your own listings.",
       },
       { property: "og:title", content: "Sign in — Malawian App Store" },
       { property: "og:description", content: "Sign in to install, review and publish apps." },
@@ -96,7 +97,8 @@ function AuthPage() {
         </Button>
 
         <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="h-px flex-1 bg-border" /> or email <span className="h-px flex-1 bg-border" />
+          <span className="h-px flex-1 bg-border" /> or email{" "}
+          <span className="h-px flex-1 bg-border" />
         </div>
 
         <div className="space-y-3">
@@ -120,7 +122,11 @@ function AuthPage() {
               autoComplete={mode === "signup" ? "new-password" : "current-password"}
             />
           </div>
-          <Button className="w-full" onClick={handleEmail} disabled={busy || !email || password.length < 6}>
+          <Button
+            className="w-full"
+            onClick={handleEmail}
+            disabled={busy || !email || password.length < 6}
+          >
             {mode === "signup" ? "Create account" : "Sign in"}
           </Button>
           <button

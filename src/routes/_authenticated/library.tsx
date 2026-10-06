@@ -18,10 +18,14 @@ export const Route = createFileRoute("/_authenticated/library")({
       { title: "My Library — Malawian App Store" },
       {
         name: "description",
-        content: "Your installed apps, saved listings and download history on the Malawian App Store.",
+        content:
+          "Your installed apps, saved listings and download history on the Malawian App Store.",
       },
       { property: "og:title", content: "My Library — Malawian App Store" },
-      { property: "og:description", content: "Installed apps, saved listings and download history." },
+      {
+        property: "og:description",
+        content: "Installed apps, saved listings and download history.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -54,7 +58,9 @@ function LibraryPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("installed_apps")
-        .select("id,listing_id,installed_version_id,installed_at,updated_at,listings(*,listing_versions(*))")
+        .select(
+          "id,listing_id,installed_version_id,installed_at,updated_at,listings(*,listing_versions(*))",
+        )
         .eq("user_id", userId!)
         .order("updated_at", { ascending: false });
       if (error) throw error;
@@ -94,7 +100,11 @@ function LibraryPage() {
 
   const uninstall = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("installed_apps").delete().eq("id", id).eq("user_id", userId!);
+      const { error } = await supabase
+        .from("installed_apps")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", userId!);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -105,14 +115,27 @@ function LibraryPage() {
   });
 
   const updateApp = useMutation({
-    mutationFn: async ({ id, listingId, versionId, fileUrl }: { id: string; listingId: string; versionId: string; fileUrl: string | null }) => {
+    mutationFn: async ({
+      id,
+      listingId,
+      versionId,
+      fileUrl,
+    }: {
+      id: string;
+      listingId: string;
+      versionId: string;
+      fileUrl: string | null;
+    }) => {
       const { error } = await supabase
         .from("installed_apps")
         .update({ installed_version_id: versionId })
         .eq("id", id)
         .eq("user_id", userId!);
       if (error) throw error;
-      await supabase.rpc("register_install", { _listing_id: listingId, _device: navigator.platform });
+      await supabase.rpc("register_install", {
+        _listing_id: listingId,
+        _device: navigator.platform,
+      });
       if (fileUrl) {
         const url = await signedAssetUrl(fileUrl);
         if (url) window.open(url, "_blank", "noopener");
@@ -156,7 +179,16 @@ function LibraryPage() {
             <Skeleton className="h-20 w-full rounded-2xl" />
           ) : installed.data?.length ? (
             installed.data.map((row) => {
-              const listing = row.listings as (Listing & { listing_versions?: Array<{ id: string; file_url: string | null; created_at: string; status: string }> }) | null;
+              const listing = row.listings as
+                | (Listing & {
+                    listing_versions?: Array<{
+                      id: string;
+                      file_url: string | null;
+                      created_at: string;
+                      status: string;
+                    }>;
+                  })
+                | null;
               if (!listing) return null;
               const latest = [...(listing.listing_versions ?? [])]
                 .filter((version) => version.status === "published")
@@ -170,15 +202,35 @@ function LibraryPage() {
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2 px-1">
                     {updateAvailable && latest ? (
-                      <Button size="sm" disabled={updateApp.isPending} onClick={() => updateApp.mutate({ id: row.id, listingId: row.listing_id, versionId: latest.id, fileUrl: latest.file_url })}>
+                      <Button
+                        size="sm"
+                        disabled={updateApp.isPending}
+                        onClick={() =>
+                          updateApp.mutate({
+                            id: row.id,
+                            listingId: row.listing_id,
+                            versionId: latest.id,
+                            fileUrl: latest.file_url,
+                          })
+                        }
+                      >
                         <RefreshCw className="mr-1.5 h-4 w-4" /> Update
                       </Button>
                     ) : (
-                      <Button size="sm" variant="outline" onClick={() => void openApp(latest?.file_url ?? null)}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => void openApp(latest?.file_url ?? null)}
+                      >
                         <ExternalLink className="mr-1.5 h-4 w-4" /> Open
                       </Button>
                     )}
-                    <Button size="sm" variant="ghost" disabled={uninstall.isPending} onClick={() => uninstall.mutate(row.id)}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      disabled={uninstall.isPending}
+                      onClick={() => uninstall.mutate(row.id)}
+                    >
                       <Trash2 className="mr-1.5 h-4 w-4" /> Uninstall
                     </Button>
                   </div>
@@ -202,7 +254,11 @@ function LibraryPage() {
                   <div key={row.listing_id} className="space-y-1">
                     <ListingCard listing={row.listings} />
                     <div className="px-1">
-                      <Button size="sm" variant="ghost" onClick={() => remove.mutate(row.listing_id)}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => remove.mutate(row.listing_id)}
+                      >
                         Remove
                       </Button>
                     </div>

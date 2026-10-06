@@ -146,7 +146,9 @@ function ConsoleDashboard() {
                   >
                     <AlertTriangle
                       className={
-                        t.tone === "warn" ? "h-4 w-4 shrink-0 text-brand-red" : "h-4 w-4 shrink-0 text-muted-foreground"
+                        t.tone === "warn"
+                          ? "h-4 w-4 shrink-0 text-brand-red"
+                          : "h-4 w-4 shrink-0 text-muted-foreground"
                       }
                     />
                     <span className="min-w-0 flex-1">{t.text}</span>
@@ -163,7 +165,11 @@ function ConsoleDashboard() {
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <MetricTile label="Installs and visits (30d)" value={sum(stats, "installs")} />
             <MetricTile label="Store views (30d)" value={sum(stats, "views")} />
-            <MetricTile label="Conversion" value={`${conversion(stats)}%`} hint="Views that convert" />
+            <MetricTile
+              label="Conversion"
+              value={`${conversion(stats)}%`}
+              hint="Views that convert"
+            />
             <MetricTile
               label="Average rating"
               value={Number.isFinite(rating) && rating > 0 ? rating.toFixed(1) : "—"}
@@ -222,7 +228,10 @@ function ConsoleDashboard() {
         </SectionCard>
 
         <div className="grid gap-4 lg:grid-cols-2">
-          <SectionCard title="Reputation" action={<Badge variant="secondary">{reputationTier(reputation)}</Badge>}>
+          <SectionCard
+            title="Reputation"
+            action={<Badge variant="secondary">{reputationTier(reputation)}</Badge>}
+          >
             <Progress value={reputation} />
             <p className="mt-2 text-xs text-muted-foreground">
               {reputation}/100 from product quality, ratings, update frequency, compliance and
@@ -236,7 +245,9 @@ function ConsoleDashboard() {
                 : "MK5,000 per month unlocks priority review, advanced analytics and the AI assistant."}
             </p>
             <Button asChild size="sm" variant={subscribed ? "outline" : "default"} className="mt-3">
-              <Link to="/console/subscription">{subscribed ? "Manage subscription" : "Upgrade to Pro"}</Link>
+              <Link to="/console/subscription">
+                {subscribed ? "Manage subscription" : "Upgrade to Pro"}
+              </Link>
             </Button>
           </SectionCard>
         </div>

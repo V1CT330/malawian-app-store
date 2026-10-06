@@ -29,6 +29,9 @@ export const startProCheckout = createServerFn({ method: "POST" })
       callbackUrl: `${origin}/api/public/payments/return?tx_ref=${txRef}`,
       returnUrl: `${origin}/console/subscription?payment=cancelled`,
     });
-    await supabaseAdmin.from("payment_sessions").update({ checkout_url: checkoutUrl }).eq("tx_ref", txRef);
+    await supabaseAdmin
+      .from("payment_sessions")
+      .update({ checkout_url: checkoutUrl })
+      .eq("tx_ref", txRef);
     return { checkoutUrl, txRef };
   });

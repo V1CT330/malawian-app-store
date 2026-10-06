@@ -169,11 +169,17 @@ function VerificationPage() {
       <section className="surface-card mt-4 space-y-3 p-4">
         <h2 className="font-display text-base font-semibold">Identity documents</h2>
         <p className="text-xs text-muted-foreground">
-          Upload a national ID or passport. Documents are stored privately and reviewed only by the store team.
+          Upload a national ID or passport. Documents are stored privately and reviewed only by the
+          store team.
         </p>
         <div>
           <Label htmlFor="fullname">Full legal name</Label>
-          <Input id="fullname" value={fullName} maxLength={80} onChange={(e) => setFullName(e.target.value)} />
+          <Input
+            id="fullname"
+            value={fullName}
+            maxLength={80}
+            onChange={(e) => setFullName(e.target.value)}
+          />
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
@@ -182,7 +188,12 @@ function VerificationPage() {
           </div>
           <div>
             <Label htmlFor="idnumber">Document number</Label>
-            <Input id="idnumber" value={idNumber} maxLength={40} onChange={(e) => setIdNumber(e.target.value)} />
+            <Input
+              id="idnumber"
+              value={idNumber}
+              maxLength={40}
+              onChange={(e) => setIdNumber(e.target.value)}
+            />
           </div>
         </div>
         <Input

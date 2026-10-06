@@ -26,7 +26,8 @@ export const Route = createFileRoute("/_authenticated/console/manage")({
       { title: "Team Collaboration — Malawian App Store" },
       {
         name: "description",
-        content: "Invite team members, set role based permissions and review the shared activity log.",
+        content:
+          "Invite team members, set role based permissions and review the shared activity log.",
       },
       { property: "og:title", content: "Team Collaboration — Malawian App Store" },
       { property: "og:description", content: "Invite members and track workspace activity." },
@@ -92,7 +93,11 @@ function TeamPage() {
         .from("team_members")
         .insert({ owner_id: userId, email: clean, role, status: "invited" });
       if (error) throw error;
-      await logActivity({ ownerId: userId, actorId: userId, action: `Invited ${clean} as ${role}` });
+      await logActivity({
+        ownerId: userId,
+        actorId: userId,
+        action: `Invited ${clean} as ${role}`,
+      });
     },
     onSuccess: () => {
       toast.success("Invitation recorded");
@@ -104,7 +109,13 @@ function TeamPage() {
   });
 
   const updateMember = useMutation({
-    mutationFn: async ({ id, patch }: { id: string; patch: { role?: string; status?: string } }) => {
+    mutationFn: async ({
+      id,
+      patch,
+    }: {
+      id: string;
+      patch: { role?: string; status?: string };
+    }) => {
       const { error } = await supabase.from("team_members").update(patch).eq("id", id);
       if (error) throw error;
     },
@@ -177,7 +188,10 @@ function TeamPage() {
         {members.data?.length ? (
           <ul className="space-y-3">
             {members.data.map((m) => (
-              <li key={m.id} className="flex flex-wrap items-center gap-2 border-b border-border pb-3 last:border-0 last:pb-0">
+              <li
+                key={m.id}
+                className="flex flex-wrap items-center gap-2 border-b border-border pb-3 last:border-0 last:pb-0"
+              >
                 <div className="mr-auto">
                   <p className="text-sm font-medium">{m.email}</p>
                   <p className="text-xs text-muted-foreground">
@@ -187,7 +201,12 @@ function TeamPage() {
                 <Badge variant="secondary" className="capitalize">
                   {m.status}
                 </Badge>
-                <Select value={m.role} onValueChange={(value) => updateMember.mutate({ id: m.id, patch: { role: value } })}>
+                <Select
+                  value={m.role}
+                  onValueChange={(value) =>
+                    updateMember.mutate({ id: m.id, patch: { role: value } })
+                  }
+                >
                   <SelectTrigger className="h-8 w-32">
                     <SelectValue />
                   </SelectTrigger>
@@ -200,11 +219,20 @@ function TeamPage() {
                   </SelectContent>
                 </Select>
                 {m.status !== "active" && (
-                  <Button size="sm" variant="outline" onClick={() => updateMember.mutate({ id: m.id, patch: { status: "active" } })}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => updateMember.mutate({ id: m.id, patch: { status: "active" } })}
+                  >
                     Activate
                   </Button>
                 )}
-                <Button size="sm" variant="ghost" className="text-destructive" onClick={() => removeMember.mutate(m.id)}>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-destructive"
+                  onClick={() => removeMember.mutate(m.id)}
+                >
                   Remove
                 </Button>
               </li>

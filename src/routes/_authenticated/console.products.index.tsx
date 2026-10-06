@@ -84,7 +84,8 @@ function ProductsPage() {
         </div>
         <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
           {FILTERS.map((f) => {
-            const count = f.key === "all" ? listings.length : listings.filter((l) => l.status === f.key).length;
+            const count =
+              f.key === "all" ? listings.length : listings.filter((l) => l.status === f.key).length;
             return (
               <button
                 key={f.key}
@@ -108,7 +109,9 @@ function ProductsPage() {
       ) : rows.length === 0 ? (
         <EmptyState
           icon={LayoutList}
-          title={listings.length === 0 ? "Publish your first product" : "Nothing matches that filter"}
+          title={
+            listings.length === 0 ? "Publish your first product" : "Nothing matches that filter"
+          }
           description={
             listings.length === 0
               ? "Create a listing, complete the checklist and submit it to the store review team."
@@ -140,7 +143,9 @@ function ProductsPage() {
                   <p className="truncate font-medium">{l.name}</p>
                   <p className="text-xs text-muted-foreground">
                     {kindLabel(l.kind)} · {l.downloads} {metricLabel(l.kind)} ·{" "}
-                    {l.rating_count > 0 ? `${Number(l.rating_avg).toFixed(1)} stars` : "no ratings yet"}
+                    {l.rating_count > 0
+                      ? `${Number(l.rating_avg).toFixed(1)} stars`
+                      : "no ratings yet"}
                   </p>
                   {l.status === "draft" && (
                     <p className="mt-0.5 text-xs text-muted-foreground">

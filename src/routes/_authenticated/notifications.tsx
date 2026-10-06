@@ -13,7 +13,10 @@ export const Route = createFileRoute("/_authenticated/notifications")({
   head: () => ({
     meta: [
       { title: "Notifications — Malawian App Store" },
-      { name: "description", content: "Store updates, review decisions and messages from the team." },
+      {
+        name: "description",
+        content: "Store updates, review decisions and messages from the team.",
+      },
       { property: "og:title", content: "Notifications — Malawian App Store" },
       { property: "og:description", content: "Store updates and review decisions." },
       { property: "og:type", content: "website" },

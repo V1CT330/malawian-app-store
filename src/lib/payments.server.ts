@@ -30,7 +30,10 @@ export async function createPaychanguCheckout(input: {
       tx_ref: input.txRef,
       callback_url: input.callbackUrl,
       return_url: input.returnUrl,
-      customization: { title: "Developer Pro", description: "Malawian App Store monthly subscription" },
+      customization: {
+        title: "Developer Pro",
+        description: "Malawian App Store monthly subscription",
+      },
     }),
   });
   const json = (await res.json().catch(() => null)) as { data?: { checkout_url?: string } } | null;
@@ -88,7 +91,9 @@ export async function settlePayment(txRef: string) {
     .limit(1)
     .maybeSingle();
   const now = Date.now();
-  const base = existing?.current_period_end ? Math.max(now, Date.parse(existing.current_period_end)) : now;
+  const base = existing?.current_period_end
+    ? Math.max(now, Date.parse(existing.current_period_end))
+    : now;
   const fields = {
     status: "active",
     plan: "pro",

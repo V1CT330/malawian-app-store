@@ -25,7 +25,8 @@ export const Route = createFileRoute("/_authenticated/console/resources")({
       { title: "Developer Resources — Malawian App Store" },
       {
         name: "description",
-        content: "Publishing guidelines, API docs, design guidelines, tutorials, FAQs and the feature request portal.",
+        content:
+          "Publishing guidelines, API docs, design guidelines, tutorials, FAQs and the feature request portal.",
       },
       { property: "og:title", content: "Developer Resources — Malawian App Store" },
       { property: "og:description", content: "Everything you need to publish well." },
@@ -60,14 +61,36 @@ const GUIDES = [
 ];
 
 const FAQS = [
-  { q: "How long does review take?", a: "Most products are reviewed within two working days. Subscribers go into the priority queue." },
-  { q: "What does the MK5,000 monthly subscription include?", a: SUBSCRIPTION_BENEFITS.join(". ") + "." },
-  { q: "Do I need KYC to publish?", a: "Yes. KYC verification protects users and unlocks the verified developer badge on your profile." },
-  { q: "Can I publish a website instead of an app?", a: "Yes. The store lists apps, websites, AI agents and browser extensions." },
-  { q: "How is my reputation score calculated?", a: "It combines product quality, user ratings, update frequency, rule compliance, profile completeness and how quickly you respond to reviews." },
+  {
+    q: "How long does review take?",
+    a: "Most products are reviewed within two working days. Subscribers go into the priority queue.",
+  },
+  {
+    q: "What does the MK5,000 monthly subscription include?",
+    a: SUBSCRIPTION_BENEFITS.join(". ") + ".",
+  },
+  {
+    q: "Do I need KYC to publish?",
+    a: "Yes. KYC verification protects users and unlocks the verified developer badge on your profile.",
+  },
+  {
+    q: "Can I publish a website instead of an app?",
+    a: "Yes. The store lists apps, websites, AI agents and browser extensions.",
+  },
+  {
+    q: "How is my reputation score calculated?",
+    a: "It combines product quality, user ratings, update frequency, rule compliance, profile completeness and how quickly you respond to reviews.",
+  },
 ];
 
-type FeatureRequest = { id: string; title: string; body: string | null; status: string; vote_count: number; created_at: string };
+type FeatureRequest = {
+  id: string;
+  title: string;
+  body: string | null;
+  status: string;
+  vote_count: number;
+  created_at: string;
+};
 
 function ResourcesPage() {
   useRequireDeveloper();
@@ -131,7 +154,9 @@ function ResourcesPage() {
         <Accordion type="single" collapsible>
           {GUIDES.map((g) => (
             <AccordionItem key={g.title} value={g.title}>
-              <AccordionTrigger className="text-left text-sm font-medium">{g.title}</AccordionTrigger>
+              <AccordionTrigger className="text-left text-sm font-medium">
+                {g.title}
+              </AccordionTrigger>
               <AccordionContent className="whitespace-pre-line text-sm text-muted-foreground">
                 {g.body}
               </AccordionContent>
@@ -155,7 +180,8 @@ function ResourcesPage() {
       <section className="surface-card mt-4 p-4">
         <h2 className="font-display text-base font-semibold">Community and feature requests</h2>
         <p className="text-sm text-muted-foreground">
-          Post an idea, or back one you want built next. The store team reviews the top requests every month.
+          Post an idea, or back one you want built next. The store team reviews the top requests
+          every month.
         </p>
         <div className="mt-3 space-y-2">
           <Input
@@ -178,8 +204,16 @@ function ResourcesPage() {
 
         <ul className="mt-4 space-y-3">
           {requests.data?.map((r) => (
-            <li key={r.id} className="flex items-start gap-3 border-b border-border pb-3 last:border-0 last:pb-0">
-              <Button size="sm" variant="outline" className="shrink-0" onClick={() => vote.mutate(r)}>
+            <li
+              key={r.id}
+              className="flex items-start gap-3 border-b border-border pb-3 last:border-0 last:pb-0"
+            >
+              <Button
+                size="sm"
+                variant="outline"
+                className="shrink-0"
+                onClick={() => vote.mutate(r)}
+              >
                 ▲ {r.vote_count}
               </Button>
               <div className="min-w-0">

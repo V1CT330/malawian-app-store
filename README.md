@@ -1,10 +1,8 @@
 # Malawian App Store
 
-Build a web app called Malawian App Store 
+Build a web app called Malawian App Store
 
-
-
-It's For 
+It's For
 
 ‎Apps
 
@@ -22,9 +20,9 @@ It's For
 
 ‎
 
-‎App/Website uploading system 
+‎App/Website uploading system
 
-‎Updating system 
+‎Updating system
 
 ‎
 
@@ -44,7 +42,7 @@ It's For
 
 ‎
 
-‎phone number verification- WhatsApp 
+‎phone number verification- WhatsApp
 
 ‎
 
@@ -52,15 +50,15 @@ It's For
 
 ‎
 
-‎AI agent 
+‎AI agent
 
 ‎
 
-‎5000/monthly subscription 
+‎5000/monthly subscription
 
 ‎
 
-‎Socia Media pages 
+‎Socia Media pages
 
 ‎
 

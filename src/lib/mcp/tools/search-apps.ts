@@ -6,7 +6,8 @@ import { supabaseForUser } from "../supabase";
 export default defineTool({
   name: "search_apps",
   title: "Search apps",
-  description: "Search published apps and websites on the Malawian App Store by name, category or kind.",
+  description:
+    "Search published apps and websites on the Malawian App Store by name, category or kind.",
   inputSchema: {
     query: z.string().trim().optional().describe("Text to match against app name or tagline."),
     category: z.string().trim().optional().describe("Category filter, e.g. Education, Finance."),

@@ -40,7 +40,11 @@ export function ListingTile({ listing }: { listing: Listing }) {
       params={{ slug: listing.slug }}
       className="w-[104px] shrink-0 transition-transform active:scale-[0.97]"
     >
-      <AppIcon path={listing.icon_url} name={listing.name} className="h-[104px] w-[104px] rounded-[22px] shadow-soft" />
+      <AppIcon
+        path={listing.icon_url}
+        name={listing.name}
+        className="h-[104px] w-[104px] rounded-[22px] shadow-soft"
+      />
       <p className="mt-2 line-clamp-2 text-[13px] font-medium leading-tight">{listing.name}</p>
       <p className="mt-0.5 flex items-center gap-0.5 text-[11px] text-muted-foreground">
         {listing.rating_count ? (
@@ -64,7 +68,11 @@ export function ListingCard({ listing }: { listing: Listing }) {
       params={{ slug: listing.slug }}
       className="flex items-center gap-4 rounded-2xl px-1 py-2 transition-colors hover:bg-secondary active:scale-[0.99]"
     >
-      <AppIcon path={listing.icon_url} name={listing.name} className="h-16 w-16 rounded-[18px] shadow-soft" />
+      <AppIcon
+        path={listing.icon_url}
+        name={listing.name}
+        className="h-16 w-16 rounded-[18px] shadow-soft"
+      />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
           <p className="truncate text-[15px] font-medium">{listing.name}</p>
@@ -74,14 +82,20 @@ export function ListingCard({ listing }: { listing: Listing }) {
             <Smartphone className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
           )}
         </div>
-        <p className="truncate text-xs text-muted-foreground">{listing.tagline || listing.category}</p>
+        <p className="truncate text-xs text-muted-foreground">
+          {listing.tagline || listing.category}
+        </p>
         <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-0.5">
             {listing.rating_count ? listing.rating_avg.toFixed(1) : "New"}
             <Star className="h-3 w-3 fill-brand-gold text-brand-gold" />
           </span>
           <span aria-hidden>·</span>
-          <span>{listing.kind === "website" ? `${listing.downloads} visits` : `${listing.downloads} installs`}</span>
+          <span>
+            {listing.kind === "website"
+              ? `${listing.downloads} visits`
+              : `${listing.downloads} installs`}
+          </span>
         </div>
       </div>
     </Link>

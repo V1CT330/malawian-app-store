@@ -90,7 +90,9 @@ function QualityPage() {
                   {missing.length > 0 && (
                     <ul className="space-y-1 text-sm text-muted-foreground">
                       {missing.slice(0, 4).map((m) => (
-                        <li key={m.label}>{m.label}: {m.hint}</li>
+                        <li key={m.label}>
+                          {m.label}: {m.hint}
+                        </li>
                       ))}
                     </ul>
                   )}

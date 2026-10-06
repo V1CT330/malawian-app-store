@@ -12,12 +12,15 @@ const Input = z.object({
 /** Strips markdown emphasis, bullet markers and emoji so replies stay professional. */
 function toPlainText(text: string) {
   return text
-    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{2190}-\u{21FF}]/gu, "")
+    .replace(/\p{Extended_Pictographic}\uFE0F?/gu, "")
+    .replace(/[\u2190-\u21FF]/g, "")
     .replace(/^\s{0,3}#{1,6}\s*/gm, "")
     .replace(/^\s*[-*+•]\s+/gm, "")
     .replace(/\*\*(.*?)\*\*/g, "$1")
     .replace(/\*(.*?)\*/g, "$1")
-    .replace(/`{1,3}/g, "").replace(/[\u2013\u2014]/g, ",").replace(/ - /g, ", ")
+    .replace(/`{1,3}/g, "")
+    .replace(/[\u2013\u2014]/g, ",")
+    .replace(/ - /g, ", ")
     .replace(/[ \t]+$/gm, "")
     .trim();
 }
@@ -46,8 +49,10 @@ export const askAssistant = createServerFn({ method: "POST" })
     });
 
     if (response.status === 429) throw new Error("Too many requests right now. Try again shortly.");
-    if (response.status === 402) throw new Error("AI credits are exhausted. Please top up to continue.");
-    if (!response.ok) throw new Error(`Assistant failed [${response.status}]: ${await response.text()}`);
+    if (response.status === 402)
+      throw new Error("AI credits are exhausted. Please top up to continue.");
+    if (!response.ok)
+      throw new Error(`Assistant failed [${response.status}]: ${await response.text()}`);
 
     const json = (await response.json()) as { choices?: { message?: { content?: string } }[] };
     const raw = json.choices?.[0]?.message?.content ?? "";

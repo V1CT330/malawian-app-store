@@ -164,7 +164,6 @@ function AnalyticsPage() {
       </p>
 
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-
         {stats.map((s) => (
           <div key={s.label} className="surface-card p-3 text-center">
             <p className="font-display text-xl font-bold">{s.value}</p>

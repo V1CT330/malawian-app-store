@@ -40,15 +40,7 @@ const TABS = [
   { key: "website", label: "Websites" },
 ] as const;
 
-function Shelf({
-  title,
-  subtitle,
-  items,
-}: {
-  title: string;
-  subtitle?: string;
-  items: Listing[];
-}) {
+function Shelf({ title, subtitle, items }: { title: string; subtitle?: string; items: Listing[] }) {
   if (items.length === 0) return null;
   return (
     <section className="mb-6">
@@ -78,12 +70,18 @@ function StorePage() {
     queryKey: ["listings", "published"],
     queryFn: async () => {
       const [listingsResult, profilesResult] = await Promise.all([
-        supabase.from("listings").select("*").eq("status", "published").order("created_at", { ascending: false }),
+        supabase
+          .from("listings")
+          .select("*")
+          .eq("status", "published")
+          .order("created_at", { ascending: false }),
         supabase.from("profiles").select("id,developer_name,display_name"),
       ]);
       if (listingsResult.error) throw listingsResult.error;
       if (profilesResult.error) throw profilesResult.error;
-      const developers = new Map((profilesResult.data ?? []).map((profile) => [profile.id, profile]));
+      const developers = new Map(
+        (profilesResult.data ?? []).map((profile) => [profile.id, profile]),
+      );
       return (listingsResult.data ?? []).map((listing) => ({
         ...(listing as Listing),
         developer: developers.get(listing.developer_id) ?? null,
@@ -163,16 +161,24 @@ function StorePage() {
         </div>
       ) : listings.length === 0 ? (
         <div className="rounded-2xl border border-border p-8 text-center">
-          <h2 className="font-display text-lg font-semibold">{search ? "No matching products" : "Nothing here yet"}</h2>
+          <h2 className="font-display text-lg font-semibold">
+            {search ? "No matching products" : "Nothing here yet"}
+          </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            {search ? "Try another app name, developer, category, or keyword." : "Be the first developer to publish on the Malawian App Store."}
+            {search
+              ? "Try another app name, developer, category, or keyword."
+              : "Be the first developer to publish on the Malawian App Store."}
           </p>
         </div>
       ) : (
         <div>
           {browsing ? (
             <>
-              <Shelf title="Recommended for you" subtitle="Fresh from Malawian developers" items={fresh} />
+              <Shelf
+                title="Recommended for you"
+                subtitle="Fresh from Malawian developers"
+                items={fresh}
+              />
               <Shelf title="Top charts" subtitle="Most popular this week" items={topCharts} />
               <Shelf title="Top rated" subtitle="Loved by reviewers" items={topRated} />
             </>
@@ -180,7 +186,9 @@ function StorePage() {
 
           <section className="mb-2">
             <h2 className="mb-2 font-display text-[17px] font-semibold">
-              {browsing ? "All listings" : `${listings.length} result${listings.length === 1 ? "" : "s"}`}
+              {browsing
+                ? "All listings"
+                : `${listings.length} result${listings.length === 1 ? "" : "s"}`}
             </h2>
             <div className="divide-y divide-border">
               {listings.map((l) => (
