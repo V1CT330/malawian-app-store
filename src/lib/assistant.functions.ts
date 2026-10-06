@@ -17,7 +17,9 @@ function toPlainText(text: string) {
     .replace(/^\s*[-*+•]\s+/gm, "")
     .replace(/\*\*(.*?)\*\*/g, "$1")
     .replace(/\*(.*?)\*/g, "$1")
-    .replace(/`{1,3}/g, "").replace(/[\u2013\u2014]/g, ",").replace(/ - /g, ", ")
+    .replace(/`{1,3}/g, "")
+    .replace(/[\u2013\u2014]/g, ",")
+    .replace(/ - /g, ", ")
     .replace(/[ \t]+$/gm, "")
     .trim();
 }
@@ -46,8 +48,10 @@ export const askAssistant = createServerFn({ method: "POST" })
     });
 
     if (response.status === 429) throw new Error("Too many requests right now. Try again shortly.");
-    if (response.status === 402) throw new Error("AI credits are exhausted. Please top up to continue.");
-    if (!response.ok) throw new Error(`Assistant failed [${response.status}]: ${await response.text()}`);
+    if (response.status === 402)
+      throw new Error("AI credits are exhausted. Please top up to continue.");
+    if (!response.ok)
+      throw new Error(`Assistant failed [${response.status}]: ${await response.text()}`);
 
     const json = (await response.json()) as { choices?: { message?: { content?: string } }[] };
     const raw = json.choices?.[0]?.message?.content ?? "";

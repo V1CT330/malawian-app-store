@@ -25,7 +25,11 @@ export function useListing(id: string | undefined) {
     queryKey: ["console-listing", id],
     enabled: Boolean(id),
     queryFn: async () => {
-      const { data, error } = await supabase.from("listings").select("*").eq("id", id!).maybeSingle();
+      const { data, error } = await supabase
+        .from("listings")
+        .select("*")
+        .eq("id", id!)
+        .maybeSingle();
       if (error) throw error;
       return (data ?? null) as unknown as PortalListing | null;
     },

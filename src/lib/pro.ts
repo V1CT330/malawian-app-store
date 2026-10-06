@@ -6,7 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const PRO_PRICE_MWK = 5000;
 export const PRO_NAME = "Developer Pro";
-export const PRO_TAGLINE = "The professional toolkit for developers building Malawi's digital future.";
+export const PRO_TAGLINE =
+  "The professional toolkit for developers building Malawi's digital future.";
 export const CORE_MESSAGE = "Build locally. Promote locally. Get discovered locally.";
 export const CORE_SUPPORT = "One professional toolkit for Malawian developers.";
 
@@ -42,7 +43,8 @@ export const WHY_PRO = [
   },
   {
     title: "Malawi Marketing",
-    detail: "Access promotional tools and opportunities created specifically for Malawian developers.",
+    detail:
+      "Access promotional tools and opportunities created specifically for Malawian developers.",
   },
 ] as const;
 

@@ -119,7 +119,9 @@ export function ConsoleShell({
   const queryClient = useQueryClient();
   const [drawer, setDrawer] = useState(false);
 
-  const initial = (profile?.developer_name || profile?.display_name || "D").slice(0, 1).toUpperCase();
+  const initial = (profile?.developer_name || profile?.display_name || "D")
+    .slice(0, 1)
+    .toUpperCase();
   const verified = profile?.kyc_status === "approved";
 
   const leaveDeveloper = useMutation({
@@ -148,7 +150,9 @@ export function ConsoleShell({
           <img src={logo} alt="" width={32} height={32} className="h-8 w-8" />
           <span className="font-display text-sm font-bold leading-tight">
             Developer
-            <span className="block text-xs font-medium text-muted-foreground">Malawian App Store</span>
+            <span className="block text-xs font-medium text-muted-foreground">
+              Malawian App Store
+            </span>
           </span>
         </Link>
         <NavList />
@@ -173,7 +177,12 @@ export function ConsoleShell({
           <div className="mx-auto flex w-full max-w-6xl items-center gap-2 px-3 py-3 sm:px-6">
             <Sheet open={drawer} onOpenChange={setDrawer}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open console menu">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="lg:hidden"
+                  aria-label="Open console menu"
+                >
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
@@ -213,7 +222,8 @@ export function ConsoleShell({
                   </>
                 ) : (
                   <>
-                    <ShieldCheck className="h-3.5 w-3.5" /> Verification {profile?.kyc_status ?? "none"}
+                    <ShieldCheck className="h-3.5 w-3.5" /> Verification{" "}
+                    {profile?.kyc_status ?? "none"}
                   </>
                 )}
               </p>
@@ -227,7 +237,13 @@ export function ConsoleShell({
                 <CircleHelp className="h-5 w-5" />
               </Link>
             </Button>
-            <Button asChild variant="ghost" size="icon" aria-label="Notifications" className="relative">
+            <Button
+              asChild
+              variant="ghost"
+              size="icon"
+              aria-label="Notifications"
+              className="relative"
+            >
               <Link to="/notifications">
                 <Bell className="h-5 w-5" />
                 {unread > 0 && (

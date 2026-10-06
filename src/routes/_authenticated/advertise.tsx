@@ -36,7 +36,11 @@ export const Route = createFileRoute("/_authenticated/advertise")({
 
 const PLACEMENTS = [
   { value: "featured", label: "Featured placement", detail: "Shown on the store home shelves" },
-  { value: "search", label: "Search boost", detail: "Higher position in category and search results" },
+  {
+    value: "search",
+    label: "Search boost",
+    detail: "Higher position in category and search results",
+  },
   { value: "banner", label: "Store banner", detail: "Wide banner across browse pages" },
 ] as const;
 
@@ -88,7 +92,8 @@ function AdvertisePage() {
     mutationFn: async () => {
       if (!listingId) throw new Error("Choose which product to promote.");
       const amount = Number(budget);
-      if (!Number.isFinite(amount) || amount < 1000) throw new Error("Set a budget of at least MK1,000.");
+      if (!Number.isFinite(amount) || amount < 1000)
+        throw new Error("Set a budget of at least MK1,000.");
       const length = Math.max(1, Math.min(90, Number(days) || 7));
       const ends = new Date(Date.now() + length * 24 * 60 * 60 * 1000);
       const { error } = await supabase.from("promotions").insert({
@@ -127,13 +132,13 @@ function AdvertisePage() {
       description="Promote your products inside the store and reach people browsing for local software."
       breadcrumbs={[{ label: "Console", to: "/console" }, { label: "Advertise" }]}
     >
-
       {founding.data?.enabled && founding.data.promo_credit_mwk > 0 && (
         <section className="surface-card mb-4 border-l-4 border-l-brand-green p-4">
           <h2 className="font-display text-base font-semibold">Founding promotional credit</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Founding developers are eligible for {formatMwk(founding.data.promo_credit_mwk)} in promotional
-            credit toward their first campaigns. Credit is applied by the store team after review.
+            Founding developers are eligible for {formatMwk(founding.data.promo_credit_mwk)} in
+            promotional credit toward their first campaigns. Credit is applied by the store team
+            after review.
           </p>
         </section>
       )}
@@ -258,11 +263,15 @@ function AdvertisePage() {
                     <p className="text-muted-foreground">clicks</p>
                   </div>
                   <div>
-                    <p className="font-display text-sm font-bold">{formatMwk(Number(c.spent_mwk))}</p>
+                    <p className="font-display text-sm font-bold">
+                      {formatMwk(Number(c.spent_mwk))}
+                    </p>
                     <p className="text-muted-foreground">spent</p>
                   </div>
                   <div>
-                    <p className="font-display text-sm font-bold">{formatMwk(Number(c.budget_mwk))}</p>
+                    <p className="font-display text-sm font-bold">
+                      {formatMwk(Number(c.budget_mwk))}
+                    </p>
                     <p className="text-muted-foreground">budget</p>
                   </div>
                 </div>

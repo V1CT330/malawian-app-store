@@ -23,9 +23,19 @@ export default defineTool({
     description: z.string().trim().max(4000).optional().describe("Full listing description."),
     category: z.string().trim().min(2).describe("Category, e.g. Education, Finance, Tools."),
     kind: z.enum(["app", "website"]).describe("Whether this listing is an app or a website."),
-    website_url: z.string().trim().url().optional().describe("Website URL, required for website listings."),
+    website_url: z
+      .string()
+      .trim()
+      .url()
+      .optional()
+      .describe("Website URL, required for website listings."),
   },
-  annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+  annotations: {
+    readOnlyHint: false,
+    destructiveHint: false,
+    idempotentHint: false,
+    openWorldHint: false,
+  },
   handler: async ({ name, tagline, description, category, kind, website_url }, ctx) => {
     if (!ctx.isAuthenticated()) {
       return { content: [{ type: "text", text: "Not authenticated" }], isError: true };

@@ -46,7 +46,9 @@ export function AppShell({
   const { userId, profile } = useProfile();
   const mode = useMode();
   const unread = useUnreadCount();
-  const initial = (profile?.display_name || profile?.developer_name || "U").slice(0, 1).toUpperCase();
+  const initial = (profile?.display_name || profile?.developer_name || "U")
+    .slice(0, 1)
+    .toUpperCase();
   const nav = mode === "developer" ? DEV_NAV : USER_NAV;
 
   return (
@@ -55,7 +57,13 @@ export function AppShell({
         <div className="mx-auto w-full max-w-5xl">
           <div className="flex items-center gap-3 rounded-full bg-secondary px-3 py-2 shadow-soft">
             <Link to="/" aria-label="Malawian App Store home" className="shrink-0">
-              <img src={logo} alt="Malawian App Store logo" width={28} height={28} className="h-7 w-7" />
+              <img
+                src={logo}
+                alt="Malawian App Store logo"
+                width={28}
+                height={28}
+                className="h-7 w-7"
+              />
             </Link>
             <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
             <input
@@ -97,7 +105,13 @@ export function AppShell({
           <p>Discover and publish apps and websites built in Malawi.</p>
           <div className="flex flex-wrap gap-4">
             {SOCIAL_LINKS.map((s) => (
-              <a key={s.label} href={s.href} target="_blank" rel="noreferrer noopener" className="hover:text-primary">
+              <a
+                key={s.label}
+                href={s.href}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="hover:text-primary"
+              >
                 {s.label}
               </a>
             ))}
@@ -127,7 +141,9 @@ export function AppShell({
                     <span className="absolute right-3 top-0 h-2 w-2 rounded-full bg-destructive" />
                   )}
                 </span>
-                <span className={active ? "text-foreground" : "text-muted-foreground"}>{item.label}</span>
+                <span className={active ? "text-foreground" : "text-muted-foreground"}>
+                  {item.label}
+                </span>
               </Link>
             );
           })}

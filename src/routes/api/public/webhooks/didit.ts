@@ -79,9 +79,14 @@ export const Route = createFileRoute("/api/public/webhooks/didit")({
         const type = String(body.webhook_type ?? "unknown");
         const status = typeof body.status === "string" ? body.status : null;
         const sessionId = typeof body.session_id === "string" ? body.session_id : null;
-        const vendor = typeof body.vendor_data === "string" && UUID.test(body.vendor_data) ? body.vendor_data : null;
+        const vendor =
+          typeof body.vendor_data === "string" && UUID.test(body.vendor_data)
+            ? body.vendor_data
+            : null;
         const eventKey =
-          typeof body.event_id === "string" ? body.event_id : `${sessionId}:${status}:${type}:${body.timestamp ?? ts}`;
+          typeof body.event_id === "string"
+            ? body.event_id
+            : `${sessionId}:${status}:${type}:${body.timestamp ?? ts}`;
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { error: dup } = await supabaseAdmin.from("identity_verification_events").insert({
@@ -98,7 +103,13 @@ export const Route = createFileRoute("/api/public/webhooks/didit")({
         }
 
         // Only session status changes affect a developer's verification badge.
-        if (type === "status.updated" && vendor && status && KYC_MAP[status] && body.session_kind !== "business") {
+        if (
+          type === "status.updated" &&
+          vendor &&
+          status &&
+          KYC_MAP[status] &&
+          body.session_kind !== "business"
+        ) {
           const kyc = KYC_MAP[status];
           await supabaseAdmin.from("profiles").update({ kyc_status: kyc }).eq("id", vendor);
           await supabaseAdmin.from("notifications").insert({

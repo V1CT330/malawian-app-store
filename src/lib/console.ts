@@ -92,8 +92,10 @@ export function canSubmit(l: Partial<PortalListing> | null) {
 
 export const STATUS_HELP: Record<string, string> = {
   draft: "Only you can see this. Complete the checklist, then submit it for review.",
-  pending: "The store review team is checking this product. You cannot edit the status while it is in review.",
+  pending:
+    "The store review team is checking this product. You cannot edit the status while it is in review.",
   published: "Live in the store and visible to everyone.",
-  rejected: "The review team asked for changes. Fix the issues, then move it back to draft and resubmit.",
+  rejected:
+    "The review team asked for changes. Fix the issues, then move it back to draft and resubmit.",
   archived: "Removed from the store. You can move it back to draft at any time.",
 };

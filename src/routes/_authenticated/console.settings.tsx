@@ -35,7 +35,8 @@ function ConsoleSettingsPage() {
       <div className="grid gap-4 lg:grid-cols-2">
         <SectionCard title="Account preferences">
           <p className="text-sm text-muted-foreground">
-            Profile details, appearance, developer mode and sign-out are managed in Account settings.
+            Profile details, appearance, developer mode and sign-out are managed in Account
+            settings.
           </p>
           <Button asChild size="sm" variant="outline" className="mt-3">
             <Link to="/settings">Open account settings</Link>

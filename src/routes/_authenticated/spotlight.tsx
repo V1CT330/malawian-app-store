@@ -70,7 +70,8 @@ function SpotlightPage() {
 
   const apply = useMutation({
     mutationFn: async () => {
-      if (pitch.trim().length < 30) throw new Error("Tell us a little more, at least 30 characters.");
+      if (pitch.trim().length < 30)
+        throw new Error("Tell us a little more, at least 30 characters.");
       const { error } = await supabase.from("spotlight_applications").insert({
         developer_id: userId!,
         listing_id: listingId || null,
@@ -95,7 +96,6 @@ function SpotlightPage() {
       description="Feature opportunities for developers building for Malawi."
       breadcrumbs={[{ label: "Console", to: "/console" }, { label: "Spotlight" }]}
     >
-
       <section className="surface-card p-4">
         <div className="flex items-center justify-between gap-2">
           <h2 className="font-display text-base font-semibold">Eligibility</h2>

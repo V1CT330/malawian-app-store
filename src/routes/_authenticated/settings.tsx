@@ -84,12 +84,18 @@ function SettingsPage() {
   });
 
   const setMode = useMutation({
-    mutationFn: async ({ next, acceptTerms }: { next: "developer" | "user"; acceptTerms?: boolean }) => {
+    mutationFn: async ({
+      next,
+      acceptTerms,
+    }: {
+      next: "developer" | "user";
+      acceptTerms?: boolean;
+    }) => {
       const { error } = await supabase
         .from("profiles")
         .update({
           mode: next,
-          is_developer: next === "developer" ? true : profile?.is_developer ?? false,
+          is_developer: next === "developer" ? true : (profile?.is_developer ?? false),
           ...(acceptTerms ? { developer_terms_accepted_at: new Date().toISOString() } : {}),
         })
         .eq("id", userId!);
@@ -190,7 +196,9 @@ function SettingsPage() {
           <Palette className="h-4 w-4 text-muted-foreground" />
           <div>
             <h2 className="font-display text-base font-semibold">Accent color</h2>
-            <p className="text-xs text-muted-foreground">Choose the color used for actions and highlights.</p>
+            <p className="text-xs text-muted-foreground">
+              Choose the color used for actions and highlights.
+            </p>
           </div>
         </div>
         <div className="flex flex-wrap gap-3">
@@ -205,10 +213,15 @@ function SettingsPage() {
               className="relative h-10 w-10 rounded-full border-2 border-background shadow-sm ring-1 ring-border"
               style={{ backgroundColor: preset.value }}
             >
-              {accent === preset.value && <Check className="absolute inset-0 m-auto h-5 w-5 text-primary-foreground" />}
+              {accent === preset.value && (
+                <Check className="absolute inset-0 m-auto h-5 w-5 text-primary-foreground" />
+              )}
             </button>
           ))}
-          <label className="relative flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-border bg-secondary" title="Custom color">
+          <label
+            className="relative flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-border bg-secondary"
+            title="Custom color"
+          >
             <Palette className="h-4 w-4" />
             <input
               type="color"
@@ -230,7 +243,11 @@ function SettingsPage() {
               <p className="text-xs text-muted-foreground">Easier on the eyes at night.</p>
             </div>
           </div>
-          <Switch aria-label="Toggle dark theme" checked={dark} onCheckedChange={(v) => setTheme(v)} />
+          <Switch
+            aria-label="Toggle dark theme"
+            checked={dark}
+            onCheckedChange={(v) => setTheme(v)}
+          />
         </div>
       </section>
 

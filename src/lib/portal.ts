@@ -70,9 +70,17 @@ export type PortalVersion = {
 /** Store-optimisation scoring used by the ASO panel. Pure, so it renders instantly. */
 export function asoReport(l: Partial<PortalListing>) {
   const checks = [
-    { label: "Name between 3 and 30 characters", ok: (l.name?.length ?? 0) >= 3 && (l.name?.length ?? 0) <= 30, weight: 10 },
+    {
+      label: "Name between 3 and 30 characters",
+      ok: (l.name?.length ?? 0) >= 3 && (l.name?.length ?? 0) <= 30,
+      weight: 10,
+    },
     { label: "Tagline written (40+ characters)", ok: (l.tagline?.length ?? 0) >= 40, weight: 10 },
-    { label: "Description of 200+ characters", ok: (l.description?.length ?? 0) >= 200, weight: 20 },
+    {
+      label: "Description of 200+ characters",
+      ok: (l.description?.length ?? 0) >= 200,
+      weight: 20,
+    },
     { label: "Icon uploaded", ok: Boolean(l.icon_url), weight: 15 },
     { label: "At least 3 screenshots", ok: (l.screenshots?.length ?? 0) >= 3, weight: 15 },
     { label: "Feature banner uploaded", ok: Boolean(l.banner_url), weight: 5 },

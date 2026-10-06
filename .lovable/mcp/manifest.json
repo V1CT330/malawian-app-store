@@ -5,9 +5,7 @@
   "auth": {
     "type": "oauth",
     "issuer": "https://txmukhfpoylrrhancmzu.supabase.co/auth/v1",
-    "accepted_audiences": [
-      "authenticated"
-    ]
+    "accepted_audiences": ["authenticated"]
   },
   "mcp": {
     "server": {
@@ -40,10 +38,7 @@
             "kind": {
               "description": "Limit to apps or websites.",
               "type": "string",
-              "enum": [
-                "app",
-                "website"
-              ]
+              "enum": ["app", "website"]
             },
             "limit": {
               "description": "Maximum results (default 10).",
@@ -74,9 +69,7 @@
               "description": "The app slug, e.g. mzuni-notes."
             }
           },
-          "required": [
-            "slug"
-          ]
+          "required": ["slug"]
         },
         "outputSchema": null
       },
@@ -96,12 +89,7 @@
             "status": {
               "description": "Filter by status.",
               "type": "string",
-              "enum": [
-                "draft",
-                "pending",
-                "published",
-                "rejected"
-              ]
+              "enum": ["draft", "pending", "published", "rejected"]
             }
           }
         },
@@ -171,10 +159,7 @@
             },
             "kind": {
               "type": "string",
-              "enum": [
-                "app",
-                "website"
-              ],
+              "enum": ["app", "website"],
               "description": "Whether this listing is an app or a website."
             },
             "website_url": {
@@ -183,11 +168,7 @@
               "format": "uri"
             }
           },
-          "required": [
-            "name",
-            "category",
-            "kind"
-          ]
+          "required": ["name", "category", "kind"]
         },
         "outputSchema": null
       }

@@ -14,7 +14,9 @@ const DEFAULT_ACCENT = ACCENT_PRESETS[0].value;
 function hexToOklch(hex: string) {
   const normalized = hex.replace("#", "");
   if (!/^[0-9a-f]{6}$/i.test(normalized)) return "oklch(0.55 0.16 145)";
-  const channels = [0, 2, 4].map((start) => Number.parseInt(normalized.slice(start, start + 2), 16) / 255);
+  const channels = [0, 2, 4].map(
+    (start) => Number.parseInt(normalized.slice(start, start + 2), 16) / 255,
+  );
   const [r, g, b] = channels.map((channel) =>
     channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4,
   );
@@ -42,7 +44,10 @@ function applyAccent(hex: string) {
   root.style.setProperty("--accent-foreground", color);
   root.style.setProperty("--sidebar-accent", `color-mix(in oklab, ${color} 15%, var(--sidebar))`);
   root.style.setProperty("--sidebar-accent-foreground", color);
-  root.style.setProperty("--primary-foreground", hex.toLowerCase() === "#171717" ? "oklch(1 0 0)" : "oklch(1 0 0)");
+  root.style.setProperty(
+    "--primary-foreground",
+    hex.toLowerCase() === "#171717" ? "oklch(1 0 0)" : "oklch(1 0 0)",
+  );
   root.style.setProperty("--sidebar-primary-foreground", "oklch(1 0 0)");
 }
 
@@ -53,7 +58,9 @@ export function useTheme() {
 
   useEffect(() => {
     const stored = localStorage.getItem("mas:theme");
-    const next = stored ? stored === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const next = stored
+      ? stored === "dark"
+      : window.matchMedia("(prefers-color-scheme: dark)").matches;
     setDark(next);
     document.documentElement.classList.toggle("dark", next);
     const storedAccent = localStorage.getItem("mas:accent") ?? DEFAULT_ACCENT;

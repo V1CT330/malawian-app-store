@@ -45,7 +45,11 @@ function ListingDetail() {
   const listingQuery = useQuery({
     queryKey: ["listing", slug],
     queryFn: async () => {
-      const { data, error } = await supabase.from("listings").select("*").eq("slug", slug).maybeSingle();
+      const { data, error } = await supabase
+        .from("listings")
+        .select("*")
+        .eq("slug", slug)
+        .maybeSingle();
       if (error) throw error;
       return data as Listing | null;
     },
@@ -221,7 +225,6 @@ function ListingDetail() {
     toast.info("Added to your library. The developer has not published a download file yet.");
   }
 
-
   if (listingQuery.isLoading) {
     return (
       <AppShell>
@@ -267,7 +270,9 @@ function ListingDetail() {
           </div>
           <div className="surface-card p-3">
             <p className="font-display text-lg font-bold">{listing.downloads}</p>
-            <p className="text-xs text-muted-foreground">{listing.kind === "website" ? "visits" : "installs"}</p>
+            <p className="text-xs text-muted-foreground">
+              {listing.kind === "website" ? "visits" : "installs"}
+            </p>
           </div>
           <div className="surface-card p-3">
             <p className="font-display text-lg font-bold">{latest?.version ?? "—"}</p>
@@ -283,11 +288,17 @@ function ListingDetail() {
           ) : (
             <>
               {installedQuery.data && installedQuery.data.installed_version_id !== latest?.id ? (
-                <><RefreshCw className="mr-2 h-4 w-4" /> Update</>
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4" /> Update
+                </>
               ) : installedQuery.data ? (
-                <><ExternalLink className="mr-2 h-4 w-4" /> Open</>
+                <>
+                  <ExternalLink className="mr-2 h-4 w-4" /> Open
+                </>
               ) : (
-                <><Download className="mr-2 h-4 w-4" /> Install</>
+                <>
+                  <Download className="mr-2 h-4 w-4" /> Install
+                </>
               )}
             </>
           )}
@@ -310,16 +321,19 @@ function ListingDetail() {
             params={{ id: developerQuery.data.id }}
             className="block text-sm text-primary underline"
           >
-            More from {developerQuery.data.developer_name ?? developerQuery.data.display_name ?? "this developer"}
+            More from{" "}
+            {developerQuery.data.developer_name ??
+              developerQuery.data.display_name ??
+              "this developer"}
           </Link>
         )}
-
-
 
         {listing.description && (
           <section className="surface-card p-4">
             <h2 className="mb-2 font-display text-base font-semibold">About</h2>
-            <p className="whitespace-pre-wrap text-sm text-muted-foreground">{listing.description}</p>
+            <p className="whitespace-pre-wrap text-sm text-muted-foreground">
+              {listing.description}
+            </p>
           </section>
         )}
 
@@ -333,7 +347,9 @@ function ListingDetail() {
                   <p className="text-xs text-muted-foreground">
                     {new Date(v.created_at).toLocaleDateString()} · {formatBytes(v.size_bytes)}
                   </p>
-                  {v.changelog && <p className="mt-1 text-sm text-muted-foreground">{v.changelog}</p>}
+                  {v.changelog && (
+                    <p className="mt-1 text-sm text-muted-foreground">{v.changelog}</p>
+                  )}
                 </li>
               ))}
             </ul>
@@ -360,15 +376,12 @@ function ListingDetail() {
                       <Star
                         className={cn(
                           "h-6 w-6",
-                          n <= rating
-                            ? "fill-brand-gold text-brand-gold"
-                            : "text-muted-foreground",
+                          n <= rating ? "fill-brand-gold text-brand-gold" : "text-muted-foreground",
                         )}
                       />
                     </button>
                   ))}
                 </div>
-
               </div>
               <Textarea
                 value={body}

@@ -27,10 +27,14 @@ export const Route = createFileRoute("/_authenticated/upload")({
       { title: "Publish an App — Malawian App Store" },
       {
         name: "description",
-        content: "Upload your Android app or website listing with an icon, description and first version.",
+        content:
+          "Upload your Android app or website listing with an icon, description and first version.",
       },
       { property: "og:title", content: "Publish an App — Malawian App Store" },
-      { property: "og:description", content: "Upload your app or website to the Malawian App Store." },
+      {
+        property: "og:description",
+        content: "Upload your app or website to the Malawian App Store.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -113,7 +117,6 @@ function UploadPage() {
       description="Apps and websites are reviewed by the store team after publishing."
       breadcrumbs={[{ label: "Console", to: "/console" }, { label: "Publish a listing" }]}
     >
-
       <div className="mt-5 space-y-4">
         <div>
           <Label>Type</Label>

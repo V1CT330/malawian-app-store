@@ -91,7 +91,12 @@ export async function signedAssetUrl(path: string | null | undefined, bucket = "
   return data?.signedUrl ?? null;
 }
 
-export async function uploadAsset(userId: string, file: File, folder: string, bucket = "app-assets") {
+export async function uploadAsset(
+  userId: string,
+  file: File,
+  folder: string,
+  bucket = "app-assets",
+) {
   const ext = file.name.split(".").pop() ?? "bin";
   const path = `${userId}/${folder}/${crypto.randomUUID()}.${ext}`;
   const { error } = await supabase.storage.from(bucket).upload(path, file, { upsert: false });
@@ -132,7 +137,8 @@ export function clientContext() {
 }
 
 export function listingUrl(slug: string) {
-  const origin = typeof window !== "undefined" ? window.location.origin : "https://malawianappstore.lovable.app";
+  const origin =
+    typeof window !== "undefined" ? window.location.origin : "https://malawianappstore.lovable.app";
   return `${origin}/apps/${slug}`;
 }
 
@@ -140,4 +146,11 @@ export function qrCodeUrl(value: string, size = 240) {
   return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(value)}`;
 }
 
-export const REPORT_KINDS = ["Fake app", "Malware / security", "Copyright violation", "Bug", "Content policy", "Other"];
+export const REPORT_KINDS = [
+  "Fake app",
+  "Malware / security",
+  "Copyright violation",
+  "Bug",
+  "Content policy",
+  "Other",
+];

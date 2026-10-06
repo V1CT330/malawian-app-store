@@ -21,7 +21,8 @@ export const Route = createFileRoute("/_authenticated/admin")({
       { title: "Admin Panel — Malawian App Store" },
       {
         name: "description",
-        content: "Review submissions, moderate reports, feature apps, manage developers and send notifications.",
+        content:
+          "Review submissions, moderate reports, feature apps, manage developers and send notifications.",
       },
       { property: "og:title", content: "Admin Panel — Malawian App Store" },
       { property: "og:description", content: "Moderation and platform management." },
@@ -169,15 +170,29 @@ function AdminPage() {
   });
 
   const decideKyc = useMutation({
-    mutationFn: async ({ id, user_id, status }: { id: string; user_id: string; status: "approved" | "rejected" }) => {
+    mutationFn: async ({
+      id,
+      user_id,
+      status,
+    }: {
+      id: string;
+      user_id: string;
+      status: "approved" | "rejected";
+    }) => {
       const { error } = await supabase.from("kyc_submissions").update({ status }).eq("id", id);
       if (error) throw error;
-      const { error: pErr } = await supabase.from("profiles").update({ kyc_status: status }).eq("id", user_id);
+      const { error: pErr } = await supabase
+        .from("profiles")
+        .update({ kyc_status: status })
+        .eq("id", user_id);
       if (pErr) throw pErr;
       await supabase.from("notifications").insert({
         user_id,
         title: `KYC ${status}`,
-        body: status === "approved" ? "Your verified developer badge is live." : "Please resubmit your documents.",
+        body:
+          status === "approved"
+            ? "Your verified developer badge is live."
+            : "Please resubmit your documents.",
       });
     },
     onSuccess: () => {
@@ -214,8 +229,8 @@ function AdminPage() {
           <Shield className="mx-auto h-6 w-6 text-muted-foreground" />
           <h1 className="font-display text-xl font-bold">Admin panel</h1>
           <p className="text-sm text-muted-foreground">
-            This area is for store administrators. If you are setting the store up, you can claim the first
-            administrator account.
+            This area is for store administrators. If you are setting the store up, you can claim
+            the first administrator account.
           </p>
           <Button onClick={() => claim.mutate()} disabled={claim.isPending}>
             Claim admin access
@@ -225,7 +240,9 @@ function AdminPage() {
     );
   }
 
-  const pending = (listings.data ?? []).filter((l) => l.status === "pending" || l.status === "draft");
+  const pending = (listings.data ?? []).filter(
+    (l) => l.status === "pending" || l.status === "draft",
+  );
 
   return (
     <AppShell>
@@ -252,7 +269,11 @@ function AdminPage() {
                 <article key={l.id} className="surface-card space-y-2 p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <Link to="/apps/$slug" params={{ slug: l.slug }} className="font-medium underline">
+                      <Link
+                        to="/apps/$slug"
+                        params={{ slug: l.slug }}
+                        className="font-medium underline"
+                      >
                         {l.name}
                       </Link>
                       <p className="text-xs text-muted-foreground">
@@ -265,14 +286,18 @@ function AdminPage() {
                   </div>
                   <p className="line-clamp-2 text-sm text-muted-foreground">{l.description}</p>
                   <div className="flex flex-wrap gap-2">
-                    <Button size="sm" onClick={() => decide.mutate({ listing: l, status: "published" })}>
+                    <Button
+                      size="sm"
+                      onClick={() => decide.mutate({ listing: l, status: "published" })}
+                    >
                       Approve & publish
                     </Button>
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => {
-                        const reason = window.prompt("Reason for rejection (shown to the developer)") ?? "";
+                        const reason =
+                          window.prompt("Reason for rejection (shown to the developer)") ?? "";
                         if (reason) decide.mutate({ listing: l, status: "rejected", reason });
                       }}
                     >
@@ -294,7 +319,9 @@ function AdminPage() {
 
         <TabsContent value="reports" className="mt-4 space-y-3">
           {(reports.data ?? []).length === 0 && (
-            <p className="surface-card p-6 text-center text-sm text-muted-foreground">No reports.</p>
+            <p className="surface-card p-6 text-center text-sm text-muted-foreground">
+              No reports.
+            </p>
           )}
           {(reports.data ?? []).map((r) => (
             <article key={r.id} className="surface-card space-y-2 p-4">
@@ -304,10 +331,18 @@ function AdminPage() {
               {r.details && <p className="text-sm text-muted-foreground">{r.details}</p>}
               <div className="flex items-center gap-2">
                 <Badge variant="secondary">{r.status}</Badge>
-                <Button size="sm" variant="outline" onClick={() => resolveReport.mutate({ id: r.id, status: "resolved" })}>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => resolveReport.mutate({ id: r.id, status: "resolved" })}
+                >
                   Resolve
                 </Button>
-                <Button size="sm" variant="ghost" onClick={() => resolveReport.mutate({ id: r.id, status: "dismissed" })}>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => resolveReport.mutate({ id: r.id, status: "dismissed" })}
+                >
                   Dismiss
                 </Button>
               </div>
@@ -317,7 +352,9 @@ function AdminPage() {
 
         <TabsContent value="kyc" className="mt-4 space-y-3">
           {(kyc.data ?? []).length === 0 && (
-            <p className="surface-card p-6 text-center text-sm text-muted-foreground">No submissions.</p>
+            <p className="surface-card p-6 text-center text-sm text-muted-foreground">
+              No submissions.
+            </p>
           )}
           {(kyc.data ?? []).map((k) => (
             <article key={k.id} className="surface-card space-y-2 p-4">
@@ -326,13 +363,20 @@ function AdminPage() {
                 {k.id_type} · {k.id_number} · {k.status}
               </p>
               <div className="flex gap-2">
-                <Button size="sm" onClick={() => decideKyc.mutate({ id: k.id, user_id: k.user_id, status: "approved" })}>
+                <Button
+                  size="sm"
+                  onClick={() =>
+                    decideKyc.mutate({ id: k.id, user_id: k.user_id, status: "approved" })
+                  }
+                >
                   Approve
                 </Button>
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => decideKyc.mutate({ id: k.id, user_id: k.user_id, status: "rejected" })}
+                  onClick={() =>
+                    decideKyc.mutate({ id: k.id, user_id: k.user_id, status: "rejected" })
+                  }
                 >
                   Reject
                 </Button>
@@ -343,9 +387,16 @@ function AdminPage() {
 
         <TabsContent value="people" className="mt-4 space-y-3">
           {(people.data ?? []).map((p) => (
-            <article key={p.id} className="surface-card flex items-center justify-between gap-3 p-4">
+            <article
+              key={p.id}
+              className="surface-card flex items-center justify-between gap-3 p-4"
+            >
               <div className="min-w-0">
-                <Link to="/developers/$id" params={{ id: p.id }} className="truncate font-medium underline">
+                <Link
+                  to="/developers/$id"
+                  params={{ id: p.id }}
+                  className="truncate font-medium underline"
+                >
                   {p.developer_name || p.display_name || "Unnamed account"}
                 </Link>
                 <p className="text-xs text-muted-foreground">

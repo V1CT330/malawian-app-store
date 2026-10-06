@@ -118,7 +118,11 @@ function ProPage() {
             </Button>
           </>
         ) : (
-          <Button className="mt-4 w-full" disabled={activate.isPending} onClick={() => activate.mutate()}>
+          <Button
+            className="mt-4 w-full"
+            disabled={activate.isPending}
+            onClick={() => activate.mutate()}
+          >
             Activate {PRO_NAME}
           </Button>
         )}

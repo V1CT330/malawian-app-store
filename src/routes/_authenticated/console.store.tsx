@@ -40,8 +40,7 @@ function DeveloperProfilePage() {
   const [fields, setFields] = useState<Record<string, string>>({});
   const [socials, setSocials] = useState<Record<string, string>>({});
 
-  const value = (key: string, fallback: string | null | undefined) =>
-    fields[key] ?? fallback ?? "";
+  const value = (key: string, fallback: string | null | undefined) => fields[key] ?? fallback ?? "";
 
   const extra = useQuery({
     queryKey: ["profile-extra", userId],
@@ -49,7 +48,9 @@ function DeveloperProfilePage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("company_name,location,contact_email,skills,github_url,portfolio_url,website_url,follower_count")
+        .select(
+          "company_name,location,contact_email,skills,github_url,portfolio_url,website_url,follower_count",
+        )
         .eq("id", userId!)
         .maybeSingle();
       if (error) throw error;
@@ -119,7 +120,10 @@ function DeveloperProfilePage() {
   const uploadAvatar = useMutation({
     mutationFn: async (file: File) => {
       const path = await uploadAsset(userId!, file, "avatars");
-      const { error } = await supabase.from("profiles").update({ avatar_url: path }).eq("id", userId!);
+      const { error } = await supabase
+        .from("profiles")
+        .update({ avatar_url: path })
+        .eq("id", userId!);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -129,7 +133,12 @@ function DeveloperProfilePage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const text = (key: string, label: string, fallback: string | null | undefined, placeholder = "") => (
+  const text = (
+    key: string,
+    label: string,
+    fallback: string | null | undefined,
+    placeholder = "",
+  ) => (
     <div>
       <Label htmlFor={key}>{label}</Label>
       <Input
@@ -150,7 +159,9 @@ function DeveloperProfilePage() {
 
       <section className="surface-card flex items-center gap-4 p-4">
         <div className="h-16 w-16 overflow-hidden rounded-full bg-secondary">
-          {avatar && <img src={avatar} alt="Your profile photo" className="h-full w-full object-cover" />}
+          {avatar && (
+            <img src={avatar} alt="Your profile photo" className="h-full w-full object-cover" />
+          )}
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium">
@@ -173,7 +184,12 @@ function DeveloperProfilePage() {
 
       <section className="surface-card mt-4 space-y-3 p-4">
         <h2 className="font-display text-base font-semibold">Professional details</h2>
-        {text("developer_name", "Developer or studio name", profile?.developer_name, "Chikondi Labs")}
+        {text(
+          "developer_name",
+          "Developer or studio name",
+          profile?.developer_name,
+          "Chikondi Labs",
+        )}
         {text("company_name", "Registered company", extra.data?.company_name, "Optional")}
         <div>
           <Label htmlFor="bio">Professional bio</Label>

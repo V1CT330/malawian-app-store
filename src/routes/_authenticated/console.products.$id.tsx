@@ -5,12 +5,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
-import {
-  EmptyState,
-  RowSkeletons,
-  SectionCard,
-  StatusPill,
-} from "@/components/console/primitives";
+import { EmptyState, RowSkeletons, SectionCard, StatusPill } from "@/components/console/primitives";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,9 +14,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { useProfile } from "@/hooks/useSession";
 import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 import { supabase } from "@/integrations/supabase/client";
-import { canSubmit, metricLabel, readinessScore, STATUS_HELP, submissionRequirements } from "@/lib/console";
+import {
+  canSubmit,
+  metricLabel,
+  readinessScore,
+  STATUS_HELP,
+  submissionRequirements,
+} from "@/lib/console";
 import { useListing } from "@/lib/console.queries";
-import { asoReport, kindLabel, logActivity, type PortalListing, type PortalVersion } from "@/lib/portal";
+import {
+  asoReport,
+  kindLabel,
+  logActivity,
+  type PortalListing,
+  type PortalVersion,
+} from "@/lib/portal";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/console/products/$id")({
@@ -72,7 +79,12 @@ function ProductDetailPage() {
       const { error } = await supabase.from("listings").update({ status }).eq("id", id);
       if (error) throw error;
       if (userId)
-        await logActivity({ ownerId: userId, actorId: userId, action: `listing ${status}`, listingId: id });
+        await logActivity({
+          ownerId: userId,
+          actorId: userId,
+          action: `listing ${status}`,
+          listingId: id,
+        });
     },
     onSuccess: (_d, status) => {
       invalidate();
@@ -286,9 +298,18 @@ function ListingTab({ listing, onSaved }: { listing: PortalListing; onSaved: () 
           category: form.category.trim(),
           website_url: form.website_url.trim() || null,
           icon_url: form.icon_url.trim() || null,
-          tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
-          keywords: form.keywords.split(",").map((t) => t.trim()).filter(Boolean),
-          screenshots: form.screenshots.split("\n").map((t) => t.trim()).filter(Boolean),
+          tags: form.tags
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean),
+          keywords: form.keywords
+            .split(",")
+            .map((t) => t.trim())
+            .filter(Boolean),
+          screenshots: form.screenshots
+            .split("\n")
+            .map((t) => t.trim())
+            .filter(Boolean),
         })
         .eq("id", listing.id);
       if (error) throw error;
@@ -446,7 +467,12 @@ function ReleasesTab({ listing }: { listing: PortalListing }) {
         <div className="grid gap-3 sm:grid-cols-[200px_1fr]">
           <div>
             <Label htmlFor="v-num">Version</Label>
-            <Input id="v-num" value={version} onChange={(e) => setVersion(e.target.value)} placeholder="1.2.0" />
+            <Input
+              id="v-num"
+              value={version}
+              onChange={(e) => setVersion(e.target.value)}
+              placeholder="1.2.0"
+            />
           </div>
           <div>
             <Label htmlFor="v-notes">Release notes</Label>
@@ -593,7 +619,9 @@ function QualityTab({ listing }: { listing: PortalListing }) {
       <ul className="mt-4 divide-y divide-border">
         {report.checks.map((c) => (
           <li key={c.label} className="flex items-center gap-3 py-2.5 text-sm">
-            <span className={c.ok ? "text-brand-green" : "text-brand-red"}>{c.ok ? "Pass" : "Fix"}</span>
+            <span className={c.ok ? "text-brand-green" : "text-brand-red"}>
+              {c.ok ? "Pass" : "Fix"}
+            </span>
             <span className="min-w-0 flex-1">{c.label}</span>
             <span className="text-xs text-muted-foreground">{c.weight} pts</span>
           </li>

@@ -20,7 +20,8 @@ export const Route = createFileRoute("/_authenticated/console/security")({
       { title: "Account Security — Malawian App Store" },
       {
         name: "description",
-        content: "Two factor authentication, backup codes, login history, active sessions and account recovery.",
+        content:
+          "Two factor authentication, backup codes, login history, active sessions and account recovery.",
       },
       { property: "og:title", content: "Account Security — Malawian App Store" },
       { property: "og:description", content: "Protect your developer account." },
@@ -47,7 +48,10 @@ type LoginEvent = {
 };
 
 function makeCodes() {
-  return Array.from({ length: 8 }, () => Math.random().toString(36).slice(2, 6) + "-" + Math.random().toString(36).slice(2, 6));
+  return Array.from(
+    { length: 8 },
+    () => Math.random().toString(36).slice(2, 6) + "-" + Math.random().toString(36).slice(2, 6),
+  );
 }
 
 function SecurityPage() {
@@ -105,7 +109,11 @@ function SecurityPage() {
   }, [userId, queryClient]);
 
   const save = useMutation({
-    mutationFn: async (patch: { two_factor_enabled?: boolean; backup_codes?: string[]; recovery_email?: string | null }) => {
+    mutationFn: async (patch: {
+      two_factor_enabled?: boolean;
+      backup_codes?: string[];
+      recovery_email?: string | null;
+    }) => {
       if (!userId) throw new Error("Sign in required");
       const { error } = await supabase
         .from("security_settings")
@@ -121,7 +129,10 @@ function SecurityPage() {
 
   const endSession = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("login_events").update({ session_active: false }).eq("id", id);
+      const { error } = await supabase
+        .from("login_events")
+        .update({ session_active: false })
+        .eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -137,7 +148,9 @@ function SecurityPage() {
   return (
     <ConsoleShell title="Security">
       <h1 className="font-display text-2xl font-bold">Security</h1>
-      <p className="mt-1 text-sm text-muted-foreground">Keep your developer account and products protected.</p>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Keep your developer account and products protected.
+      </p>
 
       <section className="surface-card p-4">
         <div className="flex items-center justify-between gap-3">
@@ -157,7 +170,9 @@ function SecurityPage() {
 
       <section className="surface-card mt-4 p-4">
         <h2 className="font-display text-base font-semibold">Backup codes</h2>
-        <p className="text-sm text-muted-foreground">Store these safely. Each code can be used once.</p>
+        <p className="text-sm text-muted-foreground">
+          Store these safely. Each code can be used once.
+        </p>
         {codes.length > 0 && (
           <div className="mt-3 grid grid-cols-2 gap-2 font-mono text-sm sm:grid-cols-4">
             {codes.map((c) => (
@@ -167,7 +182,12 @@ function SecurityPage() {
             ))}
           </div>
         )}
-        <Button className="mt-3" size="sm" variant="outline" onClick={() => save.mutate({ backup_codes: makeCodes() })}>
+        <Button
+          className="mt-3"
+          size="sm"
+          variant="outline"
+          onClick={() => save.mutate({ backup_codes: makeCodes() })}
+        >
           {codes.length ? "Regenerate codes" : "Generate codes"}
         </Button>
       </section>
@@ -198,7 +218,10 @@ function SecurityPage() {
         {events.data?.length ? (
           <ul className="space-y-3">
             {events.data.map((e) => (
-              <li key={e.id} className="flex flex-wrap items-center gap-2 border-b border-border pb-3 last:border-0 last:pb-0">
+              <li
+                key={e.id}
+                className="flex flex-wrap items-center gap-2 border-b border-border pb-3 last:border-0 last:pb-0"
+              >
                 <div className="mr-auto">
                   <p className="text-sm font-medium capitalize">
                     {e.device ?? "Unknown device"} · {e.platform ?? "web"}

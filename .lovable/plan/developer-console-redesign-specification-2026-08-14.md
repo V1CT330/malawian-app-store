@@ -11,6 +11,7 @@ Verified against the current code and database: 14 developer routes, two competi
 Replace both existing navigation systems with one console navigation.
 
 **Desktop (>=1024px) — persistent left sidebar, 260px**
+
 ```text
 [ studio identity block ]
   avatar · studio name
@@ -27,6 +28,7 @@ Replace both existing navigation systems with one console navigation.
   Help & AI      (opens docked panel)
   Switch to store
 ```
+
 Sidebar item = icon + label, 40px row, active row gets an accent-tinted rounded rect. The identity block is a link to the public developer profile.
 
 **Tablet (768–1023px)** — sidebar collapses to a 72px icon rail with tooltips.
@@ -34,6 +36,7 @@ Sidebar item = icon + label, 40px row, active row gets an accent-tinted rounded 
 **Mobile (<768px)** — 5-item bottom bar: Overview, Products, Insights, Growth, Account. Sub-tabs of each section become a horizontal scroll strip directly beneath the page title. The shopper search input is removed from the developer header; the header shows page title, notification bell, and a mode switcher.
 
 **Sub-navigation per section**
+
 - Overview: none
 - Products: list view, then per-product tabs (Listing, Media, Releases, Reviews, ASO)
 - Insights: Performance | Audience | Store presence
@@ -54,7 +57,7 @@ The AI assistant stops being a route and becomes a docked panel button in the si
    - Unanswered reviews older than 48h
    - KYC not submitted / documents rejected
    - Subscription expiring within 7 days
-   When empty: a single calm "You're all caught up" card with the next suggested growth action.
+     When empty: a single calm "You're all caught up" card with the next suggested growth action.
 3. **Metric row** — 4 tiles: Installs (30d), Views (30d), Conversion %, Average rating. Each tile shows value, sparkline, and delta vs previous period.
 4. **Products at a glance** — up to 4 compact product rows: icon, name, status pill, installs 30d, rating. "View all products" link. No editing controls here.
 5. **Reputation card** — score, tier, and the two highest-impact actions to raise it (derived from the same checks the score uses), not just a bar.
@@ -67,19 +70,20 @@ Removed from the dashboard: duplicated KYC/subscription/phone status list (now o
 ## C. Product management IA
 
 **Products list** (`/console/products`)
+
 - Filter chips: All, Live, In review, Draft, Rejected, Archived. Search by name.
 - Row: icon 48px, name + kind label, status pill, installs 30d, rating, "Manage".
 - Empty state: illustration, "Publish your first product", primary CTA.
 
 **Product detail** (`/console/products/$id`) — header with icon, name, status pill, quick actions (View in store, Submit for review / Unpublish). Tabs replace today's single 780-line page:
 
-| Tab | Contents |
-|---|---|
-| Listing | Name, tagline, description, category, tags, keywords, website URL. Inline completeness meter. |
-| Media | Icon, banner, screenshots (drag order), promo images, video URL. |
+| Tab      | Contents                                                                                                  |
+| -------- | --------------------------------------------------------------------------------------------------------- |
+| Listing  | Name, tagline, description, category, tags, keywords, website URL. Inline completeness meter.             |
+| Media    | Icon, banner, screenshots (drag order), promo images, video URL.                                          |
 | Releases | Version timeline (current, scheduled, past), ship-a-version form, rollback, per-version install adoption. |
-| Reviews | Reviews for this product with reply box, rating distribution, response rate. |
-| ASO | Score, failed checks with one-tap AI fix, keyword suggestions, score history. |
+| Reviews  | Reviews for this product with reply box, rating distribution, response rate.                              |
+| ASO      | Score, failed checks with one-tap AI fix, keyword suggestions, score history.                             |
 
 Beta testing moves inside Releases as a channel selector plus tester list, rather than a separate tab — it is a property of a release, not a parallel concept.
 
@@ -118,12 +122,14 @@ Pro gate: 90d+ ranges, country breakdown, competitor benchmark and CSV export.
 ## F. Subscription, KYC and verification UX
 
 **Subscription (Account → Subscription)**
+
 - Single card: plan name, MK5,000/month, status, current period end, and what is included.
 - Activation is initiated from the app but confirmed server-side against a payment reference; the browser cannot write subscription state.
 - Lapse handling: 7-day grace with a banner, then Pro-only features become read-only teasers rather than disappearing (existing data stays visible, actions are gated).
 - Every gated control shows the same "Pro" chip and opens the same upgrade sheet, so gating feels consistent rather than random.
 
 **Verification (Account → Verification)**
+
 - Two-step vertical stepper: 1) Phone via WhatsApp, 2) Identity documents.
 - Each step shows state (Not started / Pending review / Approved / Needs attention) with reviewer notes when rejected.
 - `kyc_status` becomes admin/server-writable only; a developer cannot self-approve.
@@ -143,6 +149,7 @@ Pro gate: 90d+ ranges, country breakdown, competitor benchmark and CSV export.
 ## H. Features to add, remove, merge
 
 **Merge**
+
 - Advertise + Spotlight → Growth ▸ Promote
 - Profile + Verification + Subscription + Team + Security + Resources → Account (tabs)
 - Growth/Stats product list → Products
@@ -150,12 +157,14 @@ Pro gate: 90d+ ranges, country breakdown, competitor benchmark and CSV export.
 - AI Assistant route → docked panel
 
 **Remove or hide**
+
 - The scrolling 10-pill PortalTabs strip
 - Any surface reporting metrics nothing records
 - 2FA toggles that are stored but unenforced (hide until enforced)
 - Leftover wallet/order/payout-era tables from the developer UI entirely
 
 **Add**
+
 - Action queue, review inbox, working release scheduling, conversion metric, notification centre, functional team seats, per-version adoption, subscription grace handling, upgrade sheet.
 
 ---
@@ -180,6 +189,7 @@ Building on existing tokens (Outfit display face, `--radius: 1rem`, `--shadow-so
 ## J. Roadmap
 
 ### P0 — trust, correctness, structure
+
 1. Console shell: sidebar/rail/bottom bar, remove PortalTabs and the shopper search from developer pages.
 2. Real review workflow: drafts, submit-for-review, admin queue functioning, rejection loop.
 3. Lock server-side: `status`/`featured` not owner-writable, `kyc_status` admin-only, subscription not client-writable.
@@ -187,6 +197,7 @@ Building on existing tokens (Outfit display face, `--radius: 1rem`, `--shadow-so
 5. Overview page with action queue and metric row.
 
 ### P1 — the console worth paying for
+
 6. Products list + product detail tabs (splitting the current manage page).
 7. Insights rebuilt on SQL aggregates with date ranges and conversion.
 8. Review inbox with reply and response-rate tracking.
@@ -195,12 +206,14 @@ Building on existing tokens (Outfit display face, `--radius: 1rem`, `--shadow-so
 11. Working release scheduling and version adoption.
 
 ### P2 — depth
+
 12. Functional team seats (role-aware policies + invitation flow).
 13. ASO score history, inline AI fixes, keyword suggestions.
 14. Promote section with impressions actually recorded by store surfaces.
 15. Category benchmarking, CSV export, verified-developer ranking benefit.
 
 ## Assumptions
+
 - Payment collection stays outside the app; subscription activation is confirmed against a reference by an admin or server routine, and the app enforces state only.
 - Admin moderation continues to live in this app.
 - Verification stays free and independent of Pro.
