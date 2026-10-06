@@ -14,8 +14,10 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
-  // No nitro preset override: Nitro auto-detects the Vercel environment at
-  // build time and uses its "vercel" preset, emitting .vercel/output with the
-  // correct static + serverless function layout. Locally it falls back to the
-  // default Node server build.
+  nitro: {
+    // Official TanStack Start Vercel deployment: Nitro's "vercel" preset emits
+    // .vercel/output (static assets + a serverless function), which Vercel
+    // detects natively — no vercel.json output dir or rewrites needed.
+    preset: "vercel",
+  },
 });
