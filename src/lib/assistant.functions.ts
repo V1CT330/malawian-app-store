@@ -12,7 +12,8 @@ const Input = z.object({
 /** Strips markdown emphasis, bullet markers and emoji so replies stay professional. */
 function toPlainText(text: string) {
   return text
-    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{2190}-\u{21FF}]/gu, "")
+    .replace(/\p{Extended_Pictographic}\uFE0F?/gu, "")
+    .replace(/[\u2190-\u21FF]/g, "")
     .replace(/^\s{0,3}#{1,6}\s*/gm, "")
     .replace(/^\s*[-*+•]\s+/gm, "")
     .replace(/\*\*(.*?)\*\*/g, "$1")

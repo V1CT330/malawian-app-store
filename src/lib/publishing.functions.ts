@@ -45,7 +45,7 @@ const PROMPTS: Record<(typeof AI_TASKS)[number], string> = {
 
 function toPlainText(text: string) {
   return text
-    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu, "")
+    .replace(/\p{Extended_Pictographic}\uFE0F?/gu, "")
     .replace(/^\s{0,3}#{1,6}\s*/gm, "")
     .replace(/^\s*[-*+•]\s+/gm, "")
     .replace(/\*\*(.*?)\*\*/g, "$1")
