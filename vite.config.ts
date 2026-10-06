@@ -15,8 +15,9 @@ export default defineConfig({
     server: { entry: "server" },
   },
   nitro: {
-    // Configure Nitro for Node.js runtime (Vercel, etc.)
-    // instead of the default Cloudflare Workers target
-    preset: "node",
+    // Official TanStack Start Vercel deployment: Nitro's "vercel" preset emits
+    // .vercel/output (static assets + a serverless function), which Vercel
+    // detects natively — no vercel.json output dir or rewrites needed.
+    preset: "vercel",
   },
 });
