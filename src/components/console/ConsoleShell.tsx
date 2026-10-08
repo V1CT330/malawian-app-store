@@ -277,7 +277,7 @@ export function ConsoleShell({
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={() => leaveDeveloper.mutate()}>
-                  Switch to shopping mode
+                  Switch to user mode
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => void signOut()}>
                   <LogOut className="mr-2 h-4 w-4" /> Sign out
