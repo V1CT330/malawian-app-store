@@ -107,6 +107,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         children: `
+          (function() {
+          if (document.getElementById('lovable-inhibitor-css')) return;
           const style = document.createElement('style');
           style.id = 'lovable-inhibitor-css';
           style.textContent = \`
@@ -126,6 +128,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             }
           \`;
           document.head.appendChild(style);
+          })();
         `,
       },
       {
