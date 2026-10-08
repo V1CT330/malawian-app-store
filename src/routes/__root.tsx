@@ -103,6 +103,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     scripts: [
       {
+        children: `(function(){try{var d=document.documentElement;var t=localStorage.getItem('mas:theme');var dark=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;d.classList.toggle('dark',dark);var a=localStorage.getItem('mas:accent');if(a&&/^#[0-9a-f]{6}$/i.test(a)){var s=d.style;s.setProperty('--primary',a);s.setProperty('--ring',a);s.setProperty('--sidebar-primary',a);s.setProperty('--accent','color-mix(in oklab, '+a+' 15%, var(--background))');s.setProperty('--accent-foreground',a);s.setProperty('--sidebar-accent','color-mix(in oklab, '+a+' 15%, var(--sidebar))');s.setProperty('--sidebar-accent-foreground',a);}}catch(e){}})();`,
+      },
+      {
         children: `
           const style = document.createElement('style');
           style.id = 'lovable-inhibitor-css';
@@ -133,7 +136,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
             function shouldHide(el) {
               const text = (el.innerText || '').trim();
-              const href = el.href || el.getAttribute?.('href') || '';
+              const href = (el.getAttribute && el.getAttribute('href')) || '';
+              if (el.tagName === 'A' && !/^https?:/i.test(href) && !/lovable/i.test(text)) return false;
               const cls = el.className?.toString() || '';
               const id = el.id || '';
               const combined = \`\${text} \${href} \${cls} \${id}\`;
@@ -154,10 +158,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
               });
             }
 
-            const observer = new MutationObserver(scrub);
-            observer.observe(document.documentElement, { childList: true, subtree: true });
-            window.addEventListener('load', scrub);
-            scrub();
+            function start() {
+              scrub();
+              const observer = new MutationObserver(scrub);
+              observer.observe(document.body, { childList: true, subtree: true });
+            }
+            // Wait until React has hydrated so the scrubber never alters server HTML.
+            if (document.readyState === 'complete') setTimeout(start, 1500);
+            else window.addEventListener('load', function () { setTimeout(start, 1500); });
           })();
         `,
       },
@@ -171,7 +179,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

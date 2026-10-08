@@ -97,8 +97,25 @@ export function useIsAdmin() {
 
 /** "developer" or "user" — drives which workspace the app renders. */
 export function useMode() {
-  const { profile } = useProfile();
-  return profile?.mode === "developer" ? "developer" : "user";
+  const { profile, userId, ready } = useProfile();
+  const [cached, setCached] = useState<string | null>(null);
+  useEffect(() => {
+    try {
+      setCached(localStorage.getItem("mas:mode"));
+    } catch {
+      /* storage unavailable */
+    }
+  }, []);
+  useEffect(() => {
+    try {
+      if (profile?.mode) localStorage.setItem("mas:mode", profile.mode);
+      else if (ready && !userId) localStorage.removeItem("mas:mode");
+    } catch {
+      /* storage unavailable */
+    }
+  }, [profile?.mode, ready, userId]);
+  const mode = profile?.mode ?? (ready && !userId ? null : cached);
+  return mode === "developer" ? "developer" : "user";
 }
 
 export function useUnreadCount() {
