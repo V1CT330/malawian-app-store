@@ -15,13 +15,13 @@ import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 export const Route = createFileRoute("/_authenticated/console/assistant")({
   head: () => ({
     meta: [
-      { title: "AI Agent — Malawian App Store" },
+      { title: "AI Agent, Malawian App Store" },
       {
         name: "description",
         content:
           "Get AI help writing listings, passing KYC and planning app updates on the Malawian App Store.",
       },
-      { property: "og:title", content: "AI Agent — Malawian App Store" },
+      { property: "og:title", content: "AI Agent, Malawian App Store" },
       { property: "og:description", content: "AI help for Malawian app developers." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

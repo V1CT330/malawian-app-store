@@ -15,13 +15,13 @@ export const Route = createFileRoute("/auth")({
     typeof search.redirect === "string" ? { redirect: search.redirect } : {},
   head: () => ({
     meta: [
-      { title: "Sign in — Malawian App Store" },
+      { title: "Sign in, Malawian App Store" },
       {
         name: "description",
         content:
           "Sign in with Google or email to install apps, post reviews and publish your own listings.",
       },
-      { property: "og:title", content: "Sign in — Malawian App Store" },
+      { property: "og:title", content: "Sign in, Malawian App Store" },
       { property: "og:description", content: "Sign in to install, review and publish apps." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -54,7 +54,7 @@ function AuthPage() {
       const result = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: window.location.origin,
       });
-      if (result.error) toast.error("Google sign-in failed. Please try again.");
+      if (result.error) toast.error("Google sign in failed. Please try again.");
     } finally {
       setBusy(false);
     }

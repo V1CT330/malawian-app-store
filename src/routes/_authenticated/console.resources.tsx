@@ -22,13 +22,13 @@ import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 export const Route = createFileRoute("/_authenticated/console/resources")({
   head: () => ({
     meta: [
-      { title: "Developer Resources — Malawian App Store" },
+      { title: "Developer Resources, Malawian App Store" },
       {
         name: "description",
         content:
           "Publishing guidelines, API docs, design guidelines, tutorials, FAQs and the feature request portal.",
       },
-      { property: "og:title", content: "Developer Resources — Malawian App Store" },
+      { property: "og:title", content: "Developer Resources, Malawian App Store" },
       { property: "og:description", content: "Everything you need to publish well." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -52,7 +52,7 @@ const GUIDES = [
   },
   {
     title: "API documentation",
-    body: "The store exposes an agent interface at /mcp using the Model Context Protocol. After signing in, a connected client can search apps, read a product, list your own products and notifications, and create a draft listing. All calls run as your signed-in account, so you only ever see and change your own data.",
+    body: "The store exposes an agent interface at /mcp using the Model Context Protocol. After signing in, a connected client can search apps, read a product, list your own products and notifications, and create a draft listing. All calls run as your signed in account, so you only ever see and change your own data.",
   },
   {
     title: "Tutorial: your first release",

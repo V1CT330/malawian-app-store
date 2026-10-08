@@ -26,13 +26,13 @@ import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 export const Route = createFileRoute("/_authenticated/console/analytics")({
   head: () => ({
     meta: [
-      { title: "Stats & Products — Malawian App Store" },
+      { title: "Stats & Products, Malawian App Store" },
       {
         name: "description",
         content:
           "Downloads, views, device and country breakdowns plus a simple list of the products you publish.",
       },
-      { property: "og:title", content: "Stats & Products — Malawian App Store" },
+      { property: "og:title", content: "Stats & Products, Malawian App Store" },
       { property: "og:description", content: "Performance and products in one place." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -151,7 +151,7 @@ function AnalyticsPage() {
     { label: "downloads", value: installs.length },
     { label: "views", value: views.length },
     { label: "active users", value: activeUsers },
-    { label: "avg rating", value: avg ? avg.toFixed(1) : "—" },
+    { label: "avg rating", value: avg ? avg.toFixed(1) : "N/A" },
   ];
 
   return (
@@ -192,7 +192,7 @@ function AnalyticsPage() {
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium">{l.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {kindLabel(l.kind)} · {l.downloads} installs · {l.rating_avg || "—"} ★
+                    {kindLabel(l.kind)} · {l.downloads} installs · {l.rating_avg || "N/A"} ★
                   </p>
                 </div>
                 <Badge

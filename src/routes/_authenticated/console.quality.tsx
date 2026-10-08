@@ -14,13 +14,13 @@ import { asoReport } from "@/lib/portal";
 export const Route = createFileRoute("/_authenticated/console/quality")({
   head: () => ({
     meta: [
-      { title: "Quality — Developer Console" },
+      { title: "Quality, Developer Console" },
       {
         name: "description",
         content:
           "Listing readiness and store optimisation checks for every product you publish on the Malawian App Store.",
       },
-      { property: "og:title", content: "Quality — Developer Console" },
+      { property: "og:title", content: "Quality, Developer Console" },
       { property: "og:description", content: "Readiness and store optimisation checks." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

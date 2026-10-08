@@ -18,12 +18,12 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/apps/$slug")({
   head: ({ params }) => ({
     meta: [
-      { title: `${params.slug.replace(/-/g, " ")} — Malawian App Store` },
+      { title: `${params.slug.replace(/-/g, " ")}, Malawian App Store` },
       {
         name: "description",
         content: `Details, versions and reviews for ${params.slug.replace(/-/g, " ")} on the Malawian App Store.`,
       },
-      { property: "og:title", content: `${params.slug.replace(/-/g, " ")} — Malawian App Store` },
+      { property: "og:title", content: `${params.slug.replace(/-/g, " ")}, Malawian App Store` },
       {
         property: "og:description",
         content: `Details, versions and reviews for ${params.slug.replace(/-/g, " ")}.`,
@@ -275,7 +275,7 @@ function ListingDetail() {
             </p>
           </div>
           <div className="surface-card p-3">
-            <p className="font-display text-lg font-bold">{latest?.version ?? "—"}</p>
+            <p className="font-display text-lg font-bold">{latest?.version ?? "N/A"}</p>
             <p className="text-xs text-muted-foreground">{formatBytes(latest?.size_bytes)}</p>
           </div>
         </div>
@@ -427,7 +427,7 @@ function ListingDetail() {
 
         <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <ShieldCheck className="h-4 w-4 text-google-green" />
-          Listings are published by KYC-verified Malawian developers.
+          Listings are published by KYC verified Malawian developers.
         </p>
       </article>
     </AppShell>

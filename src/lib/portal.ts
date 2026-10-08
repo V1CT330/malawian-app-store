@@ -15,7 +15,7 @@ export type ProductStatus = (typeof PRODUCT_STATUSES)[number];
 export const TEAM_ROLES = [
   { value: "admin", label: "Admin", hint: "Manage products, versions and team" },
   { value: "editor", label: "Editor", hint: "Edit listings and ship versions" },
-  { value: "viewer", label: "Viewer", hint: "Read-only access to analytics" },
+  { value: "viewer", label: "Viewer", hint: "Read only access to analytics" },
 ] as const;
 
 export function kindLabel(kind: string) {

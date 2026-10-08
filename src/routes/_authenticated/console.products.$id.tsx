@@ -34,13 +34,13 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/console/products/$id")({
   head: () => ({
     meta: [
-      { title: "Product Detail — Developer Console" },
+      { title: "Product Detail, Developer Console" },
       {
         name: "description",
         content:
           "Edit the store listing, ship releases, answer reviews and track store optimisation for one product.",
       },
-      { property: "og:title", content: "Product Detail — Developer Console" },
+      { property: "og:title", content: "Product Detail, Developer Console" },
       { property: "og:description", content: "Manage one product end to end." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -222,7 +222,7 @@ function OverviewTab({ listing }: { listing: PortalListing }) {
         <div className="surface-card p-4">
           <p className="text-xs text-muted-foreground">Rating</p>
           <p className="mt-1 font-display text-[28px] font-bold leading-none tabular-nums">
-            {listing.rating_count > 0 ? Number(listing.rating_avg).toFixed(1) : "—"}
+            {listing.rating_count > 0 ? Number(listing.rating_avg).toFixed(1) : "N/A"}
           </p>
         </div>
         <div className="surface-card p-4">

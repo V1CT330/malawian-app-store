@@ -69,7 +69,7 @@ function Consent() {
     <main className="mx-auto max-w-sm p-6">
       <h1 className="font-display text-xl font-bold">Connect {clientName} to your account</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        This lets {clientName} use the Malawian App Store as you — searching apps, reading your
+        This lets {clientName} use the Malawian App Store as you, searching apps, reading your
         listings and notifications, and creating draft listings.
       </p>
       {error && (

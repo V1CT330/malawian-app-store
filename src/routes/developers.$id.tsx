@@ -11,9 +11,9 @@ import { SOCIAL_FIELDS, type Listing } from "@/lib/store";
 export const Route = createFileRoute("/developers/$id")({
   head: () => ({
     meta: [
-      { title: "Developer Profile — Malawian App Store" },
+      { title: "Developer Profile, Malawian App Store" },
       { name: "description", content: "Apps and websites published by this Malawian developer." },
-      { property: "og:title", content: "Developer Profile — Malawian App Store" },
+      { property: "og:title", content: "Developer Profile, Malawian App Store" },
       { property: "og:description", content: "Apps and websites by a Malawian developer." },
       { property: "og:type", content: "profile" },
       { name: "twitter:card", content: "summary" },

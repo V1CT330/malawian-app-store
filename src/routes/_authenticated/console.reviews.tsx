@@ -14,13 +14,13 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/console/reviews")({
   head: () => ({
     meta: [
-      { title: "Reviews — Developer Console" },
+      { title: "Reviews, Developer Console" },
       {
         name: "description",
         content:
           "Ratings and written reviews across all of your Malawian App Store products, with reply status.",
       },
-      { property: "og:title", content: "Reviews — Developer Console" },
+      { property: "og:title", content: "Reviews, Developer Console" },
       { property: "og:description", content: "Ratings and reviews across your products." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -71,7 +71,7 @@ function ReviewsPage() {
   const unanswered = reviews.filter((r) => !r.developer_reply).length;
   const average = reviews.length
     ? (reviews.reduce((a, r) => a + Number(r.rating), 0) / reviews.length).toFixed(1)
-    : "—";
+    : "N/A";
   const nameOf = (id: string) => listings.find((l) => l.id === id)?.name ?? "Product";
 
   return (
