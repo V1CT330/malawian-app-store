@@ -15,13 +15,13 @@ import { signedAssetUrl, type Listing } from "@/lib/store";
 export const Route = createFileRoute("/_authenticated/library")({
   head: () => ({
     meta: [
-      { title: "My Library — Malawian App Store" },
+      { title: "My Library, Malawian App Store" },
       {
         name: "description",
         content:
           "Your installed apps, saved listings and download history on the Malawian App Store.",
       },
-      { property: "og:title", content: "My Library — Malawian App Store" },
+      { property: "og:title", content: "My Library, Malawian App Store" },
       {
         property: "og:description",
         content: "Installed apps, saved listings and download history.",

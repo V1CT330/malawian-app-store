@@ -12,12 +12,12 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/_authenticated/notifications")({
   head: () => ({
     meta: [
-      { title: "Notifications — Malawian App Store" },
+      { title: "Notifications, Malawian App Store" },
       {
         name: "description",
         content: "Store updates, review decisions and messages from the team.",
       },
-      { property: "og:title", content: "Notifications — Malawian App Store" },
+      { property: "og:title", content: "Notifications, Malawian App Store" },
       { property: "og:description", content: "Store updates and review decisions." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

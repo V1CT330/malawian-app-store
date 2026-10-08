@@ -16,13 +16,13 @@ export const Route = createFileRoute("/")({
   }),
   head: () => ({
     meta: [
-      { title: "Malawian App Store — Apps & Websites Built in Malawi" },
+      { title: "Malawian App Store, Apps & Websites Built in Malawi" },
       {
         name: "description",
         content:
           "Discover, install and review apps and websites made by Malawian developers. Publish your own app with a verified developer account.",
       },
-      { property: "og:title", content: "Malawian App Store — Apps & Websites Built in Malawi" },
+      { property: "og:title", content: "Malawian App Store, Apps & Websites Built in Malawi" },
       {
         property: "og:description",
         content: "Discover, install and review apps and websites made by Malawian developers.",

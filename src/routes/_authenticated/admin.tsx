@@ -18,13 +18,13 @@ import { type Listing } from "@/lib/store";
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
-      { title: "Admin Panel — Malawian App Store" },
+      { title: "Admin Panel, Malawian App Store" },
       {
         name: "description",
         content:
           "Review submissions, moderate reports, feature apps, manage developers and send notifications.",
       },
-      { property: "og:title", content: "Admin Panel — Malawian App Store" },
+      { property: "og:title", content: "Admin Panel, Malawian App Store" },
       { property: "og:description", content: "Moderation and platform management." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -326,7 +326,7 @@ function AdminPage() {
           {(reports.data ?? []).map((r) => (
             <article key={r.id} className="surface-card space-y-2 p-4">
               <p className="font-medium">
-                {r.kind} — {(r.listings as { name?: string } | null)?.name ?? "listing"}
+                {r.kind} , {(r.listings as { name?: string } | null)?.name ?? "listing"}
               </p>
               {r.details && <p className="text-sm text-muted-foreground">{r.details}</p>}
               <div className="flex items-center gap-2">

@@ -73,7 +73,7 @@ export function formatAmount(amount: number) {
 }
 
 export function formatBytes(bytes: number | null | undefined) {
-  if (!bytes) return "—";
+  if (!bytes) return "N/A";
   const units = ["B", "KB", "MB", "GB"];
   let n = bytes;
   let i = 0;

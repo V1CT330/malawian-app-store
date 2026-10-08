@@ -23,13 +23,13 @@ import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 export const Route = createFileRoute("/_authenticated/console/manage")({
   head: () => ({
     meta: [
-      { title: "Team Collaboration — Malawian App Store" },
+      { title: "Team Collaboration, Malawian App Store" },
       {
         name: "description",
         content:
           "Invite team members, set role based permissions and review the shared activity log.",
       },
-      { property: "og:title", content: "Team Collaboration — Malawian App Store" },
+      { property: "og:title", content: "Team Collaboration, Malawian App Store" },
       { property: "og:description", content: "Invite members and track workspace activity." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -251,7 +251,7 @@ function TeamPage() {
               <li key={a.id} className="flex justify-between gap-3">
                 <span>
                   {a.action}
-                  {a.target ? ` — ${a.target}` : ""}
+                  {a.target ? `, ${a.target}` : ""}
                 </span>
                 <span className="shrink-0 text-xs text-muted-foreground">
                   {new Date(a.created_at).toLocaleString()}

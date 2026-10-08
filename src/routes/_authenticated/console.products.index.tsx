@@ -16,13 +16,13 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/console/products/")({
   head: () => ({
     meta: [
-      { title: "All Products — Developer Console" },
+      { title: "All Products, Developer Console" },
       {
         name: "description",
         content:
           "Every app, website, AI agent and extension you publish, with review status, installs and ratings.",
       },
-      { property: "og:title", content: "All Products — Developer Console" },
+      { property: "og:title", content: "All Products, Developer Console" },
       { property: "og:description", content: "Manage all of your published products." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

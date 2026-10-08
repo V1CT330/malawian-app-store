@@ -24,13 +24,13 @@ import { reputationTier } from "@/lib/portal";
 export const Route = createFileRoute("/_authenticated/console/")({
   head: () => ({
     meta: [
-      { title: "Developer Console — Malawian App Store" },
+      { title: "Developer Console, Malawian App Store" },
       {
         name: "description",
         content:
           "Your publishing overview: what needs attention, installs and visits over the last 30 days, and every product you run.",
       },
-      { property: "og:title", content: "Developer Console — Malawian App Store" },
+      { property: "og:title", content: "Developer Console, Malawian App Store" },
       { property: "og:description", content: "Publishing overview for Malawian developers." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -172,7 +172,7 @@ function ConsoleDashboard() {
             />
             <MetricTile
               label="Average rating"
-              value={Number.isFinite(rating) && rating > 0 ? rating.toFixed(1) : "—"}
+              value={Number.isFinite(rating) && rating > 0 ? rating.toFixed(1) : "N/A"}
               hint={`${listings.reduce((a, l) => a + l.rating_count, 0)} ratings`}
             />
           </div>

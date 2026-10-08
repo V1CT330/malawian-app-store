@@ -8,13 +8,13 @@ import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 export const Route = createFileRoute("/_authenticated/console/settings")({
   head: () => ({
     meta: [
-      { title: "Console Settings — Malawian App Store" },
+      { title: "Console Settings, Malawian App Store" },
       {
         name: "description",
         content:
           "Developer account settings: profile, verification, subscription and store listing preferences.",
       },
-      { property: "og:title", content: "Console Settings — Malawian App Store" },
+      { property: "og:title", content: "Console Settings, Malawian App Store" },
       { property: "og:description", content: "Developer account and console preferences." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -35,7 +35,7 @@ function ConsoleSettingsPage() {
       <div className="grid gap-4 lg:grid-cols-2">
         <SectionCard title="Account preferences">
           <p className="text-sm text-muted-foreground">
-            Profile details, appearance, developer mode and sign-out are managed in Account
+            Profile details, appearance, developer mode and sign out are managed in Account
             settings.
           </p>
           <Button asChild size="sm" variant="outline" className="mt-3">

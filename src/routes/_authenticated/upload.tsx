@@ -24,13 +24,13 @@ import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 export const Route = createFileRoute("/_authenticated/upload")({
   head: () => ({
     meta: [
-      { title: "Publish an App — Malawian App Store" },
+      { title: "Publish an App, Malawian App Store" },
       {
         name: "description",
         content:
           "Upload your Android app or website listing with an icon, description and first version.",
       },
-      { property: "og:title", content: "Publish an App — Malawian App Store" },
+      { property: "og:title", content: "Publish an App, Malawian App Store" },
       {
         property: "og:description",
         content: "Upload your app or website to the Malawian App Store.",

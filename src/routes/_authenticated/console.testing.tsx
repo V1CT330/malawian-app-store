@@ -13,13 +13,13 @@ import { useMyListings } from "@/lib/console.queries";
 export const Route = createFileRoute("/_authenticated/console/testing")({
   head: () => ({
     meta: [
-      { title: "Testing — Developer Console" },
+      { title: "Testing, Developer Console" },
       {
         name: "description",
         content:
           "Beta testers and tester feedback across every product you publish on the Malawian App Store.",
       },
-      { property: "og:title", content: "Testing — Developer Console" },
+      { property: "og:title", content: "Testing, Developer Console" },
       { property: "og:description", content: "Beta testers and feedback in one place." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

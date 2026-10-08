@@ -17,13 +17,13 @@ import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 export const Route = createFileRoute("/_authenticated/console/security")({
   head: () => ({
     meta: [
-      { title: "Account Security — Malawian App Store" },
+      { title: "Account Security, Malawian App Store" },
       {
         name: "description",
         content:
           "Two factor authentication, backup codes, login history, active sessions and account recovery.",
       },
-      { property: "og:title", content: "Account Security — Malawian App Store" },
+      { property: "og:title", content: "Account Security, Malawian App Store" },
       { property: "og:description", content: "Protect your developer account." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -50,7 +50,7 @@ type LoginEvent = {
 function makeCodes() {
   return Array.from(
     { length: 8 },
-    () => Math.random().toString(36).slice(2, 6) + "-" + Math.random().toString(36).slice(2, 6),
+    () => Math.random().toString(36).slice(2, 6) + "N/A" + Math.random().toString(36).slice(2, 6),
   );
 }
 
@@ -244,7 +244,7 @@ function SecurityPage() {
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-muted-foreground">No sign-ins recorded yet.</p>
+          <p className="text-sm text-muted-foreground">No sign ins recorded yet.</p>
         )}
       </section>
     </ConsoleShell>

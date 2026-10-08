@@ -13,13 +13,13 @@ import { kindLabel } from "@/lib/portal";
 export const Route = createFileRoute("/_authenticated/console/publishing")({
   head: () => ({
     meta: [
-      { title: "Publishing — Developer Console" },
+      { title: "Publishing, Developer Console" },
       {
         name: "description",
         content:
           "Track every product through draft, review and live on the Malawian App Store publishing pipeline.",
       },
-      { property: "og:title", content: "Publishing — Developer Console" },
+      { property: "og:title", content: "Publishing, Developer Console" },
       { property: "og:description", content: "Your review and release pipeline." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
