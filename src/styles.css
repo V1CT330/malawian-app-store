@@ -214,3 +214,10 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
+
+/* Keep content clear of the fixed bottom navigation and device gesture area. */
+@media (max-width: 639px) {
+  .mas-mobile-main {
+    padding-bottom: calc(7rem + env(safe-area-inset-bottom));
+  }
+}
