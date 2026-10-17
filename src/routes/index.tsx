@@ -198,7 +198,7 @@ function StorePage() {
             </div>
           ))}
         </div>
-      ) : isError ? (
+      ) : isError && !data ? (
         <div role="alert" className="rounded-2xl border border-border p-6 text-center">
           <h2 className="font-display text-lg font-semibold">Couldn’t load the store</h2>
           <p className="mt-1 text-sm text-muted-foreground">
