@@ -72,7 +72,7 @@ export const Route = createFileRoute("/api/public/webhooks/didit")({
               ),
             ));
         if (!valid) {
-          console.error("Didit signature mismatch", raw.slice(0, 2000));
+          console.error("Didit signature mismatch");
           return new Response("Invalid signature", { status: 401 });
         }
 
