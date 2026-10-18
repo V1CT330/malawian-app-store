@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { BadgeCheck } from "lucide-react";
-import { useState } from "react";
+import { BadgeCheck, ExternalLink, Save, ShieldCheck } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_authenticated/console/verification")({
       {
         name: "description",
         content:
-          "Verify your WhatsApp number and submit your national ID or passport to earn the Verified Developer badge.",
+          "Save your WhatsApp contact number and verify your identity manually or securely through Didit.",
       },
       { property: "og:title", content: "Developer verification · Malawian App Store" },
       { property: "og:description", content: "Earn the Verified Developer badge and build trust." },
@@ -39,8 +39,6 @@ function VerificationPage() {
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["profile", userId] });
 
   const [phone, setPhone] = useState<string | null>(null);
-  const [code, setCode] = useState("");
-  const [sentCode, setSentCode] = useState<string | null>(null);
   const [idDoc, setIdDoc] = useState<File | null>(null);
   const [fullName, setFullName] = useState("");
   const [idType, setIdType] = useState("National ID");
@@ -48,34 +46,32 @@ function VerificationPage() {
 
   const phoneValue = phone ?? profile?.phone ?? "";
 
-  function sendWhatsAppCode() {
-    const digits = phoneValue.replace(/\D/g, "");
-    if (digits.length < 9) {
-      toast.error("Enter your number in international format, for example +265991234567");
-      return;
-    }
-    const generated = String(Math.floor(100000 + Math.random() * 900000));
-    setSentCode(generated);
-    const text = encodeURIComponent(
-      `Malawian App Store verification code: ${generated}. Send this message to confirm your number.`,
-    );
-    window.open(`https://wa.me/${digits}?text=${text}`, "_blank", "noopener");
-    toast.info("WhatsApp opened. Send the message, then enter the code below.");
-  }
+  useEffect(() => {
+    if (!userId || typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("didit") !== "return") return;
+    void queryClient.invalidateQueries({ queryKey: ["profile", userId] });
+    toast.info("You returned from Didit. Your verification status will update when MAS confirms the result.");
+    url.searchParams.delete("didit");
+    window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+  }, [queryClient, userId]);
 
-  const confirmPhone = useMutation({
+  const savePhone = useMutation({
     mutationFn: async () => {
-      if (!sentCode || code.trim() !== sentCode) throw new Error("That code does not match.");
+      const normalized = phoneValue.trim();
+      if (!/^\+[1-9]\d{7,14}$/.test(normalized)) {
+        throw new Error("Enter a valid number in international format, for example +265991234567.");
+      }
       const { error } = await supabase
         .from("profiles")
-        .update({ phone: phoneValue, phone_verified: true })
+        .update({ phone: normalized })
         .eq("id", userId!);
       if (error) throw error;
+      return normalized;
     },
-    onSuccess: () => {
-      toast.success("Phone number verified");
-      setCode("");
-      setSentCode(null);
+    onSuccess: (normalized) => {
+      setPhone(normalized);
+      toast.success("WhatsApp contact number saved");
       refresh();
     },
     onError: (e: Error) => toast.error(e.message),
@@ -96,12 +92,56 @@ function VerificationPage() {
         status: "pending",
       });
       if (error) throw error;
-      await supabase.from("profiles").update({ kyc_status: "pending" }).eq("id", userId!);
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .update({ kyc_status: "pending" })
+        .eq("id", userId!);
+      if (profileError) throw profileError;
     },
     onSuccess: () => {
-      toast.success("Verification submitted for review");
+      toast.success("Verification submitted for manual review");
       setIdDoc(null);
       refresh();
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const startDidit = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      const accessToken = data.session?.access_token;
+      if (!accessToken) throw new Error("Your session has expired. Sign in again and retry.");
+
+      const response = await fetch("/api/public/didit/session", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({}),
+      });
+      const result = (await response.json().catch(() => ({}))) as {
+        url?: string;
+        error?: string;
+      };
+      if (!response.ok) {
+        throw new Error(result.error || "Could not start Didit verification. Please try again.");
+      }
+      if (!result.url) throw new Error("Didit did not return a verification link.");
+      const verificationUrl = new URL(result.url);
+      if (
+        verificationUrl.protocol !== "https:" ||
+        !(verificationUrl.hostname === "verify.didit.me" ||
+          verificationUrl.hostname.endsWith(".didit.me"))
+      ) {
+        throw new Error("Didit returned an unexpected verification link. Please contact support.");
+      }
+      return verificationUrl.toString();
+    },
+    onSuccess: (url) => {
+      toast.info("Opening Didit secure identity verification…");
+      window.location.assign(url);
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -127,50 +167,36 @@ function VerificationPage() {
       </div>
 
       <section className="surface-card space-y-3 p-4">
-        <div className="flex items-center justify-between">
-          <h2 className="font-display text-base font-semibold">WhatsApp number</h2>
-          {profile?.phone_verified && (
-            <Badge className="gap-1">
-              <BadgeCheck className="h-3.5 w-3.5" /> Verified
-            </Badge>
-          )}
-        </div>
+        <h2 className="font-display text-base font-semibold">WhatsApp number</h2>
+        <p className="text-xs text-muted-foreground">
+          Save your contact number. This is contact information only and does not verify your identity.
+        </p>
         <div>
           <Label htmlFor="phone">Phone number</Label>
           <Input
             id="phone"
+            type="tel"
+            autoComplete="tel"
             value={phoneValue}
             placeholder="+265991234567"
             onChange={(e) => setPhone(e.target.value)}
           />
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button size="sm" variant="outline" onClick={sendWhatsAppCode}>
-            Send code on WhatsApp
-          </Button>
-          {sentCode && (
-            <>
-              <Input
-                className="w-32"
-                value={code}
-                inputMode="numeric"
-                maxLength={6}
-                onChange={(e) => setCode(e.target.value)}
-                placeholder="6 digit code"
-              />
-              <Button size="sm" onClick={() => confirmPhone.mutate()}>
-                Confirm
-              </Button>
-            </>
-          )}
-        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={savePhone.isPending || !userId}
+          onClick={() => savePhone.mutate()}
+        >
+          <Save className="mr-2 h-4 w-4" />
+          {savePhone.isPending ? "Saving…" : "Save number"}
+        </Button>
       </section>
 
       <section className="surface-card mt-4 space-y-3 p-4">
         <h2 className="font-display text-base font-semibold">Identity documents</h2>
         <p className="text-xs text-muted-foreground">
-          Upload a national ID or passport. Documents are stored privately and reviewed only by the
-          store team.
+          Choose manual review by the MAS team or automatic identity verification through Didit.
         </p>
         <div>
           <Label htmlFor="fullname">Full legal name</Label>
@@ -184,7 +210,11 @@ function VerificationPage() {
         <div className="grid gap-3 sm:grid-cols-2">
           <div>
             <Label htmlFor="idtype">Document type</Label>
-            <Input id="idtype" value={idType} onChange={(e) => setIdType(e.target.value)} />
+            <Input
+              id="idtype"
+              value={idType}
+              onChange={(e) => setIdType(e.target.value)}
+            />
           </div>
           <div>
             <Label htmlFor="idnumber">Document number</Label>
@@ -197,13 +227,38 @@ function VerificationPage() {
           </div>
         </div>
         <Input
+          aria-label="Upload national ID or passport for manual review"
           type="file"
           accept="image/*,application/pdf"
           onChange={(e) => setIdDoc(e.target.files?.[0] ?? null)}
         />
-        <Button size="sm" disabled={submitKyc.isPending} onClick={() => submitKyc.mutate()}>
-          Submit for verification
-        </Button>
+        <p className="text-xs text-muted-foreground">
+          These details and the uploaded document are used for manual review. Didit collects the
+          information required by its own hosted workflow when you choose automatic verification.
+        </p>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button
+            className="w-full sm:flex-1"
+            disabled={submitKyc.isPending || !userId}
+            onClick={() => submitKyc.mutate()}
+          >
+            {submitKyc.isPending ? "Submitting…" : "Submit for verification"}
+          </Button>
+          <Button
+            className="w-full sm:flex-1"
+            variant="outline"
+            disabled={startDidit.isPending || !userId}
+            onClick={() => startDidit.mutate()}
+          >
+            <ShieldCheck className="mr-2 h-4 w-4" />
+            {startDidit.isPending ? "Preparing Didit…" : "Verify automatically with Didit"}
+            {!startDidit.isPending && <ExternalLink className="ml-2 h-4 w-4" />}
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Automatic verification opens Didit in a secure page. Your MAS status changes only after
+          the verification result is received and validated.
+        </p>
       </section>
 
       <section className="surface-card mt-4 p-4">
