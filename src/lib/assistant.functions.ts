@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { completeNvidiaChat } from "@/lib/nvidia-ai.server";
 
 const Input = z.object({
   message: z.string().trim().min(1).max(2000),
@@ -29,6 +28,7 @@ function toPlainText(text: string) {
 export const askAssistant = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => Input.parse(data))
   .handler(async ({ data }) => {
+    const { completeNvidiaChat } = await import("@/lib/nvidia-ai.server");
     const raw = await completeNvidiaChat([
       {
         role: "system",
