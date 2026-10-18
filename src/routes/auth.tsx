@@ -33,6 +33,15 @@ function safePath(value: string | undefined) {
   return value && value.startsWith("/") && !value.startsWith("//") ? value : "/dashboard";
 }
 
+function getAuthReturnUrl() {
+  const configuredUrl = import.meta.env.VITE_APP_URL as string | undefined;
+  if (configuredUrl) return configuredUrl.replace(/\/$/, "");
+  if (typeof window !== "undefined" && ["localhost", "127.0.0.1"].includes(window.location.hostname)) {
+    return "https://malawian-app-store-j6pm.vercel.app";
+  }
+  return window.location.origin;
+}
+
 function AuthPage() {
   const navigate = useNavigate();
   const search = useSearch({ from: "/auth" });
@@ -56,7 +65,7 @@ function AuthPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: window.location.origin,
+          redirectTo: getAuthReturnUrl(),
         },
       });
       if (error) {
@@ -78,7 +87,7 @@ function AuthPage() {
         const { error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin },
+          options: { emailRedirectTo: getAuthReturnUrl() },
         });
         if (error) throw error;
         toast.success("Account created. You can sign in now.");
