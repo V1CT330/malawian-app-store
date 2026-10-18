@@ -13,7 +13,7 @@ const SUPPORTED_EVENTS = new Set([
   "transaction.created", "transaction.status.updated", "travel_rule.status.updated",
 ]);
 
-/** Didit V2 canonical JSON: compact, recursively sorted keys, Unicode preserved. */
+/** Didit's X-Signature-V2 canonical JSON: compact, sorted keys, Unicode preserved. */
 function canonical(value: Json): string {
   if (Array.isArray(value)) return `[${value.map(canonical).join(",")}]`;
   if (value !== null && typeof value === "object") {
@@ -102,10 +102,19 @@ export const Route = createFileRoute("/api/public/webhooks/didit")({
           return new Response("Invalid signature", { status: 401 });
         }
 
-        // Freshness is based on the SIGNED payload timestamp, never X-Timestamp.
+        // Didit documents X-Timestamp as the freshness header and repeats the same
+        // Unix-seconds value inside the signed envelope. Require both to agree.
+        const timestampHeader = request.headers.get("x-timestamp") ?? "";
+        const headerTimestamp = /^\d+$/.test(timestampHeader) ? Number(timestampHeader) : NaN;
         const timestamp = body.timestamp;
-        if (typeof timestamp !== "number" || !Number.isSafeInteger(timestamp) ||
-            timestamp <= 0 || Math.abs(Date.now() / 1000 - timestamp) > MAX_CLOCK_SKEW_SECONDS) {
+        if (
+          typeof timestamp !== "number" ||
+          !Number.isSafeInteger(timestamp) ||
+          timestamp <= 0 ||
+          !Number.isSafeInteger(headerTimestamp) ||
+          headerTimestamp !== timestamp ||
+          Math.abs(Date.now() / 1000 - headerTimestamp) > MAX_CLOCK_SKEW_SECONDS
+        ) {
           return new Response("Stale or invalid signed timestamp", { status: 401 });
         }
 
@@ -118,8 +127,12 @@ export const Route = createFileRoute("/api/public/webhooks/didit")({
         const status = typeof body.status === "string" ? body.status : null;
         const sessionId = typeof body.session_id === "string" ? body.session_id :
           typeof body.business_session_id === "string" ? body.business_session_id : null;
-        const vendor = typeof body.vendor_data === "string" && UUID.test(body.vendor_data) ?
-          body.vendor_data : null;
+        // Never let a sandbox test grant a real MAS verified-developer badge.
+        // Sandbox events are still stored for diagnostics, but cannot update KYC state.
+        const vendor = body.environment === "live" &&
+          typeof body.vendor_data === "string" && UUID.test(body.vendor_data)
+          ? body.vendor_data
+          : null;
         const isBusinessSession = body.session_kind === "business";
 
         try {
