@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { completeNvidiaChat } from "@/lib/nvidia-ai.server";
 
 export const AI_TASKS = [
   "description",
@@ -59,44 +60,19 @@ function toPlainText(text: string) {
 export const publishingAssist = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => Input.parse(data))
   .handler(async ({ data }) => {
-    const key = process.env["LOVABLE_API_KEY"];
-    if (!key) throw new Error("AI is not configured yet.");
+    const text = await completeNvidiaChat(
+      [
+        {
+          role: "system",
+          content:
+            "You are the publishing assistant for the Malawian App Store. You help developers prepare store listings. Write in plain text only: never use markdown, asterisks, bullet symbols, hashes or emojis. Where a list is needed use numbered lines. Amounts are in Malawian Kwacha (MK).",
+        },
+        { role: "user", content: `${PROMPTS[data.task]}\n\n${context}` },
+      ],
+      1400,
+    );
 
-    const context = [
-      `Product type: ${data.kind}`,
-      `Category: ${data.category || "unspecified"}`,
-      `Name: ${data.name || "untitled"}`,
-      `Tagline: ${data.tagline || "none"}`,
-      `Description: ${data.description || "none"}`,
-      data.extra ? `Extra notes: ${data.extra}` : "",
-      data.task === "translate" ? `Target language: ${data.language}` : "",
-    ]
-      .filter(Boolean)
-      .join("\n");
-
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Lovable-API-Key": key },
-      body: JSON.stringify({
-        model: "google/gemini-3.6-flash",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are the publishing assistant for the Malawian App Store. You help developers prepare store listings. Write in plain text only: never use markdown, asterisks, bullet symbols, hashes or emojis. Where a list is needed use numbered lines. Amounts are in Malawian Kwacha (MK).",
-          },
-          { role: "user", content: `${PROMPTS[data.task]}\n\n${context}` },
-        ],
-      }),
-    });
-
-    if (response.status === 429) throw new Error("Too many requests right now. Try again shortly.");
-    if (response.status === 402)
-      throw new Error("AI credits are exhausted. Please top up to continue.");
-    if (!response.ok) throw new Error(`Assistant failed [${response.status}]`);
-
-    const json = (await response.json()) as { choices?: { message?: { content?: string } }[] };
     return {
-      text: toPlainText(json.choices?.[0]?.message?.content ?? "") || "No suggestion returned.",
+      text: toPlainText(text) || "No suggestion returned.",
     };
   });
