@@ -1,7 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { BarChart3 } from "lucide-react";
-import { toast } from "sonner";
 import {
   Bar,
   BarChart,
@@ -59,15 +58,16 @@ function tally(rows: Event[], key: "device" | "country") {
     .sort((a, b) => b.value - a.value);
 }
 
-function monthly(installs: Event[], views: Event[]) {
-  const months: { name: string; installs: number; views: number }[] = [];
+function monthly(installs: Event[], visits: Event[], views: Event[]) {
+  const months: { name: string; installs: number; visits: number; views: number }[] = [];
   const now = new Date();
   for (let i = 5; i >= 0; i -= 1) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const key = d.toISOString().slice(0, 7);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
     months.push({
       name: d.toLocaleString("en", { month: "short" }),
       installs: installs.filter((e) => e.created_at.startsWith(key)).length,
+      visits: visits.filter((e) => e.created_at.startsWith(key)).length,
       views: views.filter((e) => e.created_at.startsWith(key)).length,
     });
   }
@@ -77,7 +77,6 @@ function monthly(installs: Event[], views: Event[]) {
 function AnalyticsPage() {
   useRequireDeveloper();
   const { userId } = useSession();
-  const queryClient = useQueryClient();
 
   const listings = useQuery({
     queryKey: ["my-listings", userId],
@@ -91,28 +90,6 @@ function AnalyticsPage() {
       if (error) throw error;
       return (data ?? []) as unknown as PortalListing[];
     },
-  });
-
-  const setStatus = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const { error } = await supabase
-        .from("listings")
-        .update({ status, archived_at: status === "archived" ? new Date().toISOString() : null })
-        .eq("id", id);
-      if (error) throw error;
-      if (userId)
-        await logActivity({
-          ownerId: userId,
-          actorId: userId,
-          action: `Set status to ${status}`,
-          listingId: id,
-        });
-    },
-    onSuccess: () => {
-      toast.success("Product updated");
-      queryClient.invalidateQueries({ queryKey: ["my-listings", userId] });
-    },
-    onError: (e: Error) => toast.error(e.message),
   });
 
   const all = listings.data ?? [];
@@ -143,14 +120,17 @@ function AnalyticsPage() {
 
   const installs = events.data?.installs ?? [];
   const views = events.data?.views ?? [];
-  const activeUsers = new Set(views.map((v) => `${v.device}-${v.country}`)).size;
+  const appIds = new Set(all.filter((l) => l.kind !== "website").map((l) => l.id));
+  const websiteIds = new Set(all.filter((l) => l.kind === "website").map((l) => l.id));
+  const appInstalls = installs.filter((event) => appIds.has(event.listing_id));
+  const websiteVisits = installs.filter((event) => websiteIds.has(event.listing_id));
   const reviews = all.reduce((s, l) => s + l.rating_count, 0);
   const avg = reviews ? all.reduce((s, l) => s + l.rating_avg * l.rating_count, 0) / reviews : 0;
 
   const stats = [
-    { label: "downloads", value: installs.length },
-    { label: "views", value: views.length },
-    { label: "active users", value: activeUsers },
+    { label: "app installs", value: appInstalls.length },
+    { label: "website visits", value: websiteVisits.length },
+    { label: "store views", value: views.length },
     { label: "avg rating", value: avg ? avg.toFixed(1) : "N/A" },
   ];
 
@@ -192,7 +172,7 @@ function AnalyticsPage() {
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium">{l.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {kindLabel(l.kind)} · {l.downloads} installs · {l.rating_avg || "N/A"} ★
+                    {kindLabel(l.kind)} · {l.downloads} {l.kind === "website" ? "visits" : "installs"} · {l.rating_avg || "N/A"} ★
                   </p>
                 </div>
                 <Badge
@@ -201,14 +181,6 @@ function AnalyticsPage() {
                 >
                   {l.status}
                 </Badge>
-                {l.status !== "published" && (
-                  <Button
-                    size="sm"
-                    onClick={() => setStatus.mutate({ id: l.id, status: "published" })}
-                  >
-                    Publish
-                  </Button>
-                )}
                 <Button asChild size="sm" variant="outline">
                   <Link to="/console/products/$id" params={{ id: l.id }}>
                     Manage
@@ -225,10 +197,11 @@ function AnalyticsPage() {
       ) : (
         <>
           <section className="surface-card mt-4 p-4">
-            <h2 className="mb-3 font-display text-base font-semibold">Last 6 months</h2>
+            <h2 className="mb-1 font-display text-base font-semibold">Last 6 months</h2>
+            <p className="mb-3 text-xs text-muted-foreground">App installs, website visits and store views.</p>
             <div className="h-56">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={monthly(installs, views)}>
+                <LineChart data={monthly(appInstalls, websiteVisits, views)}>
                   <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                   <XAxis dataKey="name" fontSize={12} />
                   <YAxis fontSize={12} allowDecimals={false} />
@@ -237,6 +210,12 @@ function AnalyticsPage() {
                     type="monotone"
                     dataKey="views"
                     stroke="var(--google-blue)"
+                    strokeWidth={2}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="visits"
+                    stroke="var(--google-yellow)"
                     strokeWidth={2}
                   />
                   <Line
