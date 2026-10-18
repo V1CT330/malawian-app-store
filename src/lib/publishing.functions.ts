@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { completeNvidiaChat } from "@/lib/nvidia-ai.server";
 
 export const AI_TASKS = [
   "description",
@@ -60,6 +59,7 @@ function toPlainText(text: string) {
 export const publishingAssist = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => Input.parse(data))
   .handler(async ({ data }) => {
+    const { completeNvidiaChat } = await import("@/lib/nvidia-ai.server");
     const text = await completeNvidiaChat(
       [
         {
