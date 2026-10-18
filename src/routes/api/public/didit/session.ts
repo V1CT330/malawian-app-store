@@ -81,6 +81,7 @@ export const Route = createFileRoute("/api/public/didit/session")({
               workflow_id: workflowId,
               vendor_data: authData.user.id,
               callback,
+              callback_method: "both",
             }),
             signal: AbortSignal.timeout(15000),
           });
