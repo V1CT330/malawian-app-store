@@ -61,14 +61,19 @@ function tally(rows: Event[], key: "device" | "country") {
 function monthly(installs: Event[], visits: Event[], views: Event[]) {
   const months: { name: string; installs: number; visits: number; views: number }[] = [];
   const now = new Date();
+  const countInMonth = (events: Event[], year: number, month: number) =>
+    events.filter((event) => {
+      const date = new Date(event.created_at);
+      return date.getFullYear() === year && date.getMonth() === month;
+    }).length;
+
   for (let i = 5; i >= 0; i -= 1) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
     months.push({
       name: d.toLocaleString("en", { month: "short" }),
-      installs: installs.filter((e) => e.created_at.startsWith(key)).length,
-      visits: visits.filter((e) => e.created_at.startsWith(key)).length,
-      views: views.filter((e) => e.created_at.startsWith(key)).length,
+      installs: countInMonth(installs, d.getFullYear(), d.getMonth()),
+      visits: countInMonth(visits, d.getFullYear(), d.getMonth()),
+      views: countInMonth(views, d.getFullYear(), d.getMonth()),
     });
   }
   return months;
