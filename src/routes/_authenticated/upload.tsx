@@ -81,7 +81,7 @@ function UploadPage() {
           kind,
           icon_url: iconPath,
           website_url: kind === "website" ? websiteUrl.trim() : null,
-          status: "published",
+          status: "draft",
         })
         .select("id,slug")
         .single();
@@ -103,10 +103,10 @@ function UploadPage() {
       return listing;
     },
     onSuccess: (listing) => {
-      toast.success("Listing published");
+      toast.success("Draft saved. Complete the checklist and submit it for review.");
       queryClient.invalidateQueries({ queryKey: ["my-listings"] });
       queryClient.invalidateQueries({ queryKey: ["listings", "published"] });
-      navigate({ to: "/apps/$slug", params: { slug: listing.slug } });
+      navigate({ to: "/console/products/$id", params: { id: listing.id } });
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -114,7 +114,7 @@ function UploadPage() {
   return (
     <ConsoleShell
       title="Publish a listing"
-      description="Apps and websites are reviewed by the store team after publishing."
+      description="Create a draft, complete the publishing checklist, then submit it for store review."
       breadcrumbs={[{ label: "Console", to: "/console" }, { label: "Publish a listing" }]}
     >
       <div className="mt-5 space-y-4">
@@ -219,7 +219,7 @@ function UploadPage() {
           disabled={publish.isPending}
           onClick={() => publish.mutate()}
         >
-          {publish.isPending ? "Publishing…" : "Publish listing"}
+          {publish.isPending ? "Saving draft…" : "Save draft"}
         </Button>
       </div>
     </ConsoleShell>
