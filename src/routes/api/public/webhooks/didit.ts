@@ -13,12 +13,6 @@ const SUPPORTED_EVENTS = new Set([
   "transaction.created", "transaction.status.updated", "travel_rule.status.updated",
 ]);
 
-const KYC_MAP: Record<string, "approved" | "rejected" | "pending" | "none"> = {
-  Approved: "approved", Declined: "rejected", "In Review": "pending",
-  "In Progress": "pending", Resubmitted: "pending", Expired: "none",
-  "KYC Expired": "none", "Kyc Expired": "none",
-};
-
 /** Didit V2 canonical JSON: compact, recursively sorted keys, Unicode preserved. */
 function canonical(value: Json): string {
   if (Array.isArray(value)) return `[${value.map(canonical).join(",")}]`;
