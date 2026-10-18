@@ -29,8 +29,8 @@ function DeveloperPage() {
     queryKey: ["developer", id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
+        .from("public_profiles")
+        .select("id,display_name,developer_name,kyc_status,bio,website_url,github_url,portfolio_url,facebook_url,x_url,linkedin_url,instagram_url,youtube_url")
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;

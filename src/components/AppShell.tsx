@@ -53,7 +53,10 @@ export function AppShell({
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <header className="sticky top-0 z-30 bg-background px-3 pb-2 pt-3">
+      <header
+        className="sticky top-0 z-30 bg-background px-3 pb-2 pt-3"
+        style={{ paddingTop: "calc(0.75rem + env(safe-area-inset-top))" }}
+      >
         <div className="mx-auto w-full max-w-5xl">
           <div className="flex items-center gap-3 rounded-full bg-secondary px-3 py-2 shadow-soft">
             <Link to="/" aria-label="Malawian App Store home" className="shrink-0">
@@ -67,7 +70,11 @@ export function AppShell({
             </Link>
             <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
             <input
+              type="search"
               value={search ?? ""}
+              maxLength={120}
+              autoComplete="off"
+              enterKeyHint="search"
               onChange={(e) =>
                 onSearchChange
                   ? onSearchChange(e.target.value)
@@ -78,12 +85,12 @@ export function AppShell({
               }}
               placeholder="Search apps & websites"
               aria-label="Search apps and websites"
-              className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+              className="min-w-0 min-h-10 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground sm:text-sm"
             />
             <Link
               to={userId ? "/settings" : "/auth"}
               aria-label="Account"
-              className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground"
+              className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground"
             >
               {initial}
               {unread > 0 && (
@@ -94,7 +101,9 @@ export function AppShell({
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-5xl flex-1 px-3 pb-28 pt-1 sm:pb-12">{children}</main>
+      <main className="mas-mobile-main mx-auto w-full max-w-5xl flex-1 px-3 pb-28 pt-1 sm:pb-12">
+        {children}
+      </main>
 
       <footer className="border-t border-border px-4 py-8 pb-28 sm:pb-8">
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-3 text-sm text-muted-foreground">
@@ -119,7 +128,11 @@ export function AppShell({
         </div>
       </footer>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur">
+      <nav
+        className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        aria-label="Primary navigation"
+      >
         <div className="mx-auto flex max-w-5xl items-stretch">
           {nav.map((item) => {
             const Icon = item.icon;
@@ -128,7 +141,8 @@ export function AppShell({
               <Link
                 key={item.to}
                 to={item.to}
-                className="flex flex-1 flex-col items-center gap-1 py-2 text-[11px] font-medium"
+                aria-current={active ? "page" : undefined}
+                className="flex min-h-14 flex-1 flex-col items-center justify-center gap-1 py-2 text-[11px] font-medium"
               >
                 <span
                   className={cn(

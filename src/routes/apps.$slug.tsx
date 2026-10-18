@@ -127,7 +127,7 @@ function ListingDetail() {
     enabled: Boolean(listing?.developer_id),
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("profiles")
+        .from("public_profiles")
         .select("id, display_name, developer_name, kyc_status")
         .eq("id", listing!.developer_id)
         .maybeSingle();
