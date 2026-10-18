@@ -254,7 +254,7 @@ function StorePage() {
                 ? "All listings"
                 : `${listings.length} result${listings.length === 1 ? "" : "s"}`}
             </h2>
-            <div className="divide-y divide-border">
+            <div className="space-y-1">
               {listings.map((l) => (
                 <ListingCard key={l.id} listing={l} />
               ))}
