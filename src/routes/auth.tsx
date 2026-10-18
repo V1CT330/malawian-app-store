@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSession } from "@/hooks/useSession";
-import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/auth")({
@@ -51,10 +50,22 @@ function AuthPage() {
     setBusy(true);
     try {
       sessionStorage.setItem("mas:redirect", safePath(search.redirect));
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+      // Use the canonical Supabase OAuth flow rather than Lovable Cloud Auth.
+      // Returning to the existing app root lets Supabase JS exchange the OAuth
+      // code and restore the session without sending users to a missing route.
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: window.location.origin,
+        },
       });
-      if (result.error) toast.error("Google sign in failed. Please try again.");
+      if (error) {
+        sessionStorage.removeItem("mas:redirect");
+        toast.error(error.message || "Google sign in failed. Please try again.");
+      }
+    } catch (e) {
+      sessionStorage.removeItem("mas:redirect");
+      toast.error(e instanceof Error ? e.message : "Google sign in failed. Please try again.");
     } finally {
       setBusy(false);
     }
