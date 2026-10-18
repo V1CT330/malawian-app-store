@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
-import { kindLabel, logActivity, type PortalListing } from "@/lib/portal";
+import { kindLabel, type PortalListing } from "@/lib/portal";
 import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 
 export const Route = createFileRoute("/_authenticated/console/analytics")({
