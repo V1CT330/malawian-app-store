@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { BadgeCheck, ExternalLink, Save, ShieldCheck } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
@@ -45,6 +45,16 @@ function VerificationPage() {
   const [idNumber, setIdNumber] = useState("");
 
   const phoneValue = phone ?? profile?.phone ?? "";
+
+  useEffect(() => {
+    if (!userId || typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("didit") !== "return") return;
+    void queryClient.invalidateQueries({ queryKey: ["profile", userId] });
+    toast.info("You returned from Didit. Your verification status will update when MAS confirms the result.");
+    url.searchParams.delete("didit");
+    window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+  }, [queryClient, userId]);
 
   const savePhone = useMutation({
     mutationFn: async () => {
