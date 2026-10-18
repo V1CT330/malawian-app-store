@@ -86,7 +86,7 @@ function StorePage() {
           .select("*")
           .eq("status", "published")
           .order("created_at", { ascending: false }),
-        supabase.from("profiles").select("id,developer_name,display_name"),
+        supabase.from("public_profiles").select("id,developer_name,display_name"),
       ]);
       if (listingsResult.error) throw listingsResult.error;
       if (profilesResult.error) throw profilesResult.error;
