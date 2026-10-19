@@ -6,7 +6,6 @@ import {
   MessageCircle,
   Search,
   Users,
-  UserRound,
 } from "lucide-react";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
@@ -22,7 +21,7 @@ const sections = [
   { id: "Friends", icon: Users, description: "Find people and build your network." },
   { id: "Messages", icon: MessageCircle, description: "Your conversations with other MAS members." },
   { id: "Notifications", icon: Bell, description: "Likes, comments, follows, and other activity." },
-  { id: "My profile", icon: UserRound, description: "Your public profile, posts, and published products." },
+  { id: "Search", icon: Search, description: "Search for people, posts, and projects on MAS." },
 ] as const;
 
 function SocialPage() {
@@ -37,7 +36,7 @@ function SocialPage() {
         <h1 className="px-4 py-3 text-xl font-semibold sm:px-5">Social</h1>
         <nav
           aria-label="Social menu"
-          className="flex items-stretch gap-1 overflow-x-auto border-b border-border px-2 sm:px-3"
+          className="flex w-full items-stretch justify-evenly border-b border-border px-1 sm:px-3"
         >
           {sections.map(({ id, icon: Icon }) => {
             const selected = activeSection === id;
@@ -50,7 +49,7 @@ function SocialPage() {
                 title={id}
                 aria-current={selected ? "page" : undefined}
                 className={cn(
-                  "flex shrink-0 items-center justify-center border-b-2 px-4 py-3 transition-colors duration-200 sm:px-5",
+                  "flex min-w-0 flex-1 items-center justify-center border-b-2 px-2 py-3 transition-colors duration-200 sm:px-5",
                   selected
                     ? "border-primary font-semibold text-foreground"
                     : "border-transparent text-muted-foreground hover:border-border hover:text-foreground",
@@ -68,7 +67,6 @@ function SocialPage() {
               <ActiveIcon className="h-4 w-4 text-primary" aria-hidden="true" />
               <h2 className="text-base font-semibold">{activeSection}</h2>
             </div>
-            <Search className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
           </div>
 
           {activeSection === "Feed" ? (
