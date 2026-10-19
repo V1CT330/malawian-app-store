@@ -2,13 +2,11 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   Bell,
-  Bookmark,
   Home,
   MessageCircle,
   Search,
   Users,
   UserRound,
-  UsersRound,
 } from "lucide-react";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
@@ -22,10 +20,8 @@ export const Route = createFileRoute("/_authenticated/console/social")({
 const sections = [
   { id: "Feed", icon: Home, description: "Updates from people and communities will appear here." },
   { id: "Friends", icon: Users, description: "Find people and build your network." },
-  { id: "Groups", icon: UsersRound, description: "Communities for shared interests and collaboration." },
   { id: "Messages", icon: MessageCircle, description: "Your conversations with other MAS members." },
   { id: "Notifications", icon: Bell, description: "Likes, comments, follows, and other activity." },
-  { id: "Saved", icon: Bookmark, description: "Keep posts and projects you want to revisit." },
   { id: "My profile", icon: UserRound, description: "Your public profile, posts, and published products." },
 ] as const;
 
