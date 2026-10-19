@@ -3,7 +3,7 @@ const API = "https://api.paychangu.com";
 
 function secretKey() {
   const key = process.env["PAYCHANGU_SECRET_KEY"];
-  if (!key) throw new Error("Payments are not configured yet.");
+  if (!key) throw new Error("Payments are not configured: PAYCHANGU_SECRET_KEY is missing.");
   return key;
 }
 
@@ -25,8 +25,9 @@ export async function createPaychanguCheckout(input: {
     body: JSON.stringify({
       amount: String(input.amount),
       currency: "MWK",
-      email: input.email,
+      ...(input.email ? { email: input.email } : {}),
       first_name: input.name,
+      last_name: "Developer",
       tx_ref: input.txRef,
       callback_url: input.callbackUrl,
       return_url: input.returnUrl,
@@ -36,9 +37,30 @@ export async function createPaychanguCheckout(input: {
       },
     }),
   });
-  const json = (await res.json().catch(() => null)) as { data?: { checkout_url?: string } } | null;
+
+  const json = (await res.json().catch(() => null)) as {
+    status?: string;
+    message?: string;
+    data?: { checkout_url?: string };
+  } | null;
   const url = json?.data?.checkout_url;
-  if (!res.ok || !url) throw new Error(`Payment provider error (${res.status})`);
+
+  if (!res.ok || json?.status !== "success" || !url) {
+    // Log provider response for diagnosis, never log authorization headers or secrets.
+    console.error("[PayChangu] Checkout creation failed", {
+      httpStatus: res.status,
+      providerStatus: json?.status ?? null,
+      providerMessage: json?.message ?? null,
+      txRef: input.txRef,
+    });
+    const detail = json?.message?.slice(0, 180);
+    throw new Error(
+      detail
+        ? `PayChangu rejected checkout (HTTP ${res.status}): ${detail}`
+        : `PayChangu rejected checkout (HTTP ${res.status}). Check the server logs for the provider response.`,
+    );
+  }
+
   return url;
 }
 
