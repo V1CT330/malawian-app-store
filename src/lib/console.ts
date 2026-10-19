@@ -3,6 +3,7 @@ import type { PortalListing } from "@/lib/portal";
 /** Sidebar information architecture for the developer console. */
 export const CONSOLE_NAV = [
   { to: "/console", label: "Dashboard", icon: "dashboard" },
+  { to: "/console/social", label: "Social", icon: "social" },
   { to: "/console/products", label: "All products", icon: "products" },
   { to: "/console/publishing", label: "Publishing", icon: "publishing" },
   { to: "/console/testing", label: "Testing", icon: "testing" },
