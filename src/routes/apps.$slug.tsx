@@ -376,7 +376,7 @@ function ListingDetail() {
                       <Star
                         className={cn(
                           "h-6 w-6",
-                          n <= rating ? "fill-brand-gold text-brand-gold" : "text-muted-foreground",
+                          n <= rating ? "fill-blue-500 text-blue-500" : "text-muted-foreground",
                         )}
                       />
                     </button>
