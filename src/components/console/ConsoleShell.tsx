@@ -106,12 +106,16 @@ export function ConsoleShell({
   breadcrumbs,
   actions,
   children,
+  hideTopBar = false,
+  hideTitleCard = false,
 }: {
   title: string;
   description?: string;
   breadcrumbs?: Crumb[];
   actions?: ReactNode;
   children: ReactNode;
+  hideTopBar?: boolean;
+  hideTitleCard?: boolean;
 }) {
   const { userId, profile } = useProfile();
   const unread = useUnreadCount();
@@ -174,7 +178,7 @@ export function ConsoleShell({
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-xl">
+        {!hideTopBar && <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur-xl">
           <div className="mx-auto flex w-full max-w-6xl items-center gap-2 px-3 py-3 sm:px-6">
             <Sheet open={drawer} onOpenChange={setDrawer}>
               <SheetTrigger asChild>
@@ -286,9 +290,9 @@ export function ConsoleShell({
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-        </header>
+        </header>}
 
-        <main className="mx-auto w-full max-w-6xl flex-1 px-3 pb-20 pt-5 sm:px-6">
+        <main className={cn("mx-auto w-full max-w-6xl flex-1 px-3 pb-20 sm:px-6", hideTopBar ? "pt-0" : "pt-5")}>
           {breadcrumbs && breadcrumbs.length > 0 && (
             <ol className="mb-3 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
               {breadcrumbs.map((c, i) => (
@@ -305,15 +309,17 @@ export function ConsoleShell({
               ))}
             </ol>
           )}
-          <div className="console-hero mb-6 flex flex-wrap items-start justify-between gap-4 p-5 sm:p-6">
-            <div className="min-w-0">
-              <h1 className="font-display text-2xl font-bold leading-tight sm:text-3xl">{title}</h1>
-              {description && (
-                <p className="mt-1.5 max-w-xl text-sm text-muted-foreground">{description}</p>
-              )}
+          {!hideTitleCard && (
+            <div className="console-hero mb-6 flex flex-wrap items-start justify-between gap-4 p-5 sm:p-6">
+              <div className="min-w-0">
+                <h1 className="font-display text-2xl font-bold leading-tight sm:text-3xl">{title}</h1>
+                {description && (
+                  <p className="mt-1.5 max-w-xl text-sm text-muted-foreground">{description}</p>
+                )}
+              </div>
+              {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
             </div>
-            {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
-          </div>
+          )}
           {children}
         </main>
       </div>
