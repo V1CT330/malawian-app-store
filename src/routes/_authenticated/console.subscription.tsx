@@ -1,7 +1,6 @@
-import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Check, CreditCard, Smartphone } from "lucide-react";
+import { Check } from "lucide-react";
 import { toast } from "sonner";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
