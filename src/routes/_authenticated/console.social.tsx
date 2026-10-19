@@ -3,7 +3,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import {
   Bell,
   Bookmark,
-  Compass,
   Home,
   MessageCircle,
   Search,
@@ -22,7 +21,6 @@ export const Route = createFileRoute("/_authenticated/console/social")({
 
 const sections = [
   { id: "Feed", icon: Home, description: "Updates from people and communities will appear here." },
-  { id: "Discover", icon: Compass, description: "Discover people, posts, and projects across MAS." },
   { id: "Friends", icon: Users, description: "Find people and build your network." },
   { id: "Groups", icon: UsersRound, description: "Communities for shared interests and collaboration." },
   { id: "Messages", icon: MessageCircle, description: "Your conversations with other MAS members." },
