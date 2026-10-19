@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -275,6 +275,11 @@ function SocialPage() {
 
   const sendConnection = useMutation({
     mutationFn: async (recipientId: string) => {
+      const existing = relationshipMap.get(recipientId);
+      if (existing?.status === "declined") {
+        const { error: deleteError } = await socialDb.from("social_connections").delete().eq("id", existing.id);
+        if (deleteError) throw deleteError;
+      }
       const { error } = await socialDb
         .from("social_connections")
         .insert({ requester_id: userId, recipient_id: recipientId, status: "pending" });
@@ -325,7 +330,9 @@ function SocialPage() {
   );
   const relationshipMap = new Map<string, SocialConnection>();
   connections.forEach((item) => {
-    relationshipMap.set(item.requester_id === userId ? item.recipient_id : item.requester_id, item);
+    const otherId = item.requester_id === userId ? item.recipient_id : item.requester_id;
+    // Results are newest-first; preserve the latest relationship for each member.
+    if (!relationshipMap.has(otherId)) relationshipMap.set(otherId, item);
   });
   const filteredProfiles = (profilesQuery.data ?? []).filter((item) =>
     item.id !== userId &&
@@ -339,6 +346,25 @@ function SocialPage() {
     ),
   );
   const unreadNotifications = (notificationsQuery.data ?? []).filter((item) => !item.read).length;
+
+  useEffect(() => {
+    if (!userId || !selectedRecipient) return;
+    const unreadIds = (messagesQuery.data ?? [])
+      .filter((message) => message.sender_id === selectedRecipient && message.recipient_id === userId && !message.read_at)
+      .map((message) => message.id);
+    if (!unreadIds.length) return;
+    socialDb
+      .from("social_messages")
+      .update({ read_at: new Date().toISOString() })
+      .in("id", unreadIds)
+      .then(({ error }: { error: { message: string } | null }) => {
+        if (error) {
+          toast.error("Could not mark messages as read");
+          return;
+        }
+        void queryClient.invalidateQueries({ queryKey: ["social", "messages", userId] });
+      });
+  }, [messagesQuery.data, queryClient, selectedRecipient, userId]);
 
   function submitPost(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
