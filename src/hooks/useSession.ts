@@ -95,27 +95,15 @@ export function useIsAdmin() {
   return query.data ?? false;
 }
 
-/** "developer" or "user" — drives which workspace the app renders. */
+/**
+ * The server profile is the source of truth for workspace mode.
+ * Never restore developer mode from localStorage: an old cached value can
+ * survive an offline session and incorrectly replace the shopper navigation.
+ * Until the current profile confirms developer mode, show user navigation.
+ */
 export function useMode() {
-  const { profile, userId, ready } = useProfile();
-  const [cached, setCached] = useState<string | null>(null);
-  useEffect(() => {
-    try {
-      setCached(localStorage.getItem("mas:mode"));
-    } catch {
-      /* storage unavailable */
-    }
-  }, []);
-  useEffect(() => {
-    try {
-      if (profile?.mode) localStorage.setItem("mas:mode", profile.mode);
-      else if (ready && !userId) localStorage.removeItem("mas:mode");
-    } catch {
-      /* storage unavailable */
-    }
-  }, [profile?.mode, ready, userId]);
-  const mode = profile?.mode ?? (ready && !userId ? null : cached);
-  return mode === "developer" ? "developer" : "user";
+  const { profile } = useProfile();
+  return profile?.mode === "developer" ? "developer" : "user";
 }
 
 export function useUnreadCount() {
