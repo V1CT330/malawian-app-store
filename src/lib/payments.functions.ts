@@ -4,11 +4,10 @@ import { getRequest } from "@tanstack/react-start/server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { PRO_PRICE_MWK } from "@/lib/pro";
 
-/** Starts a Developer Pro mobile-money checkout and returns the hosted payment URL. */
+/** Creates a pending Developer Pro payment session for the PayChangu embedded checkout. */
 export const startProCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { createPaychanguCheckout } = await import("./payments.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const origin = new URL(getRequest().url).origin;
     const email = (context.claims as { email?: string }).email ?? "";
@@ -21,17 +20,9 @@ export const startProCheckout = createServerFn({ method: "POST" })
     });
     if (error) throw new Error("Could not start payment.");
 
-    const checkoutUrl = await createPaychanguCheckout({
+    return {
       txRef,
-      amount: PRO_PRICE_MWK,
       email,
-      name: email.split("@")[0] || "Developer",
-      callbackUrl: `${origin}/api/public/payments/return?tx_ref=${txRef}`,
-      returnUrl: `${origin}/console/subscription?payment=cancelled`,
-    });
-    await supabaseAdmin
-      .from("payment_sessions")
-      .update({ checkout_url: checkoutUrl })
-      .eq("tx_ref", txRef);
-    return { checkoutUrl, txRef };
+      returnUrl: `${origin}/api/public/payments/return?tx_ref=${txRef}`,
+    };
   });
