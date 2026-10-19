@@ -50,16 +50,17 @@ function SocialPage() {
                 key={id}
                 type="button"
                 onClick={() => setActiveSection(id)}
+                aria-label={id}
+                title={id}
                 aria-current={selected ? "page" : undefined}
                 className={cn(
-                  "flex shrink-0 items-center gap-2 border-b-2 px-3 py-3 text-sm transition-colors duration-200 sm:px-4",
+                  "flex shrink-0 items-center justify-center border-b-2 px-4 py-3 transition-colors duration-200 sm:px-5",
                   selected
                     ? "border-primary font-semibold text-foreground"
                     : "border-transparent text-muted-foreground hover:border-border hover:text-foreground",
                 )}
               >
-                <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-                <span>{id}</span>
+                <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
               </button>
             );
           })}
