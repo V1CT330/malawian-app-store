@@ -6,6 +6,9 @@ import {
   Check,
   Heart,
   Home,
+  ImagePlus,
+  Share2,
+  Trash2,
   Menu,
   MessageCircle,
   Search,
@@ -54,6 +57,8 @@ type SocialPost = {
   author_id: string;
   body: string;
   created_at: string;
+  media_url: string | null;
+  media_type: "image" | "video" | null;
 };
 type SocialConnection = {
   id: string;
@@ -103,6 +108,7 @@ function SocialPage() {
   const [activeSection, setActiveSection] = useState<SectionId>("Feed");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [postDraft, setPostDraft] = useState("");
+  const [postMedia, setPostMedia] = useState<File | null>(null);
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRecipient, setSelectedRecipient] = useState<string | null>(null);
@@ -133,7 +139,7 @@ function SocialPage() {
     queryFn: async () => {
       const { data, error } = await socialDb
         .from("social_posts")
-        .select("id, author_id, body, created_at")
+        .select("id, author_id, body, created_at, media_url, media_type")
         .order("created_at", { ascending: false })
         .limit(50);
       if (error) throw error;
@@ -229,16 +235,62 @@ function SocialPage() {
   };
 
   const createPost = useMutation({
-    mutationFn: async (body: string) => {
-      const { error } = await socialDb.from("social_posts").insert({ author_id: userId, body: body.trim() });
-      if (error) throw error;
+    mutationFn: async ({ body, file }: { body: string; file: File | null }) => {
+      let mediaUrl: string | null = null;
+      let mediaType: "image" | "video" | null = null;
+      let uploadedPath: string | null = null;
+      if (file) {
+        const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
+        uploadedPath = String(userId) + "/" + Date.now() + "-" + Math.random().toString(36).slice(2) + "." + ext;
+        const { error: uploadError } = await supabase.storage.from("social-media").upload(uploadedPath, file, {
+          cacheControl: "3600",
+          contentType: file.type,
+          upsert: false,
+        });
+        if (uploadError) throw uploadError;
+        mediaUrl = supabase.storage.from("social-media").getPublicUrl(uploadedPath).data.publicUrl;
+        mediaType = file.type.startsWith("video/") ? "video" : "image";
+      }
+      const { error } = await socialDb.from("social_posts").insert({
+        author_id: userId,
+        body: body.trim(),
+        media_url: mediaUrl,
+        media_type: mediaType,
+      });
+      if (error) {
+        if (uploadedPath) await supabase.storage.from("social-media").remove([uploadedPath]);
+        throw error;
+      }
     },
     onSuccess: async () => {
       setPostDraft("");
+      setPostMedia(null);
       await invalidateSocial();
       toast.success("Post shared");
     },
     onError: (error: Error) => toast.error(error.message || "Could not publish your post"),
+  });
+
+  const deletePost = useMutation({
+    mutationFn: async (postId: string) => {
+      const post = (postsQuery.data ?? []).find((item) => item.id === postId);
+      if (!post || post.author_id !== userId) throw new Error("You can only delete your own posts");
+      const { error } = await socialDb.from("social_posts").delete().eq("id", postId).eq("author_id", userId);
+      if (error) throw error;
+      if (post.media_url) {
+        const marker = "/object/public/social-media/";
+        const markerIndex = post.media_url.indexOf(marker);
+        const objectPath = markerIndex >= 0 ? decodeURIComponent(post.media_url.slice(markerIndex + marker.length)) : "";
+        if (objectPath && objectPath.startsWith(String(userId) + "/")) {
+          await supabase.storage.from("social-media").remove([objectPath]);
+        }
+      }
+    },
+    onSuccess: async () => {
+      await invalidateSocial();
+      toast.success("Post deleted");
+    },
+    onError: (error: Error) => toast.error(error.message || "Could not delete post"),
   });
 
   const toggleReaction = useMutation({
@@ -374,7 +426,18 @@ function SocialPage() {
       toast.error("Posts must be 2,000 characters or fewer");
       return;
     }
-    createPost.mutate(body);
+    if (postMedia) {
+      const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif", "video/mp4", "video/webm", "video/quicktime"];
+      if (!allowedTypes.includes(postMedia.type)) {
+        toast.error("Choose a JPG, PNG, WEBP, GIF, MP4, WEBM, or MOV file");
+        return;
+      }
+      if (postMedia.size > 50 * 1024 * 1024) {
+        toast.error("Media files must be 50 MB or smaller");
+        return;
+      }
+    }
+    createPost.mutate({ body, file: postMedia });
   }
 
   function submitComment(event: FormEvent<HTMLFormElement>, postId: string) {
@@ -498,8 +561,15 @@ function SocialPage() {
                   <div className="min-w-0 flex-1">
                     <label htmlFor="social-post" className="sr-only">Write a post</label>
                     <textarea id="social-post" value={postDraft} onChange={(event) => setPostDraft(event.target.value)} maxLength={2000} rows={3} placeholder="What would you like to share?" className="w-full resize-y border border-border bg-background p-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary" />
-                    <div className="mt-2 flex items-center justify-between gap-3">
-                      <span className="text-xs text-muted-foreground">{postDraft.length}/2000</span>
+                    <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex min-w-0 flex-wrap items-center gap-3">
+                        <label className="flex cursor-pointer items-center gap-2 border border-border px-3 py-2 text-xs font-medium transition-colors hover:bg-secondary">
+                          <ImagePlus className="h-4 w-4" /> Add photo/video
+                          <input type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" className="sr-only" onChange={(event) => setPostMedia(event.target.files?.[0] ?? null)} />
+                        </label>
+                        {postMedia && <span className="max-w-[170px] truncate text-xs text-muted-foreground">{postMedia.name}<button type="button" onClick={() => setPostMedia(null)} className="ml-2 underline">Remove</button></span>}
+                        <span className="text-xs text-muted-foreground">{postDraft.length}/2000</span>
+                      </div>
                       <button type="submit" disabled={!postDraft.trim() || createPost.isPending} className="flex items-center gap-2 bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50">
                         <Send className="h-4 w-4" /> {createPost.isPending ? "Posting…" : "Post"}
                       </button>
@@ -531,11 +601,24 @@ function SocialPage() {
                       </div>
                     </div>
                     <p className="whitespace-pre-wrap break-words py-4 text-sm leading-6">{post.body}</p>
+                    {post.media_url && post.media_type === "image" && <img src={post.media_url} alt="Post attachment" loading="lazy" className="mb-4 max-h-[560px] w-full border border-border object-contain" />}
+                    {post.media_url && post.media_type === "video" && <video src={post.media_url} controls preload="metadata" className="mb-4 max-h-[560px] w-full border border-border bg-black" aria-label="Post video attachment" />}
                     <div className="flex items-center gap-4 border-y border-border py-2 text-xs text-muted-foreground">
                       <button type="button" disabled={toggleReaction.isPending} onClick={() => toggleReaction.mutate({ postId: post.id, reacted })} className={cn("flex items-center gap-1.5 px-1 py-1 transition-colors hover:text-foreground", reacted && "text-destructive")} aria-pressed={reacted}>
                         <Heart className={cn("h-4 w-4", reacted && "fill-current")} /> {postReactions.length} {postReactions.length === 1 ? "like" : "likes"}
                       </button>
                       <span className="flex items-center gap-1.5"><MessageCircle className="h-4 w-4" /> {postComments.length} comments</span>
+                      <button type="button" onClick={() => {
+                        const shareText = post.body + "\n\n" + window.location.origin + "/console/social";
+                        if (navigator.share) {
+                          void navigator.share({ title: "MAS post by " + displayName(author), text: post.body, url: window.location.origin + "/console/social" }).catch(() => undefined);
+                        } else {
+                          void navigator.clipboard.writeText(shareText).then(() => toast.success("Post copied for sharing")).catch(() => toast.error("Could not copy post"));
+                        }
+                      }} className="ml-auto flex items-center gap-1.5 px-1 py-1 hover:text-foreground"><Share2 className="h-4 w-4" /> Share</button>
+                      {post.author_id === userId && <button type="button" disabled={deletePost.isPending} onClick={() => {
+                        if (window.confirm("Delete this post? This cannot be undone.")) deletePost.mutate(post.id);
+                      }} aria-label="Delete your post" title="Delete post" className="flex items-center gap-1.5 px-1 py-1 text-muted-foreground hover:text-destructive disabled:opacity-50"><Trash2 className="h-4 w-4" /></button>}
                     </div>
                     {postComments.slice(-5).map((comment) => {
                       const commentAuthor = profileMap.get(comment.author_id) ?? (comment.author_id === userId ? profile as SocialProfile : null);
