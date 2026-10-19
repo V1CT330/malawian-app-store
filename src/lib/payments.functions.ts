@@ -29,7 +29,9 @@ export const startProCheckout = createServerFn({ method: "POST" })
         amount: PRO_PRICE_MWK,
         email,
         name: "Developer",
-        callbackUrl: `${origin}/api/public/payments/webhook`,
+        // PayChangu redirects the customer to callback_url after success.
+        // Keep the webhook endpoint for server-to-server POST notifications only.
+        callbackUrl: `${origin}/api/public/payments/return`,
         returnUrl,
       });
 
