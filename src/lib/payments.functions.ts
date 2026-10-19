@@ -40,12 +40,15 @@ export const startProCheckout = createServerFn({ method: "POST" })
       if (updateError) throw new Error("Could not save payment session.");
 
       return { checkoutUrl };
-    } catch {
+    } catch (error) {
       await supabaseAdmin
         .from("payment_sessions")
         .update({ status: "failed" })
         .eq("tx_ref", txRef)
         .eq("status", "pending");
+
+      // Preserve the safe provider error so the real integration failure is visible.
+      if (error instanceof Error) throw error;
       throw new Error("PayChangu could not start this payment. Please try again.");
     }
   });
