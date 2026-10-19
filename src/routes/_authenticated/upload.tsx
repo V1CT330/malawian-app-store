@@ -219,7 +219,7 @@ function UploadPage() {
           disabled={publish.isPending}
           onClick={() => publish.mutate()}
         >
-          {publish.isPending ? "Saving draft…" : "Save draft"}
+          {publish.isPending ? "Publishing…" : "Publish"}
         </Button>
       </div>
     </ConsoleShell>
