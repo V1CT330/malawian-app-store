@@ -1,6 +1,7 @@
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Check } from "lucide-react";
+import { Check, CreditCard, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
@@ -23,6 +24,22 @@ import {
 import { formatMwk } from "@/lib/store";
 import { startProCheckout } from "@/lib/payments.functions";
 import { useServerFn } from "@tanstack/react-start";
+
+type CheckoutSession = {
+  txRef: string;
+  email: string;
+  returnUrl: string;
+};
+
+declare global {
+  interface Window {
+    PayChangu?: {
+      mountCheckoutForm: (options: Record<string, unknown>) => unknown;
+    };
+  }
+}
+
+const PAYCHANGU_PUBLIC_KEY = import.meta.env.VITE_PAYCHANGU_PUBLIC_KEY as string | undefined;
 
 export const Route = createFileRoute("/_authenticated/console/subscription")({
   head: () => ({
@@ -49,6 +66,7 @@ function ProPage() {
   useRequireDeveloper();
   const { userId } = useProfile();
   const queryClient = useQueryClient();
+  const [checkoutSession, setCheckoutSession] = useState<CheckoutSession | null>(null);
 
   const subscription = useQuery({
     queryKey: ["subscription", userId],
@@ -65,15 +83,103 @@ function ProPage() {
   });
 
   const active = subscription.data?.status === "active";
-
   const startCheckout = useServerFn(startProCheckout);
+
   const activate = useMutation({
-    mutationFn: () => startCheckout(),
-    onSuccess: ({ checkoutUrl }) => {
-      window.location.href = checkoutUrl;
+    mutationFn: () => {
+      if (!PAYCHANGU_PUBLIC_KEY) {
+        throw new Error(
+          "PayChangu checkout is not configured. The production VITE_PAYCHANGU_PUBLIC_KEY is required.",
+        );
+      }
+      return startCheckout();
     },
+    onSuccess: (session) => setCheckoutSession(session),
     onError: (e: Error) => toast.error(e.message),
   });
+
+  useEffect(() => {
+    if (!checkoutSession || !PAYCHANGU_PUBLIC_KEY) return;
+    let cancelled = false;
+
+    const mountCheckout = () => {
+      if (cancelled || !window.PayChangu) return;
+      const target = document.querySelector("#paychangu-checkout");
+      if (!target) return;
+      target.replaceChildren();
+
+      window.PayChangu.mountCheckoutForm({
+        target: "#paychangu-checkout",
+        publicKey: PAYCHANGU_PUBLIC_KEY,
+        formKey: "mas-developer-pro",
+        email: checkoutSession.email,
+        amount: PRO_PRICE_MWK,
+        paymentReference: checkoutSession.txRef,
+        type: "standard",
+        config: {
+          name: "Malawian App Store",
+          currency: "MWK",
+          show_header: true,
+          title: "Choose a payment method",
+          description: "Pay for your Developer Pro monthly subscription.",
+          button_text: "Continue to payment",
+          show_amount: true,
+          methods: {
+            mobile_money: true,
+            card: true,
+            bank_transfer: true,
+          },
+          mobile_money_networks: {
+            airtel: true,
+            tnm: true,
+            changu_wallet: true,
+          },
+          collect: {
+            name: false,
+            phone: true,
+          },
+          appearance: {
+            theme: "light",
+            brand_color: "#173B7A",
+            radius: "rounded",
+          },
+          redirect_url: checkoutSession.returnUrl,
+        },
+        onSuccess: () => {
+          // The server return route verifies the transaction before activating Pro.
+          window.location.href = checkoutSession.returnUrl;
+        },
+        onError: (error: { message?: string }) => {
+          toast.error(error?.message || "PayChangu could not start this payment. Please try again.");
+        },
+      });
+    };
+
+    if (window.PayChangu) {
+      mountCheckout();
+    } else {
+      let script = document.querySelector<HTMLScriptElement>("script[data-paychangu-sdk]");
+      if (!script) {
+        script = document.createElement("script");
+        script.src = "https://checkout.paychangu.com/embed.js";
+        script.async = true;
+        script.dataset.paychanguSdk = "true";
+        script.addEventListener("load", mountCheckout, { once: true });
+        script.addEventListener(
+          "error",
+          () => toast.error("Could not load PayChangu checkout. Check your connection and retry."),
+          { once: true },
+        );
+        document.body.appendChild(script);
+      } else {
+        script.addEventListener("load", mountCheckout, { once: true });
+      }
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [checkoutSession]);
 
   const cancel = useMutation({
     mutationFn: async () => {
@@ -117,14 +223,38 @@ function ProPage() {
               Cancel plan
             </Button>
           </>
+        ) : checkoutSession ? (
+          <div className="mt-5 text-left">
+            <div className="mb-3 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5">
+                <Smartphone className="h-4 w-4" /> Airtel Money / TNM Mpamba
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <CreditCard className="h-4 w-4" /> Bank cards
+              </span>
+            </div>
+            <div id="paychangu-checkout" aria-label="PayChangu payment methods" />
+            <Button
+              className="mt-3 w-full"
+              variant="outline"
+              onClick={() => setCheckoutSession(null)}
+            >
+              Back
+            </Button>
+          </div>
         ) : (
-          <Button
-            className="mt-4 w-full"
-            disabled={activate.isPending}
-            onClick={() => activate.mutate()}
-          >
-            Activate {PRO_NAME}
-          </Button>
+          <>
+            <Button
+              className="mt-4 w-full"
+              disabled={activate.isPending}
+              onClick={() => activate.mutate()}
+            >
+              {activate.isPending ? "Preparing payment…" : `Continue to payment · ${PRO_NAME}`}
+            </Button>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Choose mobile money, bank card or bank transfer on the secure PayChangu checkout.
+            </p>
+          </>
         )}
         <ul className="mt-4 space-y-2 text-left">
           {PRO_CHECKLIST.map((c) => (
