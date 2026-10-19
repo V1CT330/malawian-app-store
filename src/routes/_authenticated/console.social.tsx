@@ -1,14 +1,16 @@
 import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Bell,
   Home,
   MessageCircle,
+  Menu,
   Search,
   Users,
 } from "lucide-react";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 import { cn } from "@/lib/utils";
 
@@ -27,11 +29,37 @@ const sections = [
 function SocialPage() {
   useRequireDeveloper();
   const [activeSection, setActiveSection] = useState<(typeof sections)[number]["id"]>("Feed");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const active = sections.find((section) => section.id === activeSection) ?? sections[0];
   const ActiveIcon = active.icon;
 
   return (
     <ConsoleShell title="Social" hideTopBar hideTitleCard>
+      <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
+        <SheetContent side="left" className="w-[260px] bg-sidebar p-3">
+          <SheetTitle className="mb-4 px-2 font-semibold">Developer console</SheetTitle>
+          <nav aria-label="Developer console menu" className="space-y-1">
+            {[
+              { label: "Dashboard", to: "/console" },
+              { label: "Social", to: "/console/social" },
+              { label: "Products", to: "/console/products" },
+              { label: "Publishing", to: "/console/publishing" },
+              { label: "Testing", to: "/console/testing" },
+              { label: "Analytics", to: "/console/analytics" },
+              { label: "Settings", to: "/console/settings" },
+            ].map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                onClick={() => setSidebarOpen(false)}
+                className="block border-b border-border px-3 py-3 text-sm text-foreground transition-colors hover:bg-secondary"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </SheetContent>
+      </Sheet>
       <section className="border-y border-border bg-background">
         <h1 className="px-4 py-3 text-xl font-semibold sm:px-5">Social</h1>
         <nav
@@ -40,7 +68,7 @@ function SocialPage() {
         >
           {sections.map(({ id, icon: Icon }) => {
             const selected = activeSection === id;
-            return (
+            const sectionButton = (
               <button
                 key={id}
                 type="button"
@@ -57,6 +85,23 @@ function SocialPage() {
               >
                 <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
               </button>
+            );
+
+            if (id !== "Search") return sectionButton;
+
+            return (
+              <div key={id} className="flex min-w-0 flex-1 flex-col items-stretch">
+                <button
+                  type="button"
+                  onClick={() => setSidebarOpen(true)}
+                  aria-label="Open sidebar menu"
+                  title="Sidebar menu"
+                  className="flex items-center justify-center px-2 py-2 text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <Menu className="h-5 w-5" aria-hidden="true" />
+                </button>
+                {sectionButton}
+              </div>
             );
           })}
         </nav>
