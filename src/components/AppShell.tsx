@@ -1,19 +1,16 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
-  BarChart3,
   Bell,
   Gamepad2,
-  LayoutDashboard,
   LayoutGrid,
   Search,
-  Upload,
   User,
 } from "lucide-react";
 import { type ReactNode } from "react";
 
 import logo from "@/assets/logo-mark.png";
 import { GeminiIcon } from "@/components/GeminiIcon";
-import { useMode, useProfile, useUnreadCount } from "@/hooks/useSession";
+import { useProfile, useUnreadCount } from "@/hooks/useSession";
 import { SOCIAL_LINKS } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -25,12 +22,6 @@ const USER_NAV = [
   { to: "/settings", label: "Account", icon: User },
 ] as const;
 
-const DEV_NAV = [
-  { to: "/console", label: "Home", icon: LayoutDashboard },
-  { to: "/upload", label: "Upload", icon: Upload },
-  { to: "/console/analytics", label: "Stats", icon: BarChart3 },
-  { to: "/console/assistant", label: "AI", icon: GeminiIcon },
-] as const;
 
 export function AppShell({
   children,
@@ -44,12 +35,11 @@ export function AppShell({
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const { userId, profile } = useProfile();
-  const mode = useMode();
   const unread = useUnreadCount();
   const initial = (profile?.display_name || profile?.developer_name || "U")
     .slice(0, 1)
     .toUpperCase();
-  const nav = mode === "developer" ? DEV_NAV : USER_NAV;
+  // Keep the shopper navigation fixed; developer links must not replace it.
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
@@ -134,7 +124,7 @@ export function AppShell({
         aria-label="Primary navigation"
       >
         <div className="mx-auto flex max-w-5xl items-stretch">
-          {nav.map((item) => {
+          {USER_NAV.map((item) => {
             const Icon = item.icon;
             const active = pathname === item.to;
             return (
