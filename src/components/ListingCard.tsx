@@ -50,7 +50,7 @@ export function ListingTile({ listing }: { listing: Listing }) {
         {listing.rating_count ? (
           <>
             {listing.rating_avg.toFixed(1)}
-            <Star className="h-2.5 w-2.5 fill-brand-gold text-brand-gold" />
+            <Star className="h-2.5 w-2.5 fill-blue-500 text-blue-500" />
           </>
         ) : (
           "New"
@@ -66,7 +66,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
     <Link
       to="/apps/$slug"
       params={{ slug: listing.slug }}
-      className="flex items-center gap-4 rounded-2xl px-1 py-2 transition-colors hover:bg-secondary active:scale-[0.99]"
+      className="flex items-center gap-4 rounded-none border-0 px-1 py-2 shadow-none transition-colors hover:bg-secondary active:scale-[0.99]"
     >
       <AppIcon
         path={listing.icon_url}
@@ -88,7 +88,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
         <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-0.5">
             {listing.rating_count ? listing.rating_avg.toFixed(1) : "New"}
-            <Star className="h-3 w-3 fill-brand-gold text-brand-gold" />
+            <Star className="h-3 w-3 fill-blue-500 text-blue-500" />
           </span>
           <span aria-hidden>·</span>
           <span>
@@ -110,7 +110,7 @@ export function Stars({ value, className }: { value: number; className?: string 
           key={i}
           className={cn(
             "h-4 w-4",
-            i <= Math.round(value) ? "fill-brand-gold text-brand-gold" : "text-border",
+            i <= Math.round(value) ? "fill-blue-500 text-blue-500" : "text-border",
           )}
         />
       ))}
