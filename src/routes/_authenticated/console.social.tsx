@@ -518,11 +518,11 @@ function SocialPage() {
       </Sheet>
 
       <section className="border-y border-border bg-background">
-        <div className="flex items-center gap-2 px-4 py-3 sm:px-5">
+        <div className="flex items-center justify-between gap-2 px-4 py-3 sm:px-5">
+          <h1 className="text-xl font-semibold">Social</h1>
           <button type="button" onClick={() => setSidebarOpen(true)} aria-label="Open sidebar menu" title="Sidebar menu" className="flex h-8 w-8 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:text-foreground">
             <Menu className="h-5 w-5" aria-hidden="true" />
           </button>
-          <h1 className="text-xl font-semibold">Social</h1>
         </div>
         <nav aria-label="Social menu" className="flex w-full items-stretch justify-evenly border-b border-border px-1 sm:px-3">
           {sections.map(({ id, icon: Icon }) => {
