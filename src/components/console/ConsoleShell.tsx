@@ -48,6 +48,7 @@ import { cn } from "@/lib/utils";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   dashboard: LayoutDashboard,
+  social: MessageSquare,
   products: LayoutList,
   publishing: Rocket,
   testing: FlaskConical,
