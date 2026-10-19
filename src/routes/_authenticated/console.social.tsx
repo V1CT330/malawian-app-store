@@ -38,8 +38,9 @@ function SocialPage() {
   const ActiveIcon = active.icon;
 
   return (
-    <ConsoleShell title="Social">
-      <section className="-mt-3 border-y border-border bg-background">
+    <ConsoleShell title="Social" hideTopBar hideTitleCard>
+      <section className="border-y border-border bg-background">
+        <h1 className="px-4 py-3 text-xl font-semibold sm:px-5">Social</h1>
         <nav
           aria-label="Social menu"
           className="flex items-stretch gap-1 overflow-x-auto border-b border-border px-2 sm:px-3"
