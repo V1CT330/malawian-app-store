@@ -518,29 +518,21 @@ function SocialPage() {
       </Sheet>
 
       <section className="border-y border-border bg-background">
-        <h1 className="px-4 py-3 text-xl font-semibold sm:px-5">Social</h1>
+        <div className="flex items-center gap-2 px-4 py-3 sm:px-5">
+          <button type="button" onClick={() => setSidebarOpen(true)} aria-label="Open sidebar menu" title="Sidebar menu" className="flex h-8 w-8 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:text-foreground">
+            <Menu className="h-5 w-5" aria-hidden="true" />
+          </button>
+          <h1 className="text-xl font-semibold">Social</h1>
+        </div>
         <nav aria-label="Social menu" className="flex w-full items-stretch justify-evenly border-b border-border px-1 sm:px-3">
           {sections.map(({ id, icon: Icon }) => {
             const selected = activeSection === id;
-            if (id !== "Search") {
-              return (
-                <button key={id} type="button" onClick={() => setActiveSection(id)} aria-label={id} title={id} aria-current={selected ? "page" : undefined}
-                  className={cn("flex min-w-0 flex-1 items-center justify-center border-b-2 px-2 py-3 transition-colors duration-200 sm:px-5", selected ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:border-border hover:text-foreground")}>
-                  <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
-                  {id === "Notifications" && unreadNotifications > 0 && <span className="ml-1 text-[10px] font-semibold">{unreadNotifications > 9 ? "9+" : unreadNotifications}</span>}
-                </button>
-              );
-            }
             return (
-              <div key={id} className="flex min-w-0 flex-1 flex-col items-stretch">
-                <button type="button" onClick={() => setSidebarOpen(true)} aria-label="Open sidebar menu" title="Sidebar menu" className="flex items-center justify-center px-2 py-2 text-muted-foreground transition-colors hover:text-foreground">
-                  <Menu className="h-5 w-5" aria-hidden="true" />
-                </button>
-                <button type="button" onClick={() => setActiveSection("Search")} aria-label="Search" title="Search" aria-current={selected ? "page" : undefined}
-                  className={cn("flex items-center justify-center border-b-2 px-2 py-3 transition-colors duration-200 sm:px-5", selected ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:border-border hover:text-foreground")}>
-                  <Search className="h-5 w-5 shrink-0" aria-hidden="true" />
-                </button>
-              </div>
+              <button key={id} type="button" onClick={() => setActiveSection(id)} aria-label={id} title={id} aria-current={selected ? "page" : undefined}
+                className={cn("flex min-w-0 flex-1 items-center justify-center border-b-2 px-2 py-3 transition-colors duration-200 sm:px-5", selected ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:border-border hover:text-foreground")}>
+                <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                {id === "Notifications" && unreadNotifications > 0 && <span className="ml-1 text-[10px] font-semibold">{unreadNotifications > 9 ? "9+" : unreadNotifications}</span>}
+              </button>
             );
           })}
         </nav>
