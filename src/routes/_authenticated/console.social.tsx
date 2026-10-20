@@ -510,7 +510,7 @@ function SocialPage() {
   }
 
   return (
-    <ConsoleShell title="Social" hideTopBar hideTitleCard>
+    <ConsoleShell title="Social" hideTopBar hideTitleCard fullWidth>
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
         <SheetContent side="left" className="w-[260px] bg-sidebar p-3">
           <SheetTitle className="mb-4 px-2 font-semibold">MAS menu</SheetTitle>
@@ -530,7 +530,7 @@ function SocialPage() {
         </SheetContent>
       </Sheet>
 
-      <section className="mx-auto min-h-[calc(100vh-4rem)] w-full max-w-6xl border-x border-border/70 bg-muted/30">
+      <section className="min-h-[calc(100vh-4rem)] w-full border-b border-border/70 bg-muted/30">
         <div className="flex items-center justify-between gap-2 border-b border-border/70 bg-background px-4 py-3.5 sm:px-6">
           <div>
              <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">Social</h1>
