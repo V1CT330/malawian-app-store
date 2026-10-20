@@ -5,11 +5,9 @@ import {
   ArrowRight,
   BarChart3,
   CheckCircle2,
-  Eye,
   LayoutList,
   PlusCircle,
   Rocket,
-  Sparkles,
   TrendingUp,
 } from "lucide-react";
 
