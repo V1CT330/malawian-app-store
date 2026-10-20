@@ -298,7 +298,7 @@ export function ConsoleShell({
           </div>
         </header>}
 
-        <main className={cn("w-full flex-1 pb-20", fullWidth ? "max-w-none px-0" : "mx-auto max-w-6xl px-3 sm:px-6", hideTopBar ? "pt-0" : "pt-5")}>
+        <main className={cn("w-full min-w-0 flex-1 pb-20", fullWidth ? "max-w-none overflow-x-clip px-0" : "mx-auto max-w-6xl px-3 sm:px-6", hideTopBar ? "pt-0" : "pt-5")}>
           {breadcrumbs && breadcrumbs.length > 0 && (
             <ol className="mb-3 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
               {breadcrumbs.map((c, i) => (
