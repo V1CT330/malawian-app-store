@@ -193,6 +193,14 @@
   box-shadow: var(--shadow-card);
 }
 
+/* Developer console uses a flat, square-edged workspace throughout. */
+.console-square [class*="rounded-"],
+.console-square .surface-card,
+.console-square .console-hero,
+.console-square .inset-tile {
+  border-radius: 0 !important;
+}
+
 /* Console hero / banner surface: soft brand wash behind the page intro. */
 @utility console-hero {
   position: relative;
