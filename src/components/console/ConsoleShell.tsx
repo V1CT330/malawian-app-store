@@ -155,7 +155,7 @@ export function ConsoleShell({
   }
 
   return (
-    <div className="flex min-h-screen bg-muted/40">
+    <div className="console-square flex min-h-screen bg-muted/40">
       <aside className="sticky top-0 hidden h-screen w-[264px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar px-4 py-5 lg:flex">
         <Link to="/console" className="mb-6 flex items-center gap-2.5 rounded-2xl px-2 py-1.5">
           <img src={logo} alt="" width={32} height={32} className="h-8 w-8" />
