@@ -6,6 +6,7 @@ import {
   BadgeCheck,
   Check,
   ExternalLink,
+  Globe,
   Heart,
   Home,
   ImagePlus,
@@ -15,6 +16,7 @@ import {
   MessageCircle,
   MoreHorizontal,
   Package,
+  Plus,
   Search,
   Send,
   UserCircle,
@@ -119,6 +121,11 @@ function SocialPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRecipient, setSelectedRecipient] = useState<string | null>(null);
   const [messageDraft, setMessageDraft] = useState("");
+  const [projectTitle, setProjectTitle] = useState("");
+  const [projectUrl, setProjectUrl] = useState("");
+  const [projectType, setProjectType] = useState<"app" | "website" | "game" | "tool" | "other">("website");
+  const [projectDescription, setProjectDescription] = useState("");
+  const [projectImageUrl, setProjectImageUrl] = useState("");
 
   const profilesQuery = useQuery({
     queryKey: ["social", "profiles"],
@@ -148,6 +155,24 @@ function SocialPage() {
         .limit(12);
       if (error) throw error;
       return data ?? [];
+    },
+  });
+
+  const externalProjectsQuery = useQuery({
+    queryKey: ["developer-portfolio-projects", userId],
+    enabled: Boolean(userId && profile?.is_developer),
+    queryFn: async () => {
+      const { data, error } = await socialDb
+        .from("developer_portfolio_projects")
+        .select("id,developer_id,title,description,project_type,url,image_url,created_at")
+        .eq("developer_id", userId!)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as {
+        id: string; developer_id: string; title: string; description: string | null;
+        project_type: "app" | "website" | "game" | "tool" | "other";
+        url: string; image_url: string | null; created_at: string;
+      }[];
     },
   });
 
@@ -281,6 +306,50 @@ function SocialPage() {
       queryKeys.map((queryKey) => queryClient.invalidateQueries({ queryKey })),
     );
   };
+
+  const addExternalProject = useMutation({
+    mutationFn: async () => {
+      const title = projectTitle.trim();
+      if (!title) throw new Error("Enter a project name");
+      if (title.length > 100) throw new Error("Project names must be 100 characters or fewer");
+      if (projectDescription.trim().length > 500) throw new Error("Descriptions must be 500 characters or fewer");
+      const validateUrl = (value: string, label: string) => {
+        if (!value.trim()) return null;
+        let parsed: URL;
+        try { parsed = new URL(value.trim()); } catch { throw new Error(label + " must be a valid HTTPS URL"); }
+        if (parsed.protocol !== "https:") throw new Error(label + " must use HTTPS");
+        return parsed.toString();
+      };
+      const safeUrl = validateUrl(projectUrl, "Project link");
+      if (!safeUrl) throw new Error("Enter the project's public URL");
+      const safeImageUrl = validateUrl(projectImageUrl, "Image link");
+      const { error } = await socialDb.from("developer_portfolio_projects").insert({
+        developer_id: userId, title, description: projectDescription.trim() || null,
+        project_type: projectType, url: safeUrl, image_url: safeImageUrl,
+      });
+      if (error) throw error;
+    },
+    onSuccess: async () => {
+      setProjectTitle(""); setProjectUrl(""); setProjectType("website");
+      setProjectDescription(""); setProjectImageUrl("");
+      await queryClient.invalidateQueries({ queryKey: ["developer-portfolio-projects", userId] });
+      toast.success("Project added to your portfolio");
+    },
+    onError: (error: Error) => toast.error(error.message || "Could not add project"),
+  });
+
+  const removeExternalProject = useMutation({
+    mutationFn: async (projectId: string) => {
+      const { error } = await socialDb.from("developer_portfolio_projects")
+        .delete().eq("id", projectId).eq("developer_id", userId);
+      if (error) throw error;
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["developer-portfolio-projects", userId] });
+      toast.success("Project removed from your portfolio");
+    },
+    onError: (error: Error) => toast.error(error.message || "Could not remove project"),
+  });
 
   const createPost = useMutation({
     mutationFn: async ({ body, file }: { body: string; file: File | null }) => {
@@ -786,6 +855,36 @@ function SocialPage() {
                   ) : (
                     <div className="px-4 py-6 text-sm text-muted-foreground">No published listings yet. Your published apps and websites will appear here.</div>
                   )}
+                </section>
+              )}
+
+              {profile?.is_developer && (
+                <section className="border-y border-border bg-background sm:border-x">
+                  <div className="border-b border-border px-4 py-3 sm:px-6">
+                    <h3 className="font-semibold">Featured projects</h3>
+                    <p className="mt-0.5 text-xs text-muted-foreground">Showcase apps and websites published outside MAS. Your MAS listings appear automatically above.</p>
+                  </div>
+                  <form onSubmit={(event) => { event.preventDefault(); addExternalProject.mutate(); }} className="grid gap-3 border-b border-border px-4 py-4 sm:px-6">
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div className="grid gap-1.5"><label htmlFor="portfolio-project-title" className="text-xs font-medium">Project name *</label><input id="portfolio-project-title" value={projectTitle} onChange={(event) => setProjectTitle(event.target.value)} maxLength={100} required placeholder="e.g. My business website" className="min-w-0 rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary" /></div>
+                      <div className="grid gap-1.5"><label htmlFor="portfolio-project-type" className="text-xs font-medium">Project type</label><select id="portfolio-project-type" value={projectType} onChange={(event) => setProjectType(event.target.value as typeof projectType)} className="min-w-0 rounded-md border border-border bg-background px-3 py-2 text-sm"><option value="app">App</option><option value="website">Website</option><option value="game">Game</option><option value="tool">Tool</option><option value="other">Other</option></select></div>
+                    </div>
+                    <div className="grid gap-1.5"><label htmlFor="portfolio-project-url" className="text-xs font-medium">Public project URL (HTTPS) *</label><input id="portfolio-project-url" type="url" value={projectUrl} onChange={(event) => setProjectUrl(event.target.value)} required placeholder="https://example.com" className="min-w-0 rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary" /></div>
+                    <div className="grid gap-1.5"><label htmlFor="portfolio-project-image" className="text-xs font-medium">Preview image URL (optional, HTTPS)</label><input id="portfolio-project-image" type="url" value={projectImageUrl} onChange={(event) => setProjectImageUrl(event.target.value)} placeholder="https://example.com/preview.png" className="min-w-0 rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary" /></div>
+                    <div className="grid gap-1.5"><label htmlFor="portfolio-project-description" className="text-xs font-medium">Short description</label><textarea id="portfolio-project-description" value={projectDescription} onChange={(event) => setProjectDescription(event.target.value)} maxLength={500} rows={2} placeholder="What does this project do?" className="min-w-0 resize-y rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary" /></div>
+                    <div><button type="submit" disabled={addExternalProject.isPending || !projectTitle.trim() || !projectUrl.trim()} className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"><Plus className="h-4 w-4" />{addExternalProject.isPending ? "Adding…" : "Add project"}</button></div>
+                  </form>
+                  {externalProjectsQuery.isLoading ? <p className="px-4 py-5 text-sm text-muted-foreground">Loading featured projects…</p> : externalProjectsQuery.isError ? <p role="alert" className="px-4 py-5 text-sm text-destructive">Could not load featured projects. The portfolio database migration may not have been applied yet.</p> : externalProjectsQuery.data?.length ? (
+                    <div className="grid gap-3 p-4 sm:grid-cols-2 sm:p-6">
+                      {externalProjectsQuery.data.map((project) => <article key={project.id} className="min-w-0 overflow-hidden border border-border">
+                        {project.image_url ? <img src={project.image_url} alt="" loading="lazy" className="h-36 w-full object-cover" /> : <div className="flex h-24 items-center justify-center bg-muted"><Globe className="h-7 w-7 text-muted-foreground" /></div>}
+                        <div className="p-3"><div className="flex items-start justify-between gap-2"><div className="min-w-0"><p className="break-words text-sm font-semibold">{project.title}</p><p className="mt-1 text-xs capitalize text-muted-foreground">{project.project_type}</p></div><button type="button" onClick={() => { if (window.confirm("Remove this project from your portfolio?")) removeExternalProject.mutate(project.id); }} disabled={removeExternalProject.isPending} aria-label={"Remove " + project.title} className="shrink-0 p-1 text-muted-foreground hover:text-destructive"><Trash2 className="h-4 w-4" /></button></div>
+                          {project.description && <p className="mt-2 break-words text-sm text-muted-foreground">{project.description}</p>}
+                          <a href={project.url} target="_blank" rel="noreferrer noopener" className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">Open project <ExternalLink className="h-3 w-3" /></a>
+                        </div>
+                      </article>)}
+                    </div>
+                  ) : <p className="px-4 py-5 text-sm text-muted-foreground">No external projects added yet. Add a website or app published on another platform.</p>}
                 </section>
               )}
 
