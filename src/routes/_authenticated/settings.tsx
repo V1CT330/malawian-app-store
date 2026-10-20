@@ -5,6 +5,7 @@ import {
   ChevronRight,
   LogOut,
   Moon,
+  Palette,
   Store,
 } from "lucide-react";
 import { useRef, useState } from "react";
@@ -17,7 +18,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useMode, useProfile, useSignedUrl } from "@/hooks/useSession";
-import { useTheme } from "@/hooks/useTheme";
+import { ACCENT_PRESETS, useTheme } from "@/hooks/useTheme";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMwk, uploadAsset } from "@/lib/store";
 import { PRO_NAME, PRO_PRICE_MWK } from "@/lib/pro";
@@ -44,7 +45,7 @@ function SettingsPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const mode = useMode();
-  const { dark, setTheme } = useTheme();
+  const { dark, setTheme, accent, setAccent } = useTheme();
   const avatar = useSignedUrl(profile?.avatar_url);
   const avatarInput = useRef<HTMLInputElement>(null);
   const [termsOpen, setTermsOpen] = useState(false);
