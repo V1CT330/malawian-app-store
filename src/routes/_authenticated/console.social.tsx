@@ -223,15 +223,10 @@ function SocialPage() {
     () => new Map((profilesQuery.data ?? []).map((item) => [item.id, item])),
     [profilesQuery.data],
   );
-  const invalidateSocial = async (...keys: (string | undefined)[][]) => {
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ["social", "posts"] }),
-      queryClient.invalidateQueries({ queryKey: ["social", "connections", userId] }),
-      queryClient.invalidateQueries({ queryKey: ["social", "reactions"] }),
-      queryClient.invalidateQueries({ queryKey: ["social", "comments"] }),
-      queryClient.invalidateQueries({ queryKey: ["social", "messages", userId] }),
-      ...keys.map((queryKey) => queryClient.invalidateQueries({ queryKey })),
-    ]);
+  const invalidateSocial = async (...queryKeys: (string | undefined)[][]) => {
+    await Promise.all(
+      queryKeys.map((queryKey) => queryClient.invalidateQueries({ queryKey })),
+    );
   };
 
   const createPost = useMutation({
@@ -265,7 +260,7 @@ function SocialPage() {
     onSuccess: async () => {
       setPostDraft("");
       setPostMedia(null);
-      await invalidateSocial();
+      await invalidateSocial(["social", "posts"], ["social", "reactions"], ["social", "comments"]);
       toast.success("Post shared");
     },
     onError: (error: Error) => toast.error(error.message || "Could not publish your post"),
@@ -287,7 +282,7 @@ function SocialPage() {
       }
     },
     onSuccess: async () => {
-      await invalidateSocial();
+      await invalidateSocial(["social", "posts"], ["social", "reactions"], ["social", "comments"]);
       toast.success("Post deleted");
     },
     onError: (error: Error) => toast.error(error.message || "Could not delete post"),
@@ -307,7 +302,7 @@ function SocialPage() {
         if (error) throw error;
       }
     },
-    onSuccess: () => invalidateSocial(),
+    onSuccess: () => invalidateSocial(["social", "reactions"]),
     onError: (error: Error) => toast.error(error.message || "Could not update reaction"),
   });
 
@@ -337,7 +332,7 @@ function SocialPage() {
         .insert({ requester_id: userId, recipient_id: recipientId, status: "pending" });
       if (error) throw error;
     },
-    onSuccess: () => invalidateSocial(),
+    onSuccess: () => invalidateSocial(["social", "connections", userId]),
     onError: (error: Error) => toast.error(error.message.includes("duplicate") ? "A connection request already exists" : error.message),
   });
 
@@ -346,7 +341,7 @@ function SocialPage() {
       const { error } = await socialDb.from("social_connections").update({ status }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => invalidateSocial(),
+    onSuccess: () => invalidateSocial(["social", "connections", userId]),
     onError: (error: Error) => toast.error(error.message || "Could not update request"),
   });
 
