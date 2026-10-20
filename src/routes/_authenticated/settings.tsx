@@ -49,7 +49,6 @@ function SettingsPage() {
   const avatarInput = useRef<HTMLInputElement>(null);
   const [termsOpen, setTermsOpen] = useState(false);
   const [displayName, setDisplayName] = useState<string | null>(null);
-  const [developerName, setDeveloperName] = useState<string | null>(null);
   const [bio, setBio] = useState<string | null>(null);
 
   const account = useQuery({
@@ -90,7 +89,7 @@ function SettingsPage() {
     mutationFn: async () => {
       if (!userId) throw new Error("Sign in required");
       const nextDisplayName = (displayName ?? profile?.display_name ?? "").trim();
-      const nextDeveloperName = (developerName ?? profile?.developer_name ?? "").trim();
+      const nextDeveloperName = (profile?.developer_name ?? "").trim();
       const nextBio = (bio ?? profile?.bio ?? "").trim();
       if (nextDisplayName.length > 80) throw new Error("Display name must be 80 characters or fewer");
       if (nextDeveloperName.length > 100) throw new Error("Developer name must be 100 characters or fewer");
