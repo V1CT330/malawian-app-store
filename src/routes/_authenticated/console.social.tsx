@@ -3,7 +3,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Bell,
+  BadgeCheck,
   Check,
+  ExternalLink,
   Heart,
   Home,
   ImagePlus,
@@ -12,8 +14,10 @@ import {
   Menu,
   MessageCircle,
   MoreHorizontal,
+  Package,
   Search,
   Send,
+  UserCircle,
   UserPlus,
   Users,
   X,
@@ -42,6 +46,7 @@ const sections = [
   { id: "Messages", icon: MessageCircle, description: "Private conversations with other MAS members." },
   { id: "Notifications", icon: Bell, description: "Your account and social activity." },
   { id: "Search", icon: Search, description: "Find members across MAS." },
+  { id: "My Profile", icon: UserCircle, description: "Your profile, posts, and published work." },
 ] as const;
 
 type SectionId = (typeof sections)[number]["id"];
@@ -127,6 +132,22 @@ function SocialPage() {
         .limit(100);
       if (error) throw error;
       return (data ?? []) as SocialProfile[];
+    },
+  });
+
+  const myListingsQuery = useQuery({
+    queryKey: ["social", "my-published-listings", userId],
+    enabled: Boolean(userId && profile?.is_developer),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("listings")
+        .select("id,slug,name,tagline,kind,icon_url,downloads,rating_avg,rating_count")
+        .eq("developer_id", userId!)
+        .eq("status", "published")
+        .order("updated_at", { ascending: false })
+        .limit(12);
+      if (error) throw error;
+      return data ?? [];
     },
   });
 
@@ -662,6 +683,99 @@ function SocialPage() {
                   </article>
                 );
               })}
+            </div>
+          ) : activeSection === "My Profile" ? (
+            <div className="mx-auto w-full max-w-3xl space-y-3 px-0 pb-8 pt-3 sm:px-4">
+              <section className="border-y border-border bg-background sm:border-x">
+                <div className="h-24 bg-gradient-to-r from-primary/20 via-primary/10 to-muted sm:h-32" aria-hidden="true" />
+                <div className="px-4 pb-5 sm:px-6">
+                  <div className="-mt-10 flex items-end justify-between gap-3">
+                    <div className="rounded-full border-4 border-background bg-background">
+                      <Avatar profile={profile as SocialProfile | null} size="md" />
+                    </div>
+                    <Link to="/console/settings" className="mb-1 inline-flex items-center gap-2 border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary">
+                      Edit profile
+                    </Link>
+                  </div>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <h2 className="text-xl font-semibold tracking-tight">{profile?.developer_name || profile?.display_name || "Your profile"}</h2>
+                    {profile?.kyc_status === "approved" && <BadgeCheck className="h-5 w-5 text-primary" aria-label="Verified developer" />}
+                    {profile?.is_developer && <span className="border border-primary/30 px-2 py-0.5 text-xs font-medium text-primary">Developer</span>}
+                  </div>
+                  {profile?.developer_name && profile?.display_name && profile.developer_name !== profile.display_name && (
+                    <p className="mt-1 text-sm text-muted-foreground">{profile.display_name}</p>
+                  )}
+                  <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-6 text-muted-foreground">
+                    {profile?.bio || "Add a short bio to introduce yourself to the MAS community."}
+                  </p>
+                  <div className="mt-4 grid grid-cols-3 border-y border-border py-3 text-center">
+                    <div><p className="text-lg font-semibold">{(postsQuery.data ?? []).filter((post) => post.author_id === userId).length}</p><p className="text-xs text-muted-foreground">Posts</p></div>
+                    <div><p className="text-lg font-semibold">{acceptedIds.size}</p><p className="text-xs text-muted-foreground">Friends</p></div>
+                    <div><p className="text-lg font-semibold">{myListingsQuery.data?.length ?? 0}</p><p className="text-xs text-muted-foreground">Published listings</p></div>
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+                    {[
+                      ["Website", profile?.website_url],
+                      ["Instagram", profile?.instagram_url],
+                      ["Facebook", profile?.facebook_url],
+                      ["X", profile?.x_url],
+                      ["LinkedIn", profile?.linkedin_url],
+                      ["YouTube", profile?.youtube_url],
+                      ["WhatsApp", profile?.whatsapp_url],
+                    ].filter((item): item is [string, string] => Boolean(item[1]))
+                      .map(([label, url]) => (
+                        <a key={label} href={url} target="_blank" rel="noreferrer noopener" className="inline-flex items-center gap-1 text-primary hover:underline">
+                          {label}<ExternalLink className="h-3 w-3" />
+                        </a>
+                      ))}
+                  </div>
+                  {profile?.is_developer && (
+                    <a href={`/developers/${userId}`} className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline">
+                      View public developer page <ExternalLink className="h-4 w-4" />
+                    </a>
+                  )}
+                </div>
+              </section>
+
+              {profile?.is_developer && (
+                <section className="border-y border-border bg-background sm:border-x">
+                  <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-6">
+                    <div><h3 className="font-semibold">Your published apps & websites</h3><p className="mt-0.5 text-xs text-muted-foreground">Your work available in the MAS store.</p></div>
+                    <Link to="/console/store" className="text-sm font-medium text-primary hover:underline">Manage</Link>
+                  </div>
+                  {myListingsQuery.isLoading ? <p className="px-4 py-5 text-sm text-muted-foreground">Loading published listings…</p> : myListingsQuery.isError ? (
+                    <p role="alert" className="px-4 py-5 text-sm text-destructive">Could not load your published listings.</p>
+                  ) : myListingsQuery.data?.length ? (
+                    <div>{myListingsQuery.data.map((listing) => (
+                      <a key={listing.id} href={`/store/${listing.slug}`} className="flex items-center gap-3 border-b border-border px-4 py-3 last:border-b-0 hover:bg-muted/40">
+                        {listing.icon_url ? <img src={listing.icon_url} alt="" loading="lazy" className="h-11 w-11 shrink-0 object-cover" /> : <span className="flex h-11 w-11 shrink-0 items-center justify-center bg-secondary"><Package className="h-5 w-5" /></span>}
+                        <span className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold">{listing.name}</span><span className="mt-0.5 block truncate text-xs text-muted-foreground">{listing.tagline || (listing.kind === "app" ? "App" : "Website")}</span></span>
+                        <span className="shrink-0 text-right text-xs text-muted-foreground">{listing.downloads ?? 0} downloads</span>
+                      </a>
+                    ))}</div>
+                  ) : (
+                    <div className="px-4 py-6 text-sm text-muted-foreground">No published listings yet. Your published apps and websites will appear here.</div>
+                  )}
+                </section>
+              )}
+
+              <section className="border-y border-border bg-background sm:border-x">
+                <div className="border-b border-border px-4 py-3 sm:px-6"><h3 className="font-semibold">Your recent posts</h3><p className="mt-0.5 text-xs text-muted-foreground">Updates you have shared with the community.</p></div>
+                {postsQuery.isLoading ? <p className="px-4 py-5 text-sm text-muted-foreground">Loading your posts…</p> : postsQuery.isError ? (
+                  <p role="alert" className="px-4 py-5 text-sm text-destructive">Could not load your posts.</p>
+                ) : (postsQuery.data ?? []).filter((post) => post.author_id === userId).length ? (
+                  (postsQuery.data ?? []).filter((post) => post.author_id === userId).slice(0, 10).map((post) => (
+                    <article key={post.id} className="border-b border-border px-4 py-4 last:border-b-0">
+                      <time className="text-xs text-muted-foreground" dateTime={post.created_at}>{new Date(post.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</time>
+                      <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6">{post.body}</p>
+                      {post.media_url && post.media_type === "image" && <img src={post.media_url} alt="Your post attachment" loading="lazy" className="mt-3 max-h-72 max-w-full object-contain" />}
+                      {post.media_url && post.media_type === "video" && <video src={post.media_url} controls preload="metadata" className="mt-3 max-h-72 max-w-full" aria-label="Your post video" />}
+                    </article>
+                  ))
+                ) : (
+                  <div className="px-4 py-7 text-center"><p className="text-sm font-medium">No posts yet</p><p className="mt-1 text-sm text-muted-foreground">Share an update from the Feed tab to get started.</p><button type="button" onClick={() => setActiveSection("Feed")} className="mt-3 border border-border px-3 py-2 text-sm hover:bg-secondary">Create a post</button></div>
+                )}
+              </section>
             </div>
           ) : activeSection === "Friends" ? (
             <div className="mx-auto w-full max-w-2xl pb-6 pt-3">
