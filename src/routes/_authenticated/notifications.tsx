@@ -45,9 +45,11 @@ function NotificationsPage() {
     },
   });
 
-  const refresh = () => {
-    queryClient.invalidateQueries({ queryKey: ["notifications", userId] });
-    queryClient.invalidateQueries({ queryKey: ["unread", userId] });
+  const refresh = async () => {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["notifications", userId] }),
+      queryClient.invalidateQueries({ queryKey: ["unread", userId] }),
+    ]);
   };
 
   const markAll = useMutation({
@@ -65,7 +67,11 @@ function NotificationsPage() {
 
   const dismiss = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("notifications").delete().eq("id", id);
+      const { error } = await supabase
+        .from("notifications")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", userId!);
       if (error) throw error;
     },
     onSuccess: refresh,
@@ -76,14 +82,27 @@ function NotificationsPage() {
     <AppShell>
       <div className="flex items-center justify-between">
         <h1 className="font-display text-2xl font-bold">Notifications</h1>
-        <Button size="sm" variant="outline" onClick={() => markAll.mutate()}>
-          <CheckCheck className="mr-1.5 h-4 w-4" /> Mark all read
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={markAll.isPending || !(list.data ?? []).some((notification) => !notification.read)}
+          onClick={() => markAll.mutate()}
+        >
+          <CheckCheck className="mr-1.5 h-4 w-4" />
+          {markAll.isPending ? "Marking…" : "Mark all read"}
         </Button>
       </div>
 
       <div className="mt-4 space-y-3">
         {list.isLoading ? (
           <Skeleton className="h-16 w-full rounded-2xl" />
+        ) : list.isError ? (
+          <div role="alert" className="surface-card flex flex-col items-start gap-3 p-4 text-sm">
+            <p className="text-destructive">Could not load notifications.</p>
+            <Button size="sm" variant="outline" disabled={list.isFetching} onClick={() => void list.refetch()}>
+              {list.isFetching ? "Retrying…" : "Try again"}
+            </Button>
+          </div>
         ) : list.data?.length ? (
           list.data.map((n) => (
             <article key={n.id} className="surface-card flex items-start gap-3 p-4">
@@ -95,8 +114,13 @@ function NotificationsPage() {
                   {!n.read && " · new"}
                 </p>
               </div>
-              <Button size="sm" variant="ghost" onClick={() => dismiss.mutate(n.id)}>
-                Dismiss
+              <Button
+                size="sm"
+                variant="ghost"
+                disabled={dismiss.isPending}
+                onClick={() => dismiss.mutate(n.id)}
+              >
+                {dismiss.isPending ? "Dismissing…" : "Dismiss"}
               </Button>
             </article>
           ))
