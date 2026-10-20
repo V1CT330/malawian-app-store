@@ -151,6 +151,22 @@ function SocialPage() {
     },
   });
 
+  const myPostsQuery = useQuery({
+    queryKey: ["social", "my-posts", userId],
+    enabled: Boolean(userId),
+    refetchInterval: 45_000,
+    queryFn: async () => {
+      const { data, error, count } = await socialDb
+        .from("social_posts")
+        .select("id, author_id, body, created_at, media_url, media_type", { count: "exact" })
+        .eq("author_id", userId!)
+        .order("created_at", { ascending: false })
+        .limit(10);
+      if (error) throw error;
+      return { posts: (data ?? []) as SocialPost[], count: count ?? 0 };
+    },
+  });
+
   const postsQuery = useQuery({
     queryKey: ["social", "posts"],
     enabled: Boolean(userId),
@@ -689,13 +705,25 @@ function SocialPage() {
               <section className="border-y border-border bg-background sm:border-x">
                 <div className="h-24 bg-gradient-to-r from-primary/20 via-primary/10 to-muted sm:h-32" aria-hidden="true" />
                 <div className="px-4 pb-5 sm:px-6">
-                  <div className="-mt-10 flex items-end justify-between gap-3">
-                    <div className="rounded-full border-4 border-background bg-background">
-                      <Avatar profile={profile as SocialProfile | null} size="md" />
+                  <div className="-mt-12 flex items-end justify-between gap-3 sm:-mt-14">
+                    <div className="h-24 w-24 overflow-hidden rounded-full border-4 border-background bg-secondary sm:h-28 sm:w-28">
+                      {profile?.avatar_url ? <img src={profile.avatar_url} alt="Your profile" className="h-full w-full object-cover" /> : <span className="flex h-full w-full items-center justify-center text-3xl font-semibold">{(profile?.developer_name || profile?.display_name || "M").slice(0, 1).toUpperCase()}</span>}
                     </div>
-                    <Link to="/console/settings" className="mb-1 inline-flex items-center gap-2 border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary">
-                      Edit profile
-                    </Link>
+                    <div className="mb-1 flex flex-wrap items-center gap-2">
+                      {profile?.is_developer && <button type="button" onClick={() => {
+                        const url = window.location.origin + `/developers/${userId}`;
+                        if (navigator.share) {
+                          void navigator.share({ title: "My Malawian App Store profile", url }).catch(() => undefined);
+                        } else {
+                          void navigator.clipboard.writeText(url).then(() => toast.success("Profile link copied")).catch(() => toast.error("Could not copy profile link"));
+                        }
+                      }} className="inline-flex items-center gap-2 border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary">
+                        <Share2 className="h-4 w-4" /> Share
+                      </button>}
+                      <Link to="/settings" className="inline-flex items-center gap-2 border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary">
+                        Edit profile
+                      </Link>
+                    </div>
                   </div>
                   <div className="mt-3 flex flex-wrap items-center gap-2">
                     <h2 className="text-xl font-semibold tracking-tight">{profile?.developer_name || profile?.display_name || "Your profile"}</h2>
@@ -709,13 +737,15 @@ function SocialPage() {
                     {profile?.bio || "Add a short bio to introduce yourself to the MAS community."}
                   </p>
                   <div className="mt-4 grid grid-cols-3 border-y border-border py-3 text-center">
-                    <div><p className="text-lg font-semibold">{(postsQuery.data ?? []).filter((post) => post.author_id === userId).length}</p><p className="text-xs text-muted-foreground">Posts</p></div>
+                    <div><p className="text-lg font-semibold">{myPostsQuery.data?.count ?? 0}</p><p className="text-xs text-muted-foreground">Posts</p></div>
                     <div><p className="text-lg font-semibold">{acceptedIds.size}</p><p className="text-xs text-muted-foreground">Friends</p></div>
                     <div><p className="text-lg font-semibold">{myListingsQuery.data?.length ?? 0}</p><p className="text-xs text-muted-foreground">Published listings</p></div>
                   </div>
                   <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm">
                     {[
                       ["Website", profile?.website_url],
+                      ["Portfolio", profile?.portfolio_url],
+                      ["GitHub", profile?.github_url],
                       ["Instagram", profile?.instagram_url],
                       ["Facebook", profile?.facebook_url],
                       ["X", profile?.x_url],
@@ -747,7 +777,7 @@ function SocialPage() {
                     <p role="alert" className="px-4 py-5 text-sm text-destructive">Could not load your published listings.</p>
                   ) : myListingsQuery.data?.length ? (
                     <div>{myListingsQuery.data.map((listing) => (
-                      <a key={listing.id} href={`/store/${listing.slug}`} className="flex items-center gap-3 border-b border-border px-4 py-3 last:border-b-0 hover:bg-muted/40">
+                      <a key={listing.id} href={`/apps/${listing.slug}`} className="flex items-center gap-3 border-b border-border px-4 py-3 last:border-b-0 hover:bg-muted/40">
                         {listing.icon_url ? <img src={listing.icon_url} alt="" loading="lazy" className="h-11 w-11 shrink-0 object-cover" /> : <span className="flex h-11 w-11 shrink-0 items-center justify-center bg-secondary"><Package className="h-5 w-5" /></span>}
                         <span className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold">{listing.name}</span><span className="mt-0.5 block truncate text-xs text-muted-foreground">{listing.tagline || (listing.kind === "app" ? "App" : "Website")}</span></span>
                         <span className="shrink-0 text-right text-xs text-muted-foreground">{listing.downloads ?? 0} downloads</span>
@@ -761,10 +791,10 @@ function SocialPage() {
 
               <section className="border-y border-border bg-background sm:border-x">
                 <div className="border-b border-border px-4 py-3 sm:px-6"><h3 className="font-semibold">Your recent posts</h3><p className="mt-0.5 text-xs text-muted-foreground">Updates you have shared with the community.</p></div>
-                {postsQuery.isLoading ? <p className="px-4 py-5 text-sm text-muted-foreground">Loading your posts…</p> : postsQuery.isError ? (
+                {myPostsQuery.isLoading ? <p className="px-4 py-5 text-sm text-muted-foreground">Loading your posts…</p> : myPostsQuery.isError ? (
                   <p role="alert" className="px-4 py-5 text-sm text-destructive">Could not load your posts.</p>
-                ) : (postsQuery.data ?? []).filter((post) => post.author_id === userId).length ? (
-                  (postsQuery.data ?? []).filter((post) => post.author_id === userId).slice(0, 10).map((post) => (
+                ) : myPostsQuery.data?.posts.length ? (
+                  myPostsQuery.data.posts.map((post) => (
                     <article key={post.id} className="border-b border-border px-4 py-4 last:border-b-0">
                       <time className="text-xs text-muted-foreground" dateTime={post.created_at}>{new Date(post.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</time>
                       <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6">{post.body}</p>
