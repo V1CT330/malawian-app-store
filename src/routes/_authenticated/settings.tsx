@@ -78,8 +78,12 @@ function SettingsPage() {
   });
 
   const refresh = async () => {
-    await queryClient.invalidateQueries({ queryKey: ["profile", userId] });
-    await queryClient.invalidateQueries({ queryKey: ["account-auth-details", userId] });
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["profile", userId] }),
+      queryClient.invalidateQueries({ queryKey: ["account-auth-details", userId] }),
+      queryClient.invalidateQueries({ queryKey: ["social", "profiles"] }),
+      queryClient.invalidateQueries({ queryKey: ["developer", userId] }),
+    ]);
   };
 
   const saveProfile = useMutation({
