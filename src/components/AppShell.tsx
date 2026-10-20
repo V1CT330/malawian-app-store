@@ -36,6 +36,7 @@ export function AppShell({
   const navigate = useNavigate();
   const { userId, profile } = useProfile();
   const unread = useUnreadCount();
+  const isSettingsPage = pathname === "/settings";
   const initial = (profile?.display_name || profile?.developer_name || "U")
     .slice(0, 1)
     .toUpperCase();
@@ -48,7 +49,7 @@ export function AppShell({
         style={{ paddingTop: "calc(0.75rem + env(safe-area-inset-top))" }}
       >
         <div className="mx-auto w-full max-w-5xl">
-          <div className="flex items-center gap-3 rounded-full bg-secondary px-3 py-2 shadow-soft">
+          <div className={cn("flex items-center gap-3", isSettingsPage ? "justify-between py-1" : "rounded-full bg-secondary px-3 py-2 shadow-soft")}>
             <Link to="/" aria-label="Malawian App Store home" className="shrink-0">
               <img
                 src={logo}
@@ -58,25 +59,29 @@ export function AppShell({
                 className="h-7 w-7"
               />
             </Link>
-            <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
-            <input
-              type="search"
-              value={search ?? ""}
-              maxLength={120}
-              autoComplete="off"
-              enterKeyHint="search"
-              onChange={(e) =>
-                onSearchChange
-                  ? onSearchChange(e.target.value)
-                  : navigate({ to: "/", search: { q: e.target.value } })
-              }
-              onFocus={() => {
-                if (!onSearchChange) navigate({ to: "/", search: { q: "" } });
-              }}
-              placeholder="Search apps & websites"
-              aria-label="Search apps and websites"
-              className="min-w-0 min-h-10 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground sm:text-sm"
-            />
+            {!isSettingsPage && (
+              <>
+                <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <input
+                  type="search"
+                  value={search ?? ""}
+                  maxLength={120}
+                  autoComplete="off"
+                  enterKeyHint="search"
+                  onChange={(e) =>
+                    onSearchChange
+                      ? onSearchChange(e.target.value)
+                      : navigate({ to: "/", search: { q: e.target.value } })
+                  }
+                  onFocus={() => {
+                    if (!onSearchChange) navigate({ to: "/", search: { q: "" } });
+                  }}
+                  placeholder="Search apps & websites"
+                  aria-label="Search apps and websites"
+                  className="min-w-0 min-h-10 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground sm:text-sm"
+                />
+              </>
+            )}
             <Link
               to={userId ? "/settings" : "/auth"}
               aria-label="Account"
