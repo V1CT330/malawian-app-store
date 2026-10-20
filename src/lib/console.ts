@@ -92,7 +92,7 @@ export function canSubmit(l: Partial<PortalListing> | null) {
 }
 
 export const STATUS_HELP: Record<string, string> = {
-  draft: "Only you can see this. Complete the checklist, then submit it for review.",
+  draft: "Only you can see this. Complete the checklist and KYC, then run automated publishing checks. Eligible websites can go live automatically; downloadable packages require security review.",
   pending:
     "The store review team is checking this product. You cannot edit the status while it is in review.",
   published: "Live in the store and visible to everyone.",

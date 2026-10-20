@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ExternalLink, Send, Star, Undo2 } from "lucide-react";
+import { ExternalLink, ShieldCheck, Star, Undo2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -15,7 +15,6 @@ import { useProfile } from "@/hooks/useSession";
 import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  canSubmit,
   metricLabel,
   readinessScore,
   STATUS_HELP,
@@ -97,6 +96,33 @@ function ProductDetailPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const autoPublish = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.rpc("attempt_auto_publish", { _listing_id: id });
+      if (error) throw error;
+      return data as unknown as {
+        ok: boolean;
+        status: string;
+        auto_published: boolean;
+        review_required: boolean;
+        reasons: string[];
+        message: string;
+      };
+    },
+    onSuccess: (result) => {
+      invalidate();
+      void queryClient.invalidateQueries({ queryKey: ["listings", "published"] });
+      if (result.auto_published || result.review_required) {
+        toast.success(result.message);
+      } else if (result.reasons?.length) {
+        toast.error(result.reasons.join(" "));
+      } else {
+        toast.info(result.message);
+      }
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   if (listingQuery.isLoading) {
     return (
       <ConsoleShell title="Loading product">
@@ -140,23 +166,23 @@ function ProductDetailPage() {
               </Link>
             </Button>
           )}
-          {listing.status === "draft" && (
+          {(listing.status === "draft" || listing.status === "rejected") && (
             <Button
               size="sm"
-              disabled={!canSubmit(listing) || setStatus.isPending}
-              onClick={() => setStatus.mutate("pending")}
+              disabled={autoPublish.isPending}
+              onClick={() => autoPublish.mutate()}
             >
-              <Send className="mr-2 h-4 w-4" /> Submit for review
+              <ShieldCheck className="mr-2 h-4 w-4" />
+              {autoPublish.isPending
+                ? "Running checks…"
+                : listing.status === "rejected"
+                  ? "Run checks again"
+                  : "Run checks & publish"}
             </Button>
           )}
           {listing.status === "pending" && (
             <Button size="sm" variant="outline" onClick={() => setStatus.mutate("draft")}>
               <Undo2 className="mr-2 h-4 w-4" /> Withdraw
-            </Button>
-          )}
-          {listing.status === "rejected" && (
-            <Button size="sm" onClick={() => setStatus.mutate("draft")}>
-              Edit and resubmit
             </Button>
           )}
           {listing.status === "published" && (

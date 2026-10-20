@@ -1887,6 +1887,10 @@ export type Database = {
         Args: { _owner: string; _user: string }
         Returns: boolean
       }
+      attempt_auto_publish: {
+        Args: { _listing_id: string }
+        Returns: Json
+      }
       process_didit_webhook: {
         Args: {
           _event_key: string
