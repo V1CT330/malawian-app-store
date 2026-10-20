@@ -178,7 +178,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
               // Inspect only newly inserted subtrees instead of rescanning the entire
               // document on every React mutation.
               const observer = new MutationObserver(records => {
-                records.forEach(record => record.addedNodes.forEach(scrubNode));
+                records.forEach(record => record.addedNodes.forEach(node => {
+                  if (node instanceof Element) scrubNode(node);
+                  else if (node.parentElement) scrubNode(node.parentElement);
+                }));
               });
               observer.observe(document.body, { childList: true, subtree: true });
             }
