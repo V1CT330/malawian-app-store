@@ -656,7 +656,6 @@ function SocialPage() {
                   return <div key={request.id} className="flex items-center gap-3 border-b border-border px-4 py-3"><Avatar profile={person} /><div className="min-w-0 flex-1"><p className="text-sm font-semibold">{displayName(person)}</p><p className="text-xs text-muted-foreground">Wants to connect with you</p></div><button type="button" disabled={respondConnection.isPending} onClick={() => respondConnection.mutate({ id: request.id, status: "accepted" })} className="border border-border p-2 hover:bg-secondary disabled:opacity-50" aria-label="Accept friend request"><Check className="h-4 w-4" /></button><button type="button" disabled={respondConnection.isPending} onClick={() => respondConnection.mutate({ id: request.id, status: "declined" })} className="border border-border p-2 hover:bg-secondary disabled:opacity-50" aria-label="Decline friend request"><X className="h-4 w-4" /></button></div>;
                 })}
               </section>}
-              <div className="px-4 py-3"><label htmlFor="friends-search" className="sr-only">Search members</label><input id="friends-search" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Find people on MAS…" className="w-full rounded-full border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary" /></div>
               <div className="w-full bg-background">{renderPeople()}</div>
             </div>
           ) : activeSection === "Search" ? (
@@ -683,7 +682,7 @@ function SocialPage() {
               </section>
             </div>
           ) : (
-            <div className="mx-auto w-full max-w-2xl pb-6 pt-3">
+            <div className="mx-auto w-full max-w-2xl pb-6 pt-0">
               {notificationsQuery.isLoading ? <p className="px-4 py-8 text-sm text-muted-foreground">Loading notifications…</p> : notificationsQuery.isError ? <p role="alert" className="px-4 py-8 text-sm text-destructive">Could not load notifications.</p> : !(notificationsQuery.data ?? []).length ? <div className="px-4 py-10 text-center"><Bell className="mx-auto h-7 w-7 text-muted-foreground" /><p className="mt-3 text-sm font-semibold">You’re all caught up</p><p className="mt-1 text-sm text-muted-foreground">New account and activity notifications will appear here.</p></div> : (notificationsQuery.data ?? []).map((notification) => <article key={notification.id} className={cn("flex w-full items-start gap-3 border-b border-border bg-background px-4 py-4", !notification.read && "border-l-2 border-l-primary bg-primary/[0.03]")}><Bell className="mt-1 h-4 w-4 shrink-0 text-primary" /><div className="min-w-0 flex-1"><p className="text-sm font-semibold">{notification.title}</p><p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{notification.body}</p><time className="mt-2 block text-xs text-muted-foreground" dateTime={notification.created_at}>{new Date(notification.created_at).toLocaleString()}</time></div>{!notification.read && <button type="button" onClick={() => markNotificationRead.mutate(notification.id)} aria-label="Mark notification as read" className="border border-border p-2 hover:bg-background"><Check className="h-4 w-4" /></button>}</article>)}
             </div>
           )}
