@@ -524,6 +524,22 @@ function SocialPage() {
                 {item.label}
               </Link>
             ))}
+            <div className="pt-2">
+              <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Opportunities</p>
+              {["Collabo", "Investors", "Grants", "Crowdfund"].map((label) => (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => {
+                    setSidebarOpen(false);
+                    toast.info(`${label} section is coming soon.`);
+                  }}
+                  className="block w-full border-b border-border px-3 py-3 text-left text-sm text-foreground transition-colors hover:bg-secondary"
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </nav>
         </SheetContent>
       </Sheet>
