@@ -148,9 +148,24 @@ function SettingsPage() {
       if (error) throw error;
       return next;
     },
-    onSuccess: async (next) => {
+    onSuccess: (next, variables) => {
       setTermsOpen(false);
-      await queryClient.invalidateQueries({ queryKey: ["profile", userId] });
+      // Update the cached source of truth immediately so the destination route
+      // sees the new mode without waiting for a profile refetch.
+      queryClient.setQueryData(["profile", userId], (current: typeof profile) =>
+        current
+          ? {
+              ...current,
+              mode: next,
+              is_developer: next === "developer" ? true : current.is_developer,
+              ...(variables.acceptTerms
+                ? { developer_terms_accepted_at: new Date().toISOString() }
+                : {}),
+            }
+          : current,
+      );
+      // Reconcile with the server in the background rather than blocking navigation.
+      void queryClient.invalidateQueries({ queryKey: ["profile", userId] });
       toast.success(next === "developer" ? "Developer workspace on" : "Back to the store");
       navigate({ to: next === "developer" ? "/console" : "/" });
     },
@@ -321,7 +336,13 @@ function SettingsPage() {
                 <div className="flex items-start gap-3">
                   <Store className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
                   <div>
-                    <p className="text-sm font-medium">{mode === "developer" ? "Developer workspace" : "Shopping mode"}</p>
+                    <p className="text-sm font-medium">
+                      {setMode.isPending
+                        ? "Switching workspace…"
+                        : mode === "developer"
+                          ? "Developer workspace"
+                          : "Shopping mode"}
+                    </p>
                     <p className="mt-1 text-sm leading-5 text-muted-foreground">
                       {mode === "developer" ? "Manage your published products and developer tools." : "Discover apps, save products and manage your library."}
                     </p>
