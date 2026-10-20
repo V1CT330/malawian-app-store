@@ -555,7 +555,7 @@ function SocialPage() {
           {!userId ? (
             <div className="px-4 py-8 text-sm text-muted-foreground">Sign in to use Social.</div>
           ) : activeSection === "Feed" ? (
-            <div className="mx-auto w-full max-w-2xl space-y-2 pb-6 pt-3">
+            <div className="mx-auto w-full max-w-2xl space-y-1 pb-6 pt-3">
               <form onSubmit={submitPost} className="rounded-2xl border border-border/80 bg-background p-4 shadow-sm sm:p-5">
                 <div className="flex items-start gap-3">
                   <Avatar profile={profile as SocialProfile | null} />
