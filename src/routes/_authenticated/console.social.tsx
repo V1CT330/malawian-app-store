@@ -648,16 +648,16 @@ function SocialPage() {
               })}
             </div>
           ) : activeSection === "Friends" ? (
-            <div className="mx-auto w-full max-w-2xl space-y-4 px-3 pb-6 pt-3 sm:px-5">
-              {incoming.length > 0 && <section className="border border-border/80 bg-background shadow-sm">
+            <div className="mx-auto w-full max-w-2xl pb-6 pt-3">
+              {incoming.length > 0 && <section className="w-full bg-background">
                 <h3 className="px-4 pt-4 text-sm font-semibold">Friend requests ({incoming.length})</h3>
                 {incoming.map((request) => {
                   const person = profileMap.get(request.requester_id);
-                  return <div key={request.id} className="flex items-center gap-3 px-4 py-3"><Avatar profile={person} /><div className="min-w-0 flex-1"><p className="text-sm font-semibold">{displayName(person)}</p><p className="text-xs text-muted-foreground">Wants to connect with you</p></div><button type="button" disabled={respondConnection.isPending} onClick={() => respondConnection.mutate({ id: request.id, status: "accepted" })} className="border border-border p-2 hover:bg-secondary disabled:opacity-50" aria-label="Accept friend request"><Check className="h-4 w-4" /></button><button type="button" disabled={respondConnection.isPending} onClick={() => respondConnection.mutate({ id: request.id, status: "declined" })} className="border border-border p-2 hover:bg-secondary disabled:opacity-50" aria-label="Decline friend request"><X className="h-4 w-4" /></button></div>;
+                  return <div key={request.id} className="flex items-center gap-3 border-b border-border px-4 py-3"><Avatar profile={person} /><div className="min-w-0 flex-1"><p className="text-sm font-semibold">{displayName(person)}</p><p className="text-xs text-muted-foreground">Wants to connect with you</p></div><button type="button" disabled={respondConnection.isPending} onClick={() => respondConnection.mutate({ id: request.id, status: "accepted" })} className="border border-border p-2 hover:bg-secondary disabled:opacity-50" aria-label="Accept friend request"><Check className="h-4 w-4" /></button><button type="button" disabled={respondConnection.isPending} onClick={() => respondConnection.mutate({ id: request.id, status: "declined" })} className="border border-border p-2 hover:bg-secondary disabled:opacity-50" aria-label="Decline friend request"><X className="h-4 w-4" /></button></div>;
                 })}
               </section>}
-              <div className="rounded-xl border border-border/80 bg-background p-4 shadow-sm"><label htmlFor="friends-search" className="sr-only">Search members</label><input id="friends-search" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Find people on MAS…" className="w-full rounded-full border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary" /></div>
-              <div className="overflow-hidden rounded-xl border border-border/80 bg-background shadow-sm">{renderPeople()}</div>
+              <div className="px-4 py-3"><label htmlFor="friends-search" className="sr-only">Search members</label><input id="friends-search" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Find people on MAS…" className="w-full rounded-full border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary" /></div>
+              <div className="w-full bg-background">{renderPeople()}</div>
             </div>
           ) : activeSection === "Search" ? (
             <div className="mx-auto w-full max-w-2xl space-y-4 px-3 pb-6 pt-3 sm:px-5">
