@@ -11,6 +11,7 @@ import {
   Trash2,
   Menu,
   MessageCircle,
+  MoreHorizontal,
   Search,
   Send,
   UserPlus,
@@ -599,26 +600,39 @@ function SocialPage() {
                         <p className="text-sm font-semibold">{displayName(author)}</p>
                         <time className="mt-0.5 block text-xs text-muted-foreground" dateTime={post.created_at}>{new Date(post.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</time>
                       </div>
+                      {post.author_id === userId && <details className="relative">
+                        <summary aria-label="Post options" title="Post options" className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground [&::-webkit-details-marker]:hidden">
+                          <MoreHorizontal className="h-5 w-5" />
+                        </summary>
+                        <div className="absolute right-0 top-full z-20 mt-1 min-w-36 rounded-lg border border-border bg-background p-1 shadow-lg">
+                          <button type="button" disabled={deletePost.isPending} onClick={(event) => {
+                            const menu = event.currentTarget.closest("details");
+                            if (window.confirm("Delete this post? This cannot be undone.")) {
+                              menu?.removeAttribute("open");
+                              deletePost.mutate(post.id);
+                            }
+                          }} className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-destructive transition-colors hover:bg-muted disabled:opacity-50">
+                            <Trash2 className="h-4 w-4" /> Delete post
+                          </button>
+                        </div>
+                      </details>}
                     </div>
                     <p className="whitespace-pre-wrap break-words py-4 text-sm leading-6">{post.body}</p>
                     {post.media_url && post.media_type === "image" && <img src={post.media_url} alt="Post attachment" loading="lazy" className="mb-4 max-h-[560px] w-full rounded-lg border border-border/70 bg-muted/20 object-contain" />}
                     {post.media_url && post.media_type === "video" && <video src={post.media_url} controls preload="metadata" className="mb-4 max-h-[560px] w-full rounded-lg border border-border/70 bg-black" aria-label="Post video attachment" />}
-                    <div className="flex items-center gap-4 border-y border-border py-2 text-xs text-muted-foreground">
-                      <button type="button" disabled={toggleReaction.isPending} onClick={() => toggleReaction.mutate({ postId: post.id, reacted })} className={cn("flex items-center gap-1.5 px-1 py-1 transition-colors hover:text-foreground", reacted && "text-destructive")} aria-pressed={reacted}>
-                        <Heart className={cn("h-4 w-4", reacted && "fill-current")} /> {postReactions.length} {postReactions.length === 1 ? "like" : "likes"}
+                    <div className="flex items-center gap-5 border-y border-border py-2 text-xs text-muted-foreground">
+                      <button type="button" disabled={toggleReaction.isPending} onClick={() => toggleReaction.mutate({ postId: post.id, reacted })} className={cn("flex items-center gap-1.5 px-1 py-1 transition-colors hover:text-foreground", reacted && "text-destructive")} aria-label={reacted ? "Unlike post" : "Like post"} aria-pressed={reacted}>
+                        <Heart className={cn("h-4 w-4", reacted && "fill-current")} /> <span>{postReactions.length}</span>
                       </button>
-                      <span className="flex items-center gap-1.5" aria-label={`${postComments.length} comments`}><MessageCircle className="h-4 w-4" /> {postComments.length}</span>
-                      <button type="button" onClick={() => {
+                      <span className="flex items-center gap-1.5" aria-label={`${postComments.length} comments`}><MessageCircle className="h-4 w-4" /> <span>{postComments.length}</span></span>
+                      <button type="button" aria-label="Share post" title="Share post" onClick={() => {
                         const shareText = post.body + "\n\n" + window.location.origin + "/console/social";
                         if (navigator.share) {
                           void navigator.share({ title: "MAS post by " + displayName(author), text: post.body, url: window.location.origin + "/console/social" }).catch(() => undefined);
                         } else {
                           void navigator.clipboard.writeText(shareText).then(() => toast.success("Post copied for sharing")).catch(() => toast.error("Could not copy post"));
                         }
-                      }} className="ml-auto flex items-center gap-1.5 px-1 py-1 hover:text-foreground"><Share2 className="h-4 w-4" /> Share</button>
-                      {post.author_id === userId && <button type="button" disabled={deletePost.isPending} onClick={() => {
-                        if (window.confirm("Delete this post? This cannot be undone.")) deletePost.mutate(post.id);
-                      }} aria-label="Delete your post" title="Delete post" className="flex items-center gap-1.5 px-1 py-1 text-muted-foreground hover:text-destructive disabled:opacity-50"><Trash2 className="h-4 w-4" /></button>}
+                      }} className="flex items-center gap-1.5 px-1 py-1 hover:text-foreground"><Share2 className="h-4 w-4" /></button>
                     </div>
                     {postComments.slice(-5).map((comment) => {
                       const commentAuthor = profileMap.get(comment.author_id) ?? (comment.author_id === userId ? profile as SocialProfile : null);
