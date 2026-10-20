@@ -555,7 +555,7 @@ function SocialPage() {
           {!userId ? (
             <div className="px-4 py-8 text-sm text-muted-foreground">Sign in to use Social.</div>
           ) : activeSection === "Feed" ? (
-            <div className="mx-auto w-full max-w-2xl space-y-4 px-3 pb-6 pt-3 sm:px-5">
+            <div className="mx-auto w-full max-w-2xl space-y-4 pb-6 pt-3">
               <form onSubmit={submitPost} className="rounded-2xl border border-border/80 bg-background p-4 shadow-sm sm:p-5">
                 <div className="flex items-start gap-3">
                   <Avatar profile={profile as SocialProfile | null} />
@@ -593,7 +593,7 @@ function SocialPage() {
                 const reacted = postReactions.some((reaction) => reaction.user_id === userId);
                 const postComments = commentsByPost.get(post.id) ?? [];
                 return (
-                  <article key={post.id} className="rounded-xl border border-border/80 bg-background px-4 py-4 shadow-sm transition-shadow hover:shadow-md sm:px-5">
+                  <article key={post.id} className="border-y border-border/80 bg-background px-4 py-4 shadow-sm sm:px-5">
                     <div className="flex items-start gap-3">
                       <Avatar profile={author} />
                       <div className="min-w-0 flex-1">
@@ -620,11 +620,11 @@ function SocialPage() {
                     <p className="whitespace-pre-wrap break-words py-4 text-sm leading-6">{post.body}</p>
                     {post.media_url && post.media_type === "image" && <img src={post.media_url} alt="Post attachment" loading="lazy" className="mb-4 max-h-[560px] w-full rounded-lg border border-border/70 bg-muted/20 object-contain" />}
                     {post.media_url && post.media_type === "video" && <video src={post.media_url} controls preload="metadata" className="mb-4 max-h-[560px] w-full rounded-lg border border-border/70 bg-black" aria-label="Post video attachment" />}
-                    <div className="flex items-center gap-5 border-y border-border py-2 text-xs text-muted-foreground">
-                      <button type="button" disabled={toggleReaction.isPending} onClick={() => toggleReaction.mutate({ postId: post.id, reacted })} className={cn("flex items-center gap-1.5 px-1 py-1 transition-colors hover:text-foreground", reacted && "text-destructive")} aria-label={reacted ? "Unlike post" : "Like post"} aria-pressed={reacted}>
-                        <Heart className={cn("h-4 w-4", reacted && "fill-current")} /> <span>{postReactions.length}</span>
+                    <div className="flex items-center justify-around gap-4 border-y border-border py-2.5 text-sm text-muted-foreground">
+                      <button type="button" disabled={toggleReaction.isPending} onClick={() => toggleReaction.mutate({ postId: post.id, reacted })} className={cn("flex flex-1 items-center justify-center gap-2 px-2 py-1.5 transition-colors hover:text-foreground", reacted && "text-destructive")} aria-label={reacted ? "Unlike post" : "Like post"} aria-pressed={reacted}>
+                        <Heart className={cn("h-5 w-5", reacted && "fill-current")} /> <span>{postReactions.length}</span>
                       </button>
-                      <span className="flex items-center gap-1.5" aria-label={`${postComments.length} comments`}><MessageCircle className="h-4 w-4" /> <span>{postComments.length}</span></span>
+                      <span className="flex flex-1 items-center justify-center gap-2 px-2 py-1.5" aria-label={`${postComments.length} comments`}><MessageCircle className="h-5 w-5" /> <span>{postComments.length}</span></span>
                       <button type="button" aria-label="Share post" title="Share post" onClick={() => {
                         const shareText = post.body + "\n\n" + window.location.origin + "/console/social";
                         if (navigator.share) {
@@ -632,7 +632,7 @@ function SocialPage() {
                         } else {
                           void navigator.clipboard.writeText(shareText).then(() => toast.success("Post copied for sharing")).catch(() => toast.error("Could not copy post"));
                         }
-                      }} className="flex items-center gap-1.5 px-1 py-1 hover:text-foreground"><Share2 className="h-4 w-4" /></button>
+                      }} className="flex flex-1 items-center justify-center gap-2 px-2 py-1.5 hover:text-foreground"><Share2 className="h-5 w-5" /></button>
                     </div>
                     {postComments.slice(-5).map((comment) => {
                       const commentAuthor = profileMap.get(comment.author_id) ?? (comment.author_id === userId ? profile as SocialProfile : null);
