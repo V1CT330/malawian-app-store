@@ -28,7 +28,7 @@ import { toast } from "sonner";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
-import { useProfile } from "@/hooks/useSession";
+import { useProfile, useSignedUrl } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -90,9 +90,11 @@ function displayName(profile?: SocialProfile | null) {
 
 function Avatar({ profile, size = "md" }: { profile?: SocialProfile | null; size?: "sm" | "md" }) {
   const label = displayName(profile);
-  return profile?.avatar_url ? (
+  const signedAvatar = useSignedUrl(profile?.avatar_url);
+  const avatarSrc = signedAvatar ?? (profile?.avatar_url?.startsWith("https://") ? profile.avatar_url : null);
+  return avatarSrc ? (
     <img
-      src={profile.avatar_url}
+      src={avatarSrc}
       alt=""
       loading="lazy"
       className={cn("shrink-0 rounded-full object-cover", size === "sm" ? "h-8 w-8" : "h-10 w-10")}
@@ -112,6 +114,7 @@ function Avatar({ profile, size = "md" }: { profile?: SocialProfile | null; size
 
 function SocialPage() {
   const { userId, profile } = useProfile();
+  const ownAvatar = useSignedUrl(profile?.avatar_url);
   const queryClient = useQueryClient();
   const [activeSection, setActiveSection] = useState<SectionId>("Feed");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -776,7 +779,7 @@ function SocialPage() {
                 <div className="px-4 pb-5 sm:px-6">
                   <div className="-mt-12 flex items-end justify-between gap-3 sm:-mt-14">
                     <div className="h-24 w-24 overflow-hidden rounded-full border-4 border-background bg-secondary sm:h-28 sm:w-28">
-                      {profile?.avatar_url ? <img src={profile.avatar_url} alt="Your profile" className="h-full w-full object-cover" /> : <span className="flex h-full w-full items-center justify-center text-3xl font-semibold">{(profile?.developer_name || profile?.display_name || "M").slice(0, 1).toUpperCase()}</span>}
+                      {ownAvatar ? <img src={ownAvatar} alt="Your profile" className="h-full w-full object-cover" /> : <span className="flex h-full w-full items-center justify-center text-3xl font-semibold">{(profile?.developer_name || profile?.display_name || "M").slice(0, 1).toUpperCase()}</span>}
                     </div>
                     <div className="mb-1 flex flex-wrap items-center gap-2">
                       {profile?.is_developer && <button type="button" onClick={() => {
