@@ -618,8 +618,8 @@ function SocialPage() {
                       </details>}
                     </div>
                     <p className="whitespace-pre-wrap break-words py-4 text-sm leading-6">{post.body}</p>
-                    {post.media_url && post.media_type === "image" && <img src={post.media_url} alt="Post attachment" loading="lazy" className="mb-4 max-h-[560px] w-full rounded-lg border border-border/70 bg-muted/20 object-contain" />}
-                    {post.media_url && post.media_type === "video" && <video src={post.media_url} controls preload="metadata" className="mb-4 max-h-[560px] w-full rounded-lg border border-border/70 bg-black" aria-label="Post video attachment" />}
+                    {post.media_url && post.media_type === "image" && <img src={post.media_url} alt="Post attachment" loading="lazy" className="-mx-4 mb-4 block max-h-[560px] w-[calc(100%+2rem)] rounded-none border-0 bg-muted/20 object-contain sm:-mx-5 sm:w-[calc(100%+2.5rem)]" />}
+                    {post.media_url && post.media_type === "video" && <video src={post.media_url} controls preload="metadata" className="-mx-4 mb-4 block max-h-[560px] w-[calc(100%+2rem)] rounded-none border-0 bg-black sm:-mx-5 sm:w-[calc(100%+2.5rem)]" aria-label="Post video attachment" />}
                     <div className="flex items-center justify-around gap-4 border-y border-border py-2.5 text-sm text-muted-foreground">
                       <button type="button" disabled={toggleReaction.isPending} onClick={() => toggleReaction.mutate({ postId: post.id, reacted })} className={cn("flex flex-1 items-center justify-center gap-2 px-2 py-1.5 transition-colors hover:text-foreground", reacted && "text-destructive")} aria-label={reacted ? "Unlike post" : "Like post"} aria-pressed={reacted}>
                         <Heart className={cn("h-5 w-5", reacted && "fill-current")} /> <span>{postReactions.length}</span>
