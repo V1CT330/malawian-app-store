@@ -135,7 +135,7 @@ function ConsoleDashboard() {
         </>
       }
     >
-      <div className="space-y-5 [&_.surface-card]:rounded-none">
+      <div className="dashboard-content-flat space-y-5 [&_.surface-card]:rounded-none">
         <section className="grid gap-0 border border-border bg-background md:grid-cols-[1.4fr_1fr]">
           <div className="flex flex-col justify-between gap-5 border-b border-border p-5 sm:p-6 md:border-b-0 md:border-r">
             <div>
