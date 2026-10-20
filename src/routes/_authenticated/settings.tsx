@@ -215,27 +215,35 @@ function SettingsPage() {
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold">{profile?.display_name || "Your name"}</p>
                   <p className="mt-1 break-all text-sm text-muted-foreground">{account.data?.email ?? "Loading account email…"}</p>
-                  <button
-                    type="button"
-                    onClick={() => avatarInput.current?.click()}
-                    disabled={uploadAvatar.isPending}
-                    className="mt-2 inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline disabled:opacity-50"
-                  >
-                    <Camera className="h-4 w-4" /> {uploadAvatar.isPending ? "Uploading photo…" : "Change profile photo"}
-                  </button>
-                  <input
-                    ref={avatarInput}
-                    type="file"
-                    accept="image/*"
-                    className="sr-only"
-                    aria-label="Choose profile photo"
-                    onChange={(event) => {
-                      const file = event.target.files?.[0];
-                      if (file) uploadAvatar.mutate(file);
-                      event.currentTarget.value = "";
-                    }}
-                  />
-                  <p className="mt-1 text-xs text-muted-foreground">Images up to 5 MB.</p>
+                  {profile?.is_developer ? (
+                    <Link to="/console/store" className="mt-2 inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline">
+                      Manage public profile <ChevronRight className="h-4 w-4" />
+                    </Link>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => avatarInput.current?.click()}
+                        disabled={uploadAvatar.isPending}
+                        className="mt-2 inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline disabled:opacity-50"
+                      >
+                        <Camera className="h-4 w-4" /> {uploadAvatar.isPending ? "Uploading photo…" : "Change profile photo"}
+                      </button>
+                      <input
+                        ref={avatarInput}
+                        type="file"
+                        accept="image/*"
+                        className="sr-only"
+                        aria-label="Choose profile photo"
+                        onChange={(event) => {
+                          const file = event.target.files?.[0];
+                          if (file) uploadAvatar.mutate(file);
+                          event.currentTarget.value = "";
+                        }}
+                      />
+                      <p className="mt-1 text-xs text-muted-foreground">Images up to 5 MB.</p>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -252,32 +260,25 @@ function SettingsPage() {
                   />
                   <p className="text-xs text-muted-foreground">Up to 80 characters.</p>
                 </div>
-                {profile?.is_developer && (
+                {profile?.is_developer ? (
+                  <p className="text-sm leading-5 text-muted-foreground">
+                    Your developer name, professional bio and public links are managed in your developer profile so they stay consistent across MAS.
+                  </p>
+                ) : (
                   <div className="grid gap-2">
-                    <Label htmlFor="devname" className="text-sm">Developer or studio name</Label>
-                    <input
-                      id="devname"
-                      value={developerName ?? profile?.developer_name ?? ""}
-                      onChange={(event) => setDeveloperName(event.target.value)}
-                      maxLength={100}
-                      placeholder="Your studio or developer name"
-                      className="h-11 w-full border border-border bg-background px-3 text-sm outline-none transition-colors focus:border-primary"
+                    <Label htmlFor="bio" className="text-sm">Bio</Label>
+                    <Textarea
+                      id="bio"
+                      rows={4}
+                      maxLength={300}
+                      value={bio ?? profile?.bio ?? ""}
+                      onChange={(event) => setBio(event.target.value)}
+                      placeholder="A little about yourself…"
+                      className="min-h-24 resize-y rounded-none border-border"
                     />
+                    <p className="text-right text-xs text-muted-foreground">{(bio ?? profile?.bio ?? "").length}/300</p>
                   </div>
                 )}
-                <div className="grid gap-2">
-                  <Label htmlFor="bio" className="text-sm">Bio</Label>
-                  <Textarea
-                    id="bio"
-                    rows={4}
-                    maxLength={300}
-                    value={bio ?? profile?.bio ?? ""}
-                    onChange={(event) => setBio(event.target.value)}
-                    placeholder="A little about yourself…"
-                    className="min-h-24 resize-y rounded-none border-border"
-                  />
-                  <p className="text-right text-xs text-muted-foreground">{(bio ?? profile?.bio ?? "").length}/300</p>
-                </div>
                 <div>
                   <Button
                     className="rounded-none px-5"
