@@ -306,7 +306,6 @@ function SettingsPage() {
                 </div>
                 <Switch aria-label="Toggle dark theme" checked={dark} onCheckedChange={setTheme} />
               </div>
-              </div>
             </div>
           </div>
         </section>
