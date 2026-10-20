@@ -530,19 +530,22 @@ function SocialPage() {
         </SheetContent>
       </Sheet>
 
-      <section className="border-y border-border bg-background">
-        <div className="flex items-center justify-between gap-2 px-4 py-3 sm:px-5">
-          <h1 className="text-xl font-semibold">Social</h1>
-          <button type="button" onClick={() => setSidebarOpen(true)} aria-label="Open sidebar menu" title="Sidebar menu" className="flex h-8 w-8 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:text-foreground">
+      <section className="mx-auto min-h-[calc(100vh-4rem)] w-full max-w-6xl border-x border-border/70 bg-muted/30">
+        <div className="flex items-center justify-between gap-2 border-b border-border/70 bg-background px-4 py-3.5 sm:px-6">
+          <div>
+             <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">Social</h1>
+             <p className="mt-0.5 hidden text-xs text-muted-foreground sm:block">Connect, share, and discover the MAS community.</p>
+           </div>
+          <button type="button" onClick={() => setSidebarOpen(true)} aria-label="Open sidebar menu" title="Sidebar menu" className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <Menu className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
-        <nav aria-label="Social menu" className="flex w-full items-stretch justify-evenly border-b border-border px-1 sm:px-3">
+        <nav aria-label="Social menu" className="sticky top-0 z-20 flex w-full items-stretch justify-evenly border-b border-border bg-background/95 px-1 shadow-sm backdrop-blur sm:px-3">
           {sections.map(({ id, icon: Icon }) => {
             const selected = activeSection === id;
             return (
               <button key={id} type="button" onClick={() => setActiveSection(id)} aria-label={id} title={id} aria-current={selected ? "page" : undefined}
-                className={cn("flex min-w-0 flex-1 items-center justify-center border-b-2 px-2 py-3 transition-colors duration-200 sm:px-5", selected ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:border-border hover:text-foreground")}>
+                className={cn("flex min-h-12 min-w-0 flex-1 items-center justify-center border-b-2 px-2 py-3 transition-colors duration-200 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:px-5", selected ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:border-border hover:text-foreground")}>
                 <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
                 {id === "Notifications" && unreadNotifications > 0 && <span className="ml-1 text-[10px] font-semibold">{unreadNotifications > 9 ? "9+" : unreadNotifications}</span>}
               </button>
@@ -551,31 +554,31 @@ function SocialPage() {
         </nav>
 
         <main className="min-h-[220px] min-w-0">
-          <div className="flex items-center gap-2 border-b border-border px-4 py-3 sm:px-5">
+          <div className="mx-auto flex max-w-4xl items-center gap-2 px-4 pb-1 pt-4 sm:px-6">
             <ActiveIcon className="h-4 w-4 text-primary" aria-hidden="true" />
-            <h2 className="text-base font-semibold">{activeSection}</h2>
+            <h2 className="text-sm font-semibold tracking-tight">{activeSection}</h2>
           </div>
 
           {!userId ? (
             <div className="px-4 py-8 text-sm text-muted-foreground">Sign in to use Social.</div>
           ) : activeSection === "Feed" ? (
-            <div className="mx-auto max-w-2xl">
-              <form onSubmit={submitPost} className="border-b border-border p-4 sm:p-5">
+            <div className="mx-auto w-full max-w-2xl space-y-4 px-3 pb-6 pt-3 sm:px-5">
+              <form onSubmit={submitPost} className="rounded-xl border border-border/80 bg-background p-4 shadow-sm sm:p-5">
                 <div className="flex items-start gap-3">
                   <Avatar profile={profile as SocialProfile | null} />
                   <div className="min-w-0 flex-1">
                     <label htmlFor="social-post" className="sr-only">Write a post</label>
-                    <textarea id="social-post" value={postDraft} onChange={(event) => setPostDraft(event.target.value)} maxLength={2000} rows={3} placeholder="What would you like to share?" className="w-full resize-y border border-border bg-background p-3 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary" />
+                    <textarea id="social-post" value={postDraft} onChange={(event) => setPostDraft(event.target.value)} maxLength={2000} rows={3} placeholder="What would you like to share?" className="min-h-24 w-full resize-y border border-border/70 bg-muted/30 p-3.5 text-sm leading-6 outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/10" />
                     <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
                       <div className="flex min-w-0 flex-wrap items-center gap-3">
-                        <label className="flex cursor-pointer items-center gap-2 border border-border px-3 py-2 text-xs font-medium transition-colors hover:bg-secondary">
+                        <label className="flex cursor-pointer items-center gap-2 border border-border/80 px-3 py-2 text-xs font-medium transition-colors hover:bg-muted focus-within:ring-2 focus-within:ring-ring">
                           <ImagePlus className="h-4 w-4" /> Add photo/video
                           <input type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" className="sr-only" onChange={(event) => setPostMedia(event.target.files?.[0] ?? null)} />
                         </label>
                         {postMedia && <span className="max-w-[170px] truncate text-xs text-muted-foreground">{postMedia.name}<button type="button" onClick={() => setPostMedia(null)} className="ml-2 underline">Remove</button></span>}
                         <span className="text-xs text-muted-foreground">{postDraft.length}/2000</span>
                       </div>
-                      <button type="submit" disabled={!postDraft.trim() || createPost.isPending} className="flex items-center gap-2 bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50">
+                      <button type="submit" disabled={!postDraft.trim() || createPost.isPending} className="flex items-center gap-2 bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
                         <Send className="h-4 w-4" /> {createPost.isPending ? "Posting…" : "Post"}
                       </button>
                     </div>
@@ -597,17 +600,17 @@ function SocialPage() {
                 const reacted = postReactions.some((reaction) => reaction.user_id === userId);
                 const postComments = commentsByPost.get(post.id) ?? [];
                 return (
-                  <article key={post.id} className="border-b border-border px-4 py-4 sm:px-5">
+                  <article key={post.id} className="rounded-xl border border-border/80 bg-background px-4 py-4 shadow-sm transition-shadow hover:shadow-md sm:px-5">
                     <div className="flex items-start gap-3">
                       <Avatar profile={author} />
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-semibold">{displayName(author)}</p>
-                        <time className="text-xs text-muted-foreground" dateTime={post.created_at}>{new Date(post.created_at).toLocaleString()}</time>
+                        <time className="mt-0.5 block text-xs text-muted-foreground" dateTime={post.created_at}>{new Date(post.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</time>
                       </div>
                     </div>
                     <p className="whitespace-pre-wrap break-words py-4 text-sm leading-6">{post.body}</p>
-                    {post.media_url && post.media_type === "image" && <img src={post.media_url} alt="Post attachment" loading="lazy" className="mb-4 max-h-[560px] w-full border border-border object-contain" />}
-                    {post.media_url && post.media_type === "video" && <video src={post.media_url} controls preload="metadata" className="mb-4 max-h-[560px] w-full border border-border bg-black" aria-label="Post video attachment" />}
+                    {post.media_url && post.media_type === "image" && <img src={post.media_url} alt="Post attachment" loading="lazy" className="mb-4 max-h-[560px] w-full rounded-lg border border-border/70 bg-muted/20 object-contain" />}
+                    {post.media_url && post.media_type === "video" && <video src={post.media_url} controls preload="metadata" className="mb-4 max-h-[560px] w-full rounded-lg border border-border/70 bg-black" aria-label="Post video attachment" />}
                     <div className="flex items-center gap-4 border-y border-border py-2 text-xs text-muted-foreground">
                       <button type="button" disabled={toggleReaction.isPending} onClick={() => toggleReaction.mutate({ postId: post.id, reacted })} className={cn("flex items-center gap-1.5 px-1 py-1 transition-colors hover:text-foreground", reacted && "text-destructive")} aria-pressed={reacted}>
                         <Heart className={cn("h-4 w-4", reacted && "fill-current")} /> {postReactions.length} {postReactions.length === 1 ? "like" : "likes"}
@@ -627,11 +630,11 @@ function SocialPage() {
                     </div>
                     {postComments.slice(-5).map((comment) => {
                       const commentAuthor = profileMap.get(comment.author_id) ?? (comment.author_id === userId ? profile as SocialProfile : null);
-                      return <div key={comment.id} className="flex items-start gap-2 pt-3"><Avatar profile={commentAuthor} size="sm" /><div className="min-w-0 flex-1 bg-muted/50 px-3 py-2"><p className="text-xs font-semibold">{displayName(commentAuthor)}</p><p className="whitespace-pre-wrap break-words text-sm">{comment.body}</p></div></div>;
+                      return <div key={comment.id} className="flex items-start gap-2 pt-3"><Avatar profile={commentAuthor} size="sm" /><div className="min-w-0 flex-1 border border-border/60 bg-muted/40 px-3 py-2"><p className="text-xs font-semibold">{displayName(commentAuthor)}</p><p className="whitespace-pre-wrap break-words text-sm">{comment.body}</p></div></div>;
                     })}
                     <form onSubmit={(event) => submitComment(event, post.id)} className="mt-3 flex items-center gap-2">
                       <label className="sr-only" htmlFor={`comment-${post.id}`}>Write a comment</label>
-                      <input id={`comment-${post.id}`} value={commentDrafts[post.id] ?? ""} onChange={(event) => setCommentDrafts((current) => ({ ...current, [post.id]: event.target.value }))} maxLength={1000} placeholder="Write a comment…" className="min-w-0 flex-1 border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary" />
+                      <input id={`comment-${post.id}`} value={commentDrafts[post.id] ?? ""} onChange={(event) => setCommentDrafts((current) => ({ ...current, [post.id]: event.target.value }))} maxLength={1000} placeholder="Write a comment…" className="min-w-0 flex-1 border border-border/80 bg-background px-3 py-2.5 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/10" />
                       <button type="submit" disabled={!(commentDrafts[post.id] ?? "").trim() || addComment.isPending} aria-label="Send comment" className="border border-border p-2 hover:bg-secondary disabled:opacity-50"><Send className="h-4 w-4" /></button>
                     </form>
                   </article>
@@ -639,24 +642,24 @@ function SocialPage() {
               })}
             </div>
           ) : activeSection === "Friends" ? (
-            <div className="mx-auto max-w-2xl">
-              {incoming.length > 0 && <section className="border-b border-border">
+            <div className="mx-auto w-full max-w-2xl space-y-4 px-3 pb-6 pt-3 sm:px-5">
+              {incoming.length > 0 && <section className="border border-border/80 bg-background shadow-sm">
                 <h3 className="px-4 pt-4 text-sm font-semibold">Friend requests ({incoming.length})</h3>
                 {incoming.map((request) => {
                   const person = profileMap.get(request.requester_id);
                   return <div key={request.id} className="flex items-center gap-3 px-4 py-3"><Avatar profile={person} /><div className="min-w-0 flex-1"><p className="text-sm font-semibold">{displayName(person)}</p><p className="text-xs text-muted-foreground">Wants to connect with you</p></div><button type="button" disabled={respondConnection.isPending} onClick={() => respondConnection.mutate({ id: request.id, status: "accepted" })} className="border border-border p-2 hover:bg-secondary disabled:opacity-50" aria-label="Accept friend request"><Check className="h-4 w-4" /></button><button type="button" disabled={respondConnection.isPending} onClick={() => respondConnection.mutate({ id: request.id, status: "declined" })} className="border border-border p-2 hover:bg-secondary disabled:opacity-50" aria-label="Decline friend request"><X className="h-4 w-4" /></button></div>;
                 })}
               </section>}
-              <div className="p-4"><label htmlFor="friends-search" className="sr-only">Search members</label><input id="friends-search" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Find people on MAS…" className="w-full border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary" /></div>
-              {renderPeople()}
+              <div className="rounded-xl border border-border/80 bg-background p-4 shadow-sm"><label htmlFor="friends-search" className="sr-only">Search members</label><input id="friends-search" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Find people on MAS…" className="w-full border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary" /></div>
+              <div className="overflow-hidden rounded-xl border border-border/80 bg-background shadow-sm">{renderPeople()}</div>
             </div>
           ) : activeSection === "Search" ? (
-            <div className="mx-auto max-w-2xl">
-              <div className="p-4"><label htmlFor="social-search" className="sr-only">Search people</label><div className="flex items-center gap-2 border border-border px-3"><Search className="h-4 w-4 text-muted-foreground" /><input id="social-search" autoFocus value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Search people by name or bio…" className="min-w-0 flex-1 bg-transparent py-3 text-sm outline-none" /></div></div>
-              {renderPeople()}
+            <div className="mx-auto w-full max-w-2xl space-y-4 px-3 pb-6 pt-3 sm:px-5">
+              <div className="rounded-xl border border-border/80 bg-background p-4 shadow-sm"><label htmlFor="social-search" className="sr-only">Search people</label><div className="flex items-center gap-2 border border-border px-3"><Search className="h-4 w-4 text-muted-foreground" /><input id="social-search" autoFocus value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Search people by name or bio…" className="min-w-0 flex-1 bg-transparent py-3 text-sm outline-none" /></div></div>
+              <div className="overflow-hidden rounded-xl border border-border/80 bg-background shadow-sm">{renderPeople()}</div>
             </div>
           ) : activeSection === "Messages" ? (
-            <div className="mx-auto grid max-w-4xl grid-cols-1 md:grid-cols-[220px_minmax(0,1fr)]">
+            <div className="mx-auto grid w-full max-w-4xl grid-cols-1 overflow-hidden rounded-xl border border-border/80 bg-background shadow-sm md:grid-cols-[240px_minmax(0,1fr)]">
               <aside className="border-b border-border md:border-b-0 md:border-r">
                 <div className="p-3"><label htmlFor="message-contact-search" className="sr-only">Find a conversation</label><input id="message-contact-search" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Find people…" className="w-full border border-border bg-background px-2 py-2 text-sm outline-none focus:border-primary" /></div>
                 {(profilesQuery.data ?? []).filter((person) => person.id !== userId && (acceptedIds.has(person.id) || (messagesQuery.data ?? []).some((message) => message.sender_id === person.id || message.recipient_id === person.id))).filter((person) => displayName(person).toLowerCase().includes(searchTerm.toLowerCase())).map((person) => {
@@ -676,8 +679,8 @@ function SocialPage() {
               </section>
             </div>
           ) : (
-            <div className="mx-auto max-w-2xl">
-              {notificationsQuery.isLoading ? <p className="px-4 py-8 text-sm text-muted-foreground">Loading notifications…</p> : notificationsQuery.isError ? <p role="alert" className="px-4 py-8 text-sm text-destructive">Could not load notifications.</p> : !(notificationsQuery.data ?? []).length ? <div className="px-4 py-10 text-center"><Bell className="mx-auto h-7 w-7 text-muted-foreground" /><p className="mt-3 text-sm font-semibold">You’re all caught up</p><p className="mt-1 text-sm text-muted-foreground">New account and activity notifications will appear here.</p></div> : (notificationsQuery.data ?? []).map((notification) => <article key={notification.id} className={cn("flex items-start gap-3 border-b border-border px-4 py-4", !notification.read && "bg-secondary/40")}><Bell className="mt-1 h-4 w-4 shrink-0 text-primary" /><div className="min-w-0 flex-1"><p className="text-sm font-semibold">{notification.title}</p><p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{notification.body}</p><time className="mt-2 block text-xs text-muted-foreground" dateTime={notification.created_at}>{new Date(notification.created_at).toLocaleString()}</time></div>{!notification.read && <button type="button" onClick={() => markNotificationRead.mutate(notification.id)} aria-label="Mark notification as read" className="border border-border p-2 hover:bg-background"><Check className="h-4 w-4" /></button>}</article>)}
+            <div className="mx-auto w-full max-w-2xl space-y-3 px-3 pb-6 pt-3 sm:px-5">
+              {notificationsQuery.isLoading ? <p className="px-4 py-8 text-sm text-muted-foreground">Loading notifications…</p> : notificationsQuery.isError ? <p role="alert" className="px-4 py-8 text-sm text-destructive">Could not load notifications.</p> : !(notificationsQuery.data ?? []).length ? <div className="px-4 py-10 text-center"><Bell className="mx-auto h-7 w-7 text-muted-foreground" /><p className="mt-3 text-sm font-semibold">You’re all caught up</p><p className="mt-1 text-sm text-muted-foreground">New account and activity notifications will appear here.</p></div> : (notificationsQuery.data ?? []).map((notification) => <article key={notification.id} className={cn("flex items-start gap-3 border border-border/80 bg-background px-4 py-4 shadow-sm", !notification.read && "border-l-2 border-l-primary bg-primary/[0.03]")}><Bell className="mt-1 h-4 w-4 shrink-0 text-primary" /><div className="min-w-0 flex-1"><p className="text-sm font-semibold">{notification.title}</p><p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{notification.body}</p><time className="mt-2 block text-xs text-muted-foreground" dateTime={notification.created_at}>{new Date(notification.created_at).toLocaleString()}</time></div>{!notification.read && <button type="button" onClick={() => markNotificationRead.mutate(notification.id)} aria-label="Mark notification as read" className="border border-border p-2 hover:bg-background"><Check className="h-4 w-4" /></button>}</article>)}
             </div>
           )}
         </main>
