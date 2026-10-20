@@ -108,6 +108,7 @@ export function ConsoleShell({
   children,
   hideTopBar = false,
   hideTitleCard = false,
+  fullWidth = false,
 }: {
   title: string;
   description?: string;
@@ -116,6 +117,7 @@ export function ConsoleShell({
   children: ReactNode;
   hideTopBar?: boolean;
   hideTitleCard?: boolean;
+  fullWidth?: boolean;
 }) {
   const { userId, profile } = useProfile();
   const unread = useUnreadCount();
@@ -296,7 +298,7 @@ export function ConsoleShell({
           </div>
         </header>}
 
-        <main className={cn("mx-auto w-full max-w-6xl flex-1 px-3 pb-20 sm:px-6", hideTopBar ? "pt-0" : "pt-5")}>
+        <main className={cn("w-full flex-1 pb-20", fullWidth ? "max-w-none px-0" : "mx-auto max-w-6xl px-3 sm:px-6", hideTopBar ? "pt-0" : "pt-5")}>
           {breadcrumbs && breadcrumbs.length > 0 && (
             <ol className="mb-3 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
               {breadcrumbs.map((c, i) => (
