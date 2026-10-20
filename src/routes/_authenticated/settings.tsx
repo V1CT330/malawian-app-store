@@ -1,17 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
-  ArrowUpRight,
   Bell,
   Camera,
   Check,
   ChevronRight,
-  Library,
   LogOut,
-  Mail,
   Moon,
-  Palette,
-  Shield,
   Store,
   UserRound,
 } from "lucide-react";
@@ -24,8 +19,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { useIsAdmin, useMode, useProfile, useSignedUrl } from "@/hooks/useSession";
-import { ACCENT_PRESETS, useTheme } from "@/hooks/useTheme";
+import { useMode, useProfile, useSignedUrl } from "@/hooks/useSession";
+import { useTheme } from "@/hooks/useTheme";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMwk, uploadAsset } from "@/lib/store";
 import { PRO_NAME, PRO_PRICE_MWK } from "@/lib/pro";
@@ -52,8 +47,7 @@ function SettingsPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const mode = useMode();
-  const isAdmin = useIsAdmin();
-  const { dark, setTheme, accent, setAccent } = useTheme();
+  const { dark, setTheme } = useTheme();
   const avatar = useSignedUrl(profile?.avatar_url);
   const avatarInput = useRef<HTMLInputElement>(null);
   const [termsOpen, setTermsOpen] = useState(false);
@@ -203,7 +197,7 @@ function SettingsPage() {
             <a href="#profile" className="shrink-0 border-b-2 border-primary pb-3 font-medium">Profile</a>
             <a href="#preferences" className="shrink-0 border-b-2 border-transparent pb-3 text-muted-foreground hover:text-foreground">Appearance</a>
             <a href="#workspace" className="shrink-0 border-b-2 border-transparent pb-3 text-muted-foreground hover:text-foreground">Workspace</a>
-            <a href="#activity" className="shrink-0 border-b-2 border-transparent pb-3 text-muted-foreground hover:text-foreground">Activity & help</a>
+            <a href="#notifications" className="shrink-0 border-b-2 border-transparent pb-3 text-muted-foreground hover:text-foreground">Notifications</a>
           </nav>
         </header>
 
@@ -312,37 +306,6 @@ function SettingsPage() {
                 </div>
                 <Switch aria-label="Toggle dark theme" checked={dark} onCheckedChange={setTheme} />
               </div>
-              <div className="py-5">
-                <div className="flex items-start gap-3">
-                  <Palette className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
-                  <div><p className="text-sm font-medium">Accent color</p><p className="mt-1 text-sm text-muted-foreground">Choose the highlight color for buttons and active controls.</p></div>
-                </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {ACCENT_PRESETS.map((preset) => (
-                    <button
-                      key={preset.value}
-                      type="button"
-                      title={preset.name}
-                      aria-label={`Use ${preset.name}`}
-                      aria-pressed={accent === preset.value}
-                      onClick={() => setAccent(preset.value)}
-                      className={`flex h-11 min-w-11 items-center justify-center border-2 p-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${accent === preset.value ? "border-foreground" : "border-border"}`}
-                      style={{ backgroundColor: preset.value }}
-                    >
-                      {accent === preset.value && <Check className="h-4 w-4 text-white drop-shadow" />}
-                    </button>
-                  ))}
-                  <label className="relative flex h-11 w-11 cursor-pointer items-center justify-center border border-border bg-secondary" title="Custom color">
-                    <Palette className="h-4 w-4" />
-                    <input
-                      type="color"
-                      value={accent}
-                      onChange={(event) => setAccent(event.target.value)}
-                      aria-label="Choose a custom accent color"
-                      className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                    />
-                  </label>
-                </div>
               </div>
             </div>
           </div>
@@ -402,11 +365,11 @@ function SettingsPage() {
           </div>
         </section>
 
-        <section id="activity" className="scroll-mt-24 border-b border-border py-7 sm:py-8">
+        <section id="notifications" className="scroll-mt-24 border-b border-border py-7 sm:py-8">
           <div className="grid gap-6 sm:grid-cols-[200px_minmax(0,1fr)] sm:gap-10">
             <div>
-              <h2 className="font-display text-lg font-semibold">Activity & help</h2>
-              <p className="mt-1 text-sm leading-5 text-muted-foreground">Keep up with your account and get help.</p>
+              <h2 className="font-display text-lg font-semibold">Notifications</h2>
+              <p className="mt-1 text-sm leading-5 text-muted-foreground">View updates and messages about your account.</p>
             </div>
             <div className="min-w-0 divide-y divide-border">
               <Link to="/notifications" className="group flex items-center gap-3 py-4 first:pt-0 hover:text-primary">
@@ -414,23 +377,6 @@ function SettingsPage() {
                 <div className="min-w-0 flex-1"><p className="text-sm font-medium">Notifications</p><p className="mt-1 text-xs text-muted-foreground">Store updates, review decisions and account messages.</p></div>
                 <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground" />
               </Link>
-              <Link to="/library" className="group flex items-center gap-3 py-4 hover:text-primary">
-                <Library className="h-5 w-5 shrink-0 text-muted-foreground" />
-                <div className="min-w-0 flex-1"><p className="text-sm font-medium">Your library</p><p className="mt-1 text-xs text-muted-foreground">Manage saved and installed products.</p></div>
-                <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-              </Link>
-              {isAdmin && (
-                <Link to="/admin" className="group flex items-center gap-3 py-4 hover:text-primary">
-                  <Shield className="h-5 w-5 shrink-0 text-muted-foreground" />
-                  <div className="min-w-0 flex-1"><p className="text-sm font-medium">Admin panel</p><p className="mt-1 text-xs text-muted-foreground">Platform management.</p></div>
-                  <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-                </Link>
-              )}
-              <div className="flex items-center gap-3 py-4">
-                <Mail className="h-5 w-5 shrink-0 text-muted-foreground" />
-                <div className="min-w-0 flex-1"><p className="text-sm font-medium">Sign-in email</p><p className="mt-1 break-all text-xs text-muted-foreground">{account.data?.email ?? "Loading email…"}</p></div>
-                <span className="text-xs text-muted-foreground">{account.data?.provider === "google" ? "Google" : "Email"}</span>
-              </div>
             </div>
           </div>
         </section>
