@@ -19,6 +19,8 @@ export type Profile = {
   suspended: boolean;
 
   website_url: string | null;
+  github_url?: string | null;
+  portfolio_url?: string | null;
   facebook_url: string | null;
   x_url: string | null;
   linkedin_url: string | null;
