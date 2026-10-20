@@ -6,8 +6,6 @@ import {
   Camera,
   Check,
   ChevronRight,
-  CircleHelp,
-  ExternalLink,
   Library,
   LogOut,
   Mail,
@@ -29,9 +27,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { useIsAdmin, useMode, useProfile, useSignedUrl } from "@/hooks/useSession";
 import { ACCENT_PRESETS, useTheme } from "@/hooks/useTheme";
 import { supabase } from "@/integrations/supabase/client";
-import { uploadAsset } from "@/lib/store";
+import { formatMwk, uploadAsset } from "@/lib/store";
 import { PRO_NAME, PRO_PRICE_MWK } from "@/lib/pro";
-import { formatMwk } from "@/lib/store";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -422,11 +419,6 @@ function SettingsPage() {
                 <div className="min-w-0 flex-1"><p className="text-sm font-medium">Your library</p><p className="mt-1 text-xs text-muted-foreground">Manage saved and installed products.</p></div>
                 <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground" />
               </Link>
-              <a href="mailto:support@malawianappstore.com" className="group flex items-center gap-3 py-4 hover:text-primary">
-                <CircleHelp className="h-5 w-5 shrink-0 text-muted-foreground" />
-                <div className="min-w-0 flex-1"><p className="text-sm font-medium">Contact support</p><p className="mt-1 text-xs text-muted-foreground">Get help with your account or the store.</p></div>
-                <ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground" />
-              </a>
               {isAdmin && (
                 <Link to="/admin" className="group flex items-center gap-3 py-4 hover:text-primary">
                   <Shield className="h-5 w-5 shrink-0 text-muted-foreground" />
