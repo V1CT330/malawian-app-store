@@ -119,6 +119,38 @@ function tally(rows: Event[], key: "device" | "country") {
     .sort((a, b) => b.value - a.value);
 }
 
+async function fetchEvents(
+  table: "install_events" | "view_events",
+  listingIds: string[],
+  startIso: string,
+  endIso: string,
+): Promise<Event[]> {
+  const pageSize = 1000;
+  const rows: Event[] = [];
+  for (let offset = 0; ; offset += pageSize) {
+    const result = table === "install_events"
+      ? await supabase.from("install_events")
+          .select("created_at,device,country,listing_id")
+          .in("listing_id", listingIds)
+          .gte("created_at", startIso)
+          .lte("created_at", endIso)
+          .order("created_at", { ascending: true })
+          .range(offset, offset + pageSize - 1)
+      : await supabase.from("view_events")
+          .select("created_at,device,country,listing_id")
+          .in("listing_id", listingIds)
+          .gte("created_at", startIso)
+          .lte("created_at", endIso)
+          .order("created_at", { ascending: true })
+          .range(offset, offset + pageSize - 1);
+    if (result.error) throw result.error;
+    const page = (result.data ?? []) as Event[];
+    rows.push(...page);
+    if (page.length < pageSize) break;
+  }
+  return rows;
+}
+
 function makeTrend(installs: Event[], views: Event[], start: Date, end: Date, duration: number) {
   const useDaily = duration <= 90;
   const buckets: { key: string; label: string; installs: number; views: number }[] = [];
@@ -240,26 +272,11 @@ function AnalyticsPage() {
     queryKey: ["advanced-analytics-events", userId, ids.join(","), startIso, endIso],
     enabled: Boolean(userId) && ids.length > 0,
     queryFn: async () => {
-      const [installResult, viewResult] = await Promise.all([
-        supabase
-          .from("install_events")
-          .select("created_at,device,country,listing_id")
-          .in("listing_id", ids)
-          .gte("created_at", startIso)
-          .lte("created_at", endIso),
-        supabase
-          .from("view_events")
-          .select("created_at,device,country,listing_id")
-          .in("listing_id", ids)
-          .gte("created_at", startIso)
-          .lte("created_at", endIso),
+      const [installs, views] = await Promise.all([
+        fetchEvents("install_events", ids, startIso, endIso),
+        fetchEvents("view_events", ids, startIso, endIso),
       ]);
-      if (installResult.error) throw installResult.error;
-      if (viewResult.error) throw viewResult.error;
-      return {
-        installs: (installResult.data ?? []) as Event[],
-        views: (viewResult.data ?? []) as Event[],
-      };
+      return { installs, views };
     },
     staleTime: 60_000,
   });
