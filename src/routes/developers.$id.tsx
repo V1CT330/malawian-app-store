@@ -52,6 +52,20 @@ function DeveloperPage() {
     },
   });
 
+  const externalProjects = useQuery({
+    queryKey: ["developer-portfolio-projects", id],
+    queryFn: async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any)
+        .from("developer_portfolio_projects")
+        .select("id,title,description,project_type,url,image_url,created_at")
+        .eq("developer_id", id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
   const p = profile.data as Record<string, string | boolean | null> | null | undefined;
 
   return (
@@ -82,6 +96,24 @@ function DeveloperPage() {
           </div>
         </header>
       )}
+
+      <section className="mt-6">
+        <h2 className="font-display text-lg font-semibold">Featured projects</h2>
+        <p className="mt-1 text-sm text-muted-foreground">Projects this developer has published outside Malawian App Store.</p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          {externalProjects.isLoading ? <Skeleton className="h-36 w-full rounded-2xl" /> : externalProjects.data?.length ? externalProjects.data.map((project: { id: string; title: string; description: string | null; project_type: string; url: string; image_url: string | null }) => (
+            <article key={project.id} className="surface-card min-w-0 overflow-hidden">
+              {project.image_url ? <img src={project.image_url} alt="" loading="lazy" className="h-36 w-full object-cover" /> : <div className="flex h-24 items-center justify-center bg-muted"><span className="text-sm text-muted-foreground">Featured project</span></div>}
+              <div className="p-4">
+                <p className="break-words font-semibold">{project.title}</p>
+                <p className="mt-1 text-xs capitalize text-muted-foreground">{project.project_type}</p>
+                {project.description && <p className="mt-2 break-words text-sm text-muted-foreground">{project.description}</p>}
+                <a href={project.url} target="_blank" rel="noreferrer noopener" className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary underline">Open project <span aria-hidden="true">↗</span></a>
+              </div>
+            </article>
+          )) : <p className="surface-card p-5 text-sm text-muted-foreground">No featured projects yet.</p>}
+        </div>
+      </section>
 
       <h2 className="mt-6 font-display text-lg font-semibold">Published listings</h2>
       <div className="mt-3 space-y-3">
