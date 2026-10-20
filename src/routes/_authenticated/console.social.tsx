@@ -554,11 +554,6 @@ function SocialPage() {
         </nav>
 
         <main className="min-h-[220px] min-w-0">
-          <div className="mx-auto flex max-w-4xl items-center gap-2 px-4 pb-1 pt-4 sm:px-6">
-            <ActiveIcon className="h-4 w-4 text-primary" aria-hidden="true" />
-            <h2 className="text-sm font-semibold tracking-tight">{activeSection}</h2>
-          </div>
-
           {!userId ? (
             <div className="px-4 py-8 text-sm text-muted-foreground">Sign in to use Social.</div>
           ) : activeSection === "Feed" ? (
@@ -615,7 +610,7 @@ function SocialPage() {
                       <button type="button" disabled={toggleReaction.isPending} onClick={() => toggleReaction.mutate({ postId: post.id, reacted })} className={cn("flex items-center gap-1.5 px-1 py-1 transition-colors hover:text-foreground", reacted && "text-destructive")} aria-pressed={reacted}>
                         <Heart className={cn("h-4 w-4", reacted && "fill-current")} /> {postReactions.length} {postReactions.length === 1 ? "like" : "likes"}
                       </button>
-                      <span className="flex items-center gap-1.5"><MessageCircle className="h-4 w-4" /> {postComments.length} comments</span>
+                      <span className="flex items-center gap-1.5" aria-label={`${postComments.length} comments`}><MessageCircle className="h-4 w-4" /> {postComments.length}</span>
                       <button type="button" onClick={() => {
                         const shareText = post.body + "\n\n" + window.location.origin + "/console/social";
                         if (navigator.share) {
@@ -661,12 +656,10 @@ function SocialPage() {
           ) : activeSection === "Messages" ? (
             <div className="mx-auto grid w-full max-w-4xl grid-cols-1 overflow-hidden rounded-xl border border-border/80 bg-background shadow-sm md:grid-cols-[240px_minmax(0,1fr)]">
               <aside className="border-b border-border md:border-b-0 md:border-r">
-                <div className="p-3"><label htmlFor="message-contact-search" className="sr-only">Find a conversation</label><input id="message-contact-search" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Find people…" className="w-full rounded-full border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary" /></div>
-                {(profilesQuery.data ?? []).filter((person) => person.id !== userId && (acceptedIds.has(person.id) || (messagesQuery.data ?? []).some((message) => message.sender_id === person.id || message.recipient_id === person.id))).filter((person) => displayName(person).toLowerCase().includes(searchTerm.toLowerCase())).map((person) => {
+                {(profilesQuery.data ?? []).filter((person) => person.id !== userId && (acceptedIds.has(person.id) || (messagesQuery.data ?? []).some((message) => message.sender_id === person.id || message.recipient_id === person.id))).map((person) => {
                   const last = [...(messagesQuery.data ?? [])].reverse().find((message) => message.sender_id === person.id || message.recipient_id === person.id);
                   return <button key={person.id} type="button" onClick={() => setSelectedRecipient(person.id)} className={cn("flex w-full items-center gap-2 border-t border-border px-3 py-3 text-left hover:bg-secondary", selectedRecipient === person.id && "bg-secondary")}><Avatar profile={person} size="sm" /><span className="min-w-0 flex-1 truncate text-sm">{displayName(person)}{last?.sender_id === person.id && last.recipient_id === userId && !last.read_at ? <span className="block text-xs font-semibold text-primary">New message</span> : null}</span></button>;
                 })}
-                <div className="border-t border-border p-3"><p className="mb-2 text-xs text-muted-foreground">Start a conversation</p><button type="button" onClick={() => setActiveSection("Search")} className="flex items-center gap-2 text-sm font-medium text-primary"><Search className="h-4 w-4" /> Find a member</button></div>
               </aside>
               <section className="flex min-h-[360px] min-w-0 flex-col">
                 {selectedRecipient && selectedProfile ? <>
@@ -675,7 +668,7 @@ function SocialPage() {
                     {threadMessages.length ? threadMessages.map((message) => <div key={message.id} className={cn("flex", message.sender_id === userId ? "justify-end" : "justify-start")}><div className={cn("max-w-[85%] whitespace-pre-wrap break-words px-3 py-2 text-sm", message.sender_id === userId ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground")}>{message.body}<time className="mt-1 block text-[10px] opacity-70">{new Date(message.created_at).toLocaleString()}</time></div></div>) : <p className="py-8 text-center text-sm text-muted-foreground">Say hello to start this conversation.</p>}
                   </div>
                   <form onSubmit={submitMessage} className="flex gap-2 border-t border-border p-3"><label htmlFor="social-message" className="sr-only">Message</label><input id="social-message" value={messageDraft} onChange={(event) => setMessageDraft(event.target.value)} maxLength={4000} placeholder="Write a message…" className="min-w-0 flex-1 rounded-full border border-border bg-background px-4 py-2.5 text-sm outline-none focus:border-primary" /><button type="submit" disabled={!messageDraft.trim() || sendMessage.isPending} aria-label="Send message" className="rounded-full bg-primary p-2.5 text-primary-foreground disabled:opacity-50"><Send className="h-4 w-4" /></button></form>
-                </> : <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center"><MessageCircle className="h-8 w-8 text-muted-foreground" /><p className="mt-3 text-sm font-semibold">Your messages</p><p className="mt-1 max-w-xs text-sm text-muted-foreground">Choose a conversation or find a member to send a message.</p><button type="button" onClick={() => setActiveSection("Search")} className="mt-4 border border-border px-4 py-2 text-sm font-medium hover:bg-secondary">Find members</button></div>}
+                </> : <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center"><MessageCircle className="h-8 w-8 text-muted-foreground" /><p className="mt-3 text-sm font-semibold">Your messages</p><p className="mt-1 max-w-xs text-sm text-muted-foreground">Choose a conversation to start messaging.</p></div>}
               </section>
             </div>
           ) : (
