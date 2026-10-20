@@ -35,6 +35,15 @@ export const Route = createFileRoute("/apps/$slug")({
   component: ListingDetail,
 });
 
+function getDeviceType() {
+  const userAgent = typeof navigator !== "undefined" ? navigator.userAgent : "";
+  return /tablet|ipad/i.test(userAgent)
+    ? "Tablet"
+    : /mobile|android|iphone|ipod/i.test(userAgent)
+      ? "Mobile"
+      : "Desktop";
+}
+
 function ListingDetail() {
   const { slug } = Route.useParams();
   const { userId } = useSession();
@@ -63,12 +72,7 @@ function ListingDetail() {
     if (!listing || listing.status !== "published" || trackedViewId.current === listing.id) return;
     trackedViewId.current = listing.id;
 
-    const userAgent = typeof navigator !== "undefined" ? navigator.userAgent : "";
-    const device = /tablet|ipad/i.test(userAgent)
-      ? "Tablet"
-      : /mobile|android|iphone|ipod/i.test(userAgent)
-        ? "Mobile"
-        : "Desktop";
+    const device = getDeviceType();
 
     void supabase.from("view_events").insert({
       listing_id: listing.id,
@@ -201,7 +205,7 @@ function ListingDetail() {
       if (!listing) throw new Error("Listing unavailable");
       const { error: eventError } = await supabase.rpc("register_install", {
         _listing_id: listing.id,
-        _device: typeof navigator !== "undefined" ? navigator.platform : undefined,
+        _device: getDeviceType(),
       });
       if (eventError) throw eventError;
       if (listing.kind === "app" && userId) {
