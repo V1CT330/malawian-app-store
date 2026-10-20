@@ -555,8 +555,8 @@ function SocialPage() {
           {!userId ? (
             <div className="px-4 py-8 text-sm text-muted-foreground">Sign in to use Social.</div>
           ) : activeSection === "Feed" ? (
-            <div className="mx-auto w-full max-w-2xl space-y-1 pb-6 pt-3">
-              <form onSubmit={submitPost} className="rounded-2xl border border-border/80 bg-background p-4 shadow-sm sm:p-5">
+            <div className="w-full space-y-1 pb-6 pt-0">
+              <form onSubmit={submitPost} className="w-full border-y border-border/80 bg-background px-4 py-3 sm:px-5">
                 <div className="flex items-start gap-3">
                   <Avatar profile={profile as SocialProfile | null} />
                   <div className="min-w-0 flex-1">
@@ -660,9 +660,9 @@ function SocialPage() {
               <div className="w-full bg-background">{renderPeople()}</div>
             </div>
           ) : activeSection === "Search" ? (
-            <div className="mx-auto w-full max-w-2xl space-y-4 px-3 pb-6 pt-3 sm:px-5">
-              <div className="rounded-xl border border-border/80 bg-background p-4 shadow-sm"><label htmlFor="social-search" className="sr-only">Search people</label><div className="flex items-center gap-2 border border-border px-3"><Search className="h-4 w-4 text-muted-foreground" /><input id="social-search" autoFocus value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Search people by name or bio…" className="min-w-0 flex-1 rounded-full bg-transparent py-3 text-sm outline-none" /></div></div>
-              <div className="overflow-hidden rounded-xl border border-border/80 bg-background shadow-sm">{renderPeople()}</div>
+            <div className="mx-auto w-full max-w-2xl pb-6 pt-0">
+              <div className="w-full px-4 py-3"><label htmlFor="social-search" className="sr-only">Search people</label><div className="flex items-center gap-2 rounded-full border border-border bg-background px-4"><Search className="h-4 w-4 shrink-0 text-muted-foreground" /><input id="social-search" autoFocus value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Search people by name or bio…" className="min-w-0 flex-1 bg-transparent py-2.5 text-sm outline-none" /></div></div>
+              <div className="w-full bg-background">{renderPeople()}</div>
             </div>
           ) : activeSection === "Messages" ? (
             <div className="mx-auto grid w-full max-w-4xl grid-cols-1 overflow-hidden rounded-xl border border-border/80 bg-background shadow-sm md:grid-cols-[240px_minmax(0,1fr)]">
