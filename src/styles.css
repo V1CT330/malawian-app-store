@@ -229,3 +229,9 @@
     padding-bottom: calc(7rem + env(safe-area-inset-bottom));
   }
 }
+
+/* Flat, non-floating cards only inside the developer dashboard overview content. */
+.dashboard-content-flat .surface-card,
+.dashboard-content-flat .surface-card:hover {
+  box-shadow: none !important;
+}
