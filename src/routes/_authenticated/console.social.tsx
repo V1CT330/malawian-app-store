@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Bell,
@@ -28,7 +28,7 @@ import { toast } from "sonner";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
-import { useProfile, useSignedUrl } from "@/hooks/useSession";
+import { useProfile, useSignedUrl, useUnreadCount } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -115,6 +115,8 @@ function Avatar({ profile, size = "md" }: { profile?: SocialProfile | null; size
 function SocialPage() {
   const { userId, profile } = useProfile();
   const ownAvatar = useSignedUrl(profile?.avatar_url);
+  const unread = useUnreadCount();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [activeSection, setActiveSection] = useState<SectionId>("Feed");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -266,21 +268,7 @@ function SocialPage() {
     },
   });
 
-  const notificationsQuery = useQuery({
-    queryKey: ["social", "notifications", userId],
-    enabled: Boolean(userId),
-    refetchInterval: 60_000,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("notifications")
-        .select("*")
-        .eq("user_id", userId!)
-        .order("created_at", { ascending: false })
-        .limit(50);
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
+
 
   const profileMap = useMemo(
     () => new Map((profilesQuery.data ?? []).map((item) => [item.id, item])),
@@ -484,14 +472,7 @@ function SocialPage() {
     onError: (error: Error) => toast.error(error.message || "Could not send message"),
   });
 
-  const markNotificationRead = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("notifications").update({ read: true }).eq("id", id).eq("user_id", userId!);
-      if (error) throw error;
-    },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["social", "notifications", userId] }),
-    onError: (error: Error) => toast.error(error.message || "Could not mark notification as read"),
-  });
+
 
   const connections = connectionsQuery.data ?? [];
   const incoming = connections.filter((item) => item.recipient_id === userId && item.status === "pending");
@@ -517,7 +498,6 @@ function SocialPage() {
       (item.sender_id === selectedRecipient && item.recipient_id === userId)
     ),
   );
-  const unreadNotifications = (notificationsQuery.data ?? []).filter((item) => !item.read).length;
 
   useEffect(() => {
     if (!userId || !selectedRecipient) return;
@@ -667,10 +647,10 @@ function SocialPage() {
           {sections.map(({ id, icon: Icon }) => {
             const selected = activeSection === id;
             return (
-              <button key={id} type="button" onClick={() => setActiveSection(id)} aria-label={id} title={id} aria-current={selected ? "page" : undefined}
+              <button key={id} type="button" onClick={() => id === "Notifications" ? navigate({ to: "/notifications" }) : setActiveSection(id)} aria-label={id} title={id} aria-current={selected ? "page" : undefined}
                 className={cn("flex min-h-12 min-w-0 flex-1 items-center justify-center border-b-2 px-2 py-3 transition-colors duration-200 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:px-5", selected ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:border-border hover:text-foreground")}>
                 <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
-                {id === "Notifications" && unreadNotifications > 0 && <span className="ml-1 text-[10px] font-semibold">{unreadNotifications > 9 ? "9+" : unreadNotifications}</span>}
+                {id === "Notifications" && unread > 0 && <span className="ml-1 text-[10px] font-semibold">{unread > 9 ? "9+" : unread}</span>}
               </button>
             );
           })}
@@ -944,9 +924,7 @@ function SocialPage() {
               </section>
             </div>
           ) : (
-            <div className="mx-auto w-full max-w-2xl pb-6 pt-0">
-              {notificationsQuery.isLoading ? <p className="px-4 py-8 text-sm text-muted-foreground">Loading notifications…</p> : notificationsQuery.isError ? <p role="alert" className="px-4 py-8 text-sm text-destructive">Could not load notifications.</p> : !(notificationsQuery.data ?? []).length ? <div className="px-4 py-10 text-center"><Bell className="mx-auto h-7 w-7 text-muted-foreground" /><p className="mt-3 text-sm font-semibold">You’re all caught up</p><p className="mt-1 text-sm text-muted-foreground">New account and activity notifications will appear here.</p></div> : (notificationsQuery.data ?? []).map((notification) => <article key={notification.id} className={cn("flex w-full items-start gap-3 border-b border-border bg-background px-4 py-4", !notification.read && "border-l-2 border-l-primary bg-primary/[0.03]")}><Bell className="mt-1 h-4 w-4 shrink-0 text-primary" /><div className="min-w-0 flex-1"><p className="text-sm font-semibold">{notification.title}</p><p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{notification.body}</p><time className="mt-2 block text-xs text-muted-foreground" dateTime={notification.created_at}>{new Date(notification.created_at).toLocaleString()}</time></div>{!notification.read && <button type="button" onClick={() => markNotificationRead.mutate(notification.id)} aria-label="Mark notification as read" className="border border-border p-2 hover:bg-background"><Check className="h-4 w-4" /></button>}</article>)}
-            </div>
+            <div className="px-4 py-8 text-sm text-muted-foreground">Choose a social section to continue.</div>
           )}
         </main>
       </section>
