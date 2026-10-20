@@ -114,9 +114,6 @@ function SocialPage() {
   const [selectedRecipient, setSelectedRecipient] = useState<string | null>(null);
   const [messageDraft, setMessageDraft] = useState("");
 
-  const active = sections.find((section) => section.id === activeSection) ?? sections[0];
-  const ActiveIcon = active.icon;
-
   const profilesQuery = useQuery({
     queryKey: ["social", "profiles"],
     enabled: Boolean(userId),
