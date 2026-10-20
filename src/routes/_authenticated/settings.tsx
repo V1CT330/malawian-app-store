@@ -124,9 +124,13 @@ function SettingsPage() {
   }
 
   async function signOut() {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast.error(error.message || "Could not sign out. Please try again.");
+      return;
+    }
     await queryClient.cancelQueries();
     queryClient.clear();
-    await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
   }
 
