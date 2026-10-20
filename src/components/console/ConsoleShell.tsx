@@ -157,7 +157,7 @@ export function ConsoleShell({
   return (
     <div className="flex min-h-screen bg-muted/40">
       <aside className="sticky top-0 hidden h-screen w-[264px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar px-4 py-5 lg:flex">
-        <Link to="/console" className="mb-6 flex items-center gap-2.5 rounded-none px-2 py-1.5">
+        <Link to="/console" className="mb-6 flex items-center gap-2.5 rounded-2xl px-2 py-1.5">
           <img src={logo} alt="" width={32} height={32} className="h-8 w-8" />
           <span className="font-display text-sm font-bold leading-tight">
             Developer
@@ -170,7 +170,7 @@ export function ConsoleShell({
         <div className="mt-auto space-y-1 pt-4">
           <Link
             to="/console/assistant"
-            className="flex items-center gap-3 rounded-none px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
+            className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
           >
             <GeminiIcon className="h-4 w-4" /> AI assistant
           </Link>
