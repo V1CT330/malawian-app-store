@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Download, ExternalLink, RefreshCw, ShieldCheck, Star } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
@@ -55,6 +55,30 @@ function ListingDetail() {
     },
   });
   const listing = listingQuery.data ?? null;
+  const trackedViewId = useRef<string | null>(null);
+
+  // Record one listing detail view per mounted listing. This is intentionally
+  // best-effort so analytics failures never block the store experience.
+  useEffect(() => {
+    if (!listing || listing.status !== "published" || trackedViewId.current === listing.id) return;
+    trackedViewId.current = listing.id;
+
+    const userAgent = typeof navigator !== "undefined" ? navigator.userAgent : "";
+    const device = /tablet|ipad/i.test(userAgent)
+      ? "Tablet"
+      : /mobile|android|iphone|ipod/i.test(userAgent)
+        ? "Mobile"
+        : "Desktop";
+
+    void supabase.from("view_events").insert({
+      listing_id: listing.id,
+      user_id: userId ?? null,
+      device,
+      country: null,
+    }).then(({ error }) => {
+      if (error) console.warn("Listing view tracking failed.");
+    });
+  }, [listing, userId]);
 
   const versionsQuery = useQuery({
     queryKey: ["versions", listing?.id],
