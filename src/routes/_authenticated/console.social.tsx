@@ -223,6 +223,24 @@ function SocialPage() {
     () => new Map((profilesQuery.data ?? []).map((item) => [item.id, item])),
     [profilesQuery.data],
   );
+  const reactionsByPost = useMemo(() => {
+    const grouped = new Map<string, { id: string; post_id: string; user_id: string }[]>();
+    for (const reaction of reactionsQuery.data ?? []) {
+      const group = grouped.get(reaction.post_id);
+      if (group) group.push(reaction);
+      else grouped.set(reaction.post_id, [reaction]);
+    }
+    return grouped;
+  }, [reactionsQuery.data]);
+  const commentsByPost = useMemo(() => {
+    const grouped = new Map<string, { id: string; post_id: string; author_id: string; body: string; created_at: string }[]>();
+    for (const comment of commentsQuery.data ?? []) {
+      const group = grouped.get(comment.post_id);
+      if (group) group.push(comment);
+      else grouped.set(comment.post_id, [comment]);
+    }
+    return grouped;
+  }, [commentsQuery.data]);
   const invalidateSocial = async (...queryKeys: (string | undefined)[][]) => {
     await Promise.all(
       queryKeys.map((queryKey) => queryClient.invalidateQueries({ queryKey })),
@@ -575,9 +593,9 @@ function SocialPage() {
                 </div>
               ) : postsQuery.data.map((post) => {
                 const author = profileMap.get(post.author_id) ?? (post.author_id === userId ? profile as SocialProfile : null);
-                const postReactions = (reactionsQuery.data ?? []).filter((reaction) => reaction.post_id === post.id);
+                const postReactions = reactionsByPost.get(post.id) ?? [];
                 const reacted = postReactions.some((reaction) => reaction.user_id === userId);
-                const postComments = (commentsQuery.data ?? []).filter((comment) => comment.post_id === post.id);
+                const postComments = commentsByPost.get(post.id) ?? [];
                 return (
                   <article key={post.id} className="border-b border-border px-4 py-4 sm:px-5">
                     <div className="flex items-start gap-3">
@@ -626,7 +644,7 @@ function SocialPage() {
                 <h3 className="px-4 pt-4 text-sm font-semibold">Friend requests ({incoming.length})</h3>
                 {incoming.map((request) => {
                   const person = profileMap.get(request.requester_id);
-                  return <div key={request.id} className="flex items-center gap-3 px-4 py-3"><Avatar profile={person} /><div className="min-w-0 flex-1"><p className="text-sm font-semibold">{displayName(person)}</p><p className="text-xs text-muted-foreground">Wants to connect with you</p></div><button type="button" onClick={() => respondConnection.mutate({ id: request.id, status: "accepted" })} className="border border-border p-2 hover:bg-secondary" aria-label="Accept friend request"><Check className="h-4 w-4" /></button><button type="button" onClick={() => respondConnection.mutate({ id: request.id, status: "declined" })} className="border border-border p-2 hover:bg-secondary" aria-label="Decline friend request"><X className="h-4 w-4" /></button></div>;
+                  return <div key={request.id} className="flex items-center gap-3 px-4 py-3"><Avatar profile={person} /><div className="min-w-0 flex-1"><p className="text-sm font-semibold">{displayName(person)}</p><p className="text-xs text-muted-foreground">Wants to connect with you</p></div><button type="button" disabled={respondConnection.isPending} onClick={() => respondConnection.mutate({ id: request.id, status: "accepted" })} className="border border-border p-2 hover:bg-secondary disabled:opacity-50" aria-label="Accept friend request"><Check className="h-4 w-4" /></button><button type="button" disabled={respondConnection.isPending} onClick={() => respondConnection.mutate({ id: request.id, status: "declined" })} className="border border-border p-2 hover:bg-secondary disabled:opacity-50" aria-label="Decline friend request"><X className="h-4 w-4" /></button></div>;
                 })}
               </section>}
               <div className="p-4"><label htmlFor="friends-search" className="sr-only">Search members</label><input id="friends-search" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Find people on MAS…" className="w-full border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary" /></div>
