@@ -1,33 +1,48 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Check, LogOut, Moon, Palette, Shield } from "lucide-react";
-import { useState } from "react";
+import {
+  ArrowUpRight,
+  Bell,
+  Camera,
+  Check,
+  ChevronRight,
+  CircleHelp,
+  ExternalLink,
+  Library,
+  LogOut,
+  Mail,
+  Moon,
+  Palette,
+  Shield,
+  Store,
+  UserRound,
+} from "lucide-react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
 import { DeveloperTermsDialog } from "@/components/DeveloperTerms";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { useIsAdmin, useMode, useProfile } from "@/hooks/useSession";
+import { useIsAdmin, useMode, useProfile, useSignedUrl } from "@/hooks/useSession";
 import { ACCENT_PRESETS, useTheme } from "@/hooks/useTheme";
 import { supabase } from "@/integrations/supabase/client";
+import { uploadAsset } from "@/lib/store";
 import { PRO_NAME, PRO_PRICE_MWK } from "@/lib/pro";
 import { formatMwk } from "@/lib/store";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
     meta: [
-      { title: "Settings · Malawian App Store" },
+      { title: "Account settings · Malawian App Store" },
       {
         name: "description",
-        content:
-          "Manage your profile, switch between shopping and developer mode, choose your theme and reach your developer tools.",
+        content: "Manage your account, profile, appearance, workspace and account preferences.",
       },
-      { property: "og:title", content: "Settings · Malawian App Store" },
-      { property: "og:description", content: "Profile, developer mode and theme." },
+      { property: "og:title", content: "Account settings · Malawian App Store" },
+      { property: "og:description", content: "Manage your Malawian App Store account." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -42,21 +57,31 @@ function SettingsPage() {
   const mode = useMode();
   const isAdmin = useIsAdmin();
   const { dark, setTheme, accent, setAccent } = useTheme();
+  const avatar = useSignedUrl(profile?.avatar_url);
+  const avatarInput = useRef<HTMLInputElement>(null);
   const [termsOpen, setTermsOpen] = useState(false);
-
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [developerName, setDeveloperName] = useState<string | null>(null);
   const [bio, setBio] = useState<string | null>(null);
 
-  const refresh = () => queryClient.invalidateQueries({ queryKey: ["profile", userId] });
+  const account = useQuery({
+    queryKey: ["account-auth-details", userId],
+    enabled: Boolean(userId),
+    queryFn: async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (error) throw error;
+      return { email: data.user?.email ?? null, provider: data.user?.app_metadata?.provider ?? "email" };
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
   const subscription = useQuery({
     queryKey: ["subscription", userId],
-    enabled: Boolean(userId),
+    enabled: Boolean(userId && mode === "developer"),
     queryFn: async () => {
       const { data, error } = await supabase
         .from("subscriptions")
-        .select("*")
+        .select("status")
         .eq("user_id", userId!)
         .maybeSingle();
       if (error) throw error;
@@ -64,23 +89,52 @@ function SettingsPage() {
     },
   });
 
+  const refresh = async () => {
+    await queryClient.invalidateQueries({ queryKey: ["profile", userId] });
+    await queryClient.invalidateQueries({ queryKey: ["account-auth-details", userId] });
+  };
+
   const saveProfile = useMutation({
     mutationFn: async () => {
+      if (!userId) throw new Error("Sign in required");
+      const nextDisplayName = (displayName ?? profile?.display_name ?? "").trim();
+      const nextDeveloperName = (developerName ?? profile?.developer_name ?? "").trim();
+      const nextBio = (bio ?? profile?.bio ?? "").trim();
+      if (nextDisplayName.length > 80) throw new Error("Display name must be 80 characters or fewer");
+      if (nextDeveloperName.length > 100) throw new Error("Developer name must be 100 characters or fewer");
+      if (nextBio.length > 300) throw new Error("Bio must be 300 characters or fewer");
       const { error } = await supabase
         .from("profiles")
         .update({
-          display_name: displayName ?? profile?.display_name ?? null,
-          developer_name: developerName ?? profile?.developer_name ?? null,
-          bio: bio ?? profile?.bio ?? null,
+          display_name: nextDisplayName || null,
+          developer_name: nextDeveloperName || null,
+          bio: nextBio || null,
         })
-        .eq("id", userId!);
+        .eq("id", userId);
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Profile saved");
-      refresh();
+      await refresh();
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (error: Error) => toast.error(error.message || "Could not save profile"),
+  });
+
+  const uploadAvatar = useMutation({
+    mutationFn: async (file: File) => {
+      if (!userId) throw new Error("Sign in required");
+      if (!file.type.startsWith("image/")) throw new Error("Choose an image file");
+      if (file.size > 5 * 1024 * 1024) throw new Error("Profile images must be 5 MB or smaller");
+      const path = await uploadAsset(userId, file, "avatars");
+      const { error } = await supabase.from("profiles").update({ avatar_url: path }).eq("id", userId);
+      if (error) throw error;
+    },
+    onSuccess: async () => {
+      toast.success("Profile photo updated");
+      await queryClient.invalidateQueries({ queryKey: ["profile", userId] });
+      await queryClient.invalidateQueries({ queryKey: ["signed-url"] });
+    },
+    onError: (error: Error) => toast.error(error.message || "Could not upload profile photo"),
   });
 
   const setMode = useMutation({
@@ -91,6 +145,7 @@ function SettingsPage() {
       next: "developer" | "user";
       acceptTerms?: boolean;
     }) => {
+      if (!userId) throw new Error("Sign in required");
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -98,7 +153,7 @@ function SettingsPage() {
           is_developer: next === "developer" ? true : (profile?.is_developer ?? false),
           ...(acceptTerms ? { developer_terms_accepted_at: new Date().toISOString() } : {}),
         })
-        .eq("id", userId!);
+        .eq("id", userId);
       if (error) throw error;
       return next;
     },
@@ -108,7 +163,7 @@ function SettingsPage() {
       toast.success(next === "developer" ? "Developer workspace on" : "Back to the store");
       navigate({ to: next === "developer" ? "/console" : "/" });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (error: Error) => toast.error(error.message),
   });
 
   function toggleDeveloper(on: boolean) {
@@ -134,169 +189,267 @@ function SettingsPage() {
     navigate({ to: "/auth", replace: true });
   }
 
+  const initial = (profile?.display_name || profile?.developer_name || account.data?.email || "U")
+    .slice(0, 1)
+    .toUpperCase();
+
   return (
     <AppShell>
-      <h1 className="font-display text-2xl font-bold">Settings</h1>
+      <div className="mx-auto w-full max-w-4xl">
+        <header className="border-b border-border pb-5 pt-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Your account</p>
+          <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">Settings</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+            Manage your profile, preferences and how you use Malawian App Store.
+          </p>
+          <nav aria-label="Settings sections" className="mt-5 flex max-w-full gap-5 overflow-x-auto border-b border-border text-sm">
+            <a href="#profile" className="shrink-0 border-b-2 border-primary pb-3 font-medium">Profile</a>
+            <a href="#preferences" className="shrink-0 border-b-2 border-transparent pb-3 text-muted-foreground hover:text-foreground">Appearance</a>
+            <a href="#workspace" className="shrink-0 border-b-2 border-transparent pb-3 text-muted-foreground hover:text-foreground">Workspace</a>
+            <a href="#activity" className="shrink-0 border-b-2 border-transparent pb-3 text-muted-foreground hover:text-foreground">Activity & help</a>
+          </nav>
+        </header>
 
-      <section className="surface-card mt-5 space-y-3 p-4">
-        <h2 className="font-display text-base font-semibold">Profile</h2>
-        <div>
-          <Label htmlFor="display">Display name</Label>
-          <Input
-            id="display"
-            value={displayName ?? profile?.display_name ?? ""}
-            onChange={(e) => setDisplayName(e.target.value)}
-          />
-        </div>
-        <div>
-          <Label htmlFor="bio">Bio</Label>
-          <Textarea
-            id="bio"
-            rows={3}
-            maxLength={300}
-            value={bio ?? profile?.bio ?? ""}
-            onChange={(e) => setBio(e.target.value)}
-          />
-        </div>
-        <Button size="sm" disabled={saveProfile.isPending} onClick={() => saveProfile.mutate()}>
-          Save profile
-        </Button>
-      </section>
-
-      <section className="surface-card mt-4 space-y-3 p-4">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <h2 className="font-display text-base font-semibold">Developer mode</h2>
-            <p className="text-xs text-muted-foreground">Switch between shopping and publishing.</p>
-          </div>
-          <Switch
-            aria-label="Switch between user and developer mode"
-            checked={mode === "developer"}
-            onCheckedChange={(v) => toggleDeveloper(v)}
-          />
-        </div>
-        {profile?.is_developer && (
-          <div>
-            <Label htmlFor="devname">Developer or studio name</Label>
-            <Input
-              id="devname"
-              value={developerName ?? profile?.developer_name ?? ""}
-              onChange={(e) => setDeveloperName(e.target.value)}
-            />
-            <Button
-              size="sm"
-              className="mt-2"
-              disabled={saveProfile.isPending}
-              onClick={() => saveProfile.mutate()}
-            >
-              Save
-            </Button>
-          </div>
-        )}
-      </section>
-
-      <section className="surface-card mt-4 space-y-3 p-4">
-        <div className="flex items-center gap-2">
-          <Palette className="h-4 w-4 text-muted-foreground" />
-          <div>
-            <h2 className="font-display text-base font-semibold">Accent color</h2>
-            <p className="text-xs text-muted-foreground">
-              Choose the color used for actions and highlights.
-            </p>
-          </div>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          {ACCENT_PRESETS.map((preset) => (
-            <button
-              key={preset.value}
-              type="button"
-              title={preset.name}
-              aria-label={`Use ${preset.name}`}
-              aria-pressed={accent === preset.value}
-              onClick={() => setAccent(preset.value)}
-              className="relative h-10 w-10 rounded-full border-2 border-background shadow-sm ring-1 ring-border"
-              style={{ backgroundColor: preset.value }}
-            >
-              {accent === preset.value && (
-                <Check className="absolute inset-0 m-auto h-5 w-5 text-primary-foreground" />
-              )}
-            </button>
-          ))}
-          <label
-            className="relative flex h-10 w-10 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-border bg-secondary"
-            title="Custom color"
-          >
-            <Palette className="h-4 w-4" />
-            <input
-              type="color"
-              value={accent}
-              onChange={(event) => setAccent(event.target.value)}
-              aria-label="Choose a custom accent color"
-              className="absolute inset-0 cursor-pointer opacity-0"
-            />
-          </label>
-        </div>
-      </section>
-
-      <section className="surface-card mt-4 space-y-3 p-4">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <Moon className="h-4 w-4 text-muted-foreground" />
+        <section id="profile" className="scroll-mt-24 border-b border-border py-7 sm:py-8">
+          <div className="grid gap-6 sm:grid-cols-[200px_minmax(0,1fr)] sm:gap-10">
             <div>
-              <h2 className="font-display text-base font-semibold">Dark theme</h2>
-              <p className="text-xs text-muted-foreground">Easier on the eyes at night.</p>
+              <h2 className="font-display text-lg font-semibold">Profile</h2>
+              <p className="mt-1 text-sm leading-5 text-muted-foreground">The details people see when they discover you.</p>
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-4 border-b border-border pb-5">
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden border border-border bg-muted text-xl font-semibold">
+                  {avatar ? <img src={avatar} alt="Your profile" className="h-full w-full object-cover" /> : <span>{initial}</span>}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold">{profile?.display_name || "Your name"}</p>
+                  <p className="mt-1 break-all text-sm text-muted-foreground">{account.data?.email ?? "Loading account email…"}</p>
+                  <button
+                    type="button"
+                    onClick={() => avatarInput.current?.click()}
+                    disabled={uploadAvatar.isPending}
+                    className="mt-2 inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline disabled:opacity-50"
+                  >
+                    <Camera className="h-4 w-4" /> {uploadAvatar.isPending ? "Uploading photo…" : "Change profile photo"}
+                  </button>
+                  <input
+                    ref={avatarInput}
+                    type="file"
+                    accept="image/*"
+                    className="sr-only"
+                    aria-label="Choose profile photo"
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
+                      if (file) uploadAvatar.mutate(file);
+                      event.currentTarget.value = "";
+                    }}
+                  />
+                  <p className="mt-1 text-xs text-muted-foreground">Images up to 5 MB.</p>
+                </div>
+              </div>
+
+              <div className="grid gap-5 py-5">
+                <div className="grid gap-2">
+                  <Label htmlFor="display" className="text-sm">Display name</Label>
+                  <input
+                    id="display"
+                    value={displayName ?? profile?.display_name ?? ""}
+                    onChange={(event) => setDisplayName(event.target.value)}
+                    maxLength={80}
+                    placeholder="How should we call you?"
+                    className="h-11 w-full border border-border bg-background px-3 text-sm outline-none transition-colors focus:border-primary"
+                  />
+                  <p className="text-xs text-muted-foreground">Up to 80 characters.</p>
+                </div>
+                {profile?.is_developer && (
+                  <div className="grid gap-2">
+                    <Label htmlFor="devname" className="text-sm">Developer or studio name</Label>
+                    <input
+                      id="devname"
+                      value={developerName ?? profile?.developer_name ?? ""}
+                      onChange={(event) => setDeveloperName(event.target.value)}
+                      maxLength={100}
+                      placeholder="Your studio or developer name"
+                      className="h-11 w-full border border-border bg-background px-3 text-sm outline-none transition-colors focus:border-primary"
+                    />
+                  </div>
+                )}
+                <div className="grid gap-2">
+                  <Label htmlFor="bio" className="text-sm">Bio</Label>
+                  <Textarea
+                    id="bio"
+                    rows={4}
+                    maxLength={300}
+                    value={bio ?? profile?.bio ?? ""}
+                    onChange={(event) => setBio(event.target.value)}
+                    placeholder="A little about yourself…"
+                    className="min-h-24 resize-y rounded-none border-border"
+                  />
+                  <p className="text-right text-xs text-muted-foreground">{(bio ?? profile?.bio ?? "").length}/300</p>
+                </div>
+                <div>
+                  <Button
+                    className="rounded-none px-5"
+                    disabled={saveProfile.isPending}
+                    onClick={() => saveProfile.mutate()}
+                  >
+                    {saveProfile.isPending ? "Saving…" : "Save profile"}
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
-          <Switch
-            aria-label="Toggle dark theme"
-            checked={dark}
-            onCheckedChange={(v) => setTheme(v)}
-          />
-        </div>
-      </section>
+        </section>
 
-      {isAdmin && (
-        <section className="surface-card mt-4 flex items-center justify-between gap-3 p-4">
-          <div className="flex items-center gap-2">
-            <Shield className="h-4 w-4 text-muted-foreground" />
-            <h2 className="font-display text-base font-semibold">Admin panel</h2>
+        <section id="preferences" className="scroll-mt-24 border-b border-border py-7 sm:py-8">
+          <div className="grid gap-6 sm:grid-cols-[200px_minmax(0,1fr)] sm:gap-10">
+            <div>
+              <h2 className="font-display text-lg font-semibold">Appearance</h2>
+              <p className="mt-1 text-sm leading-5 text-muted-foreground">Make the store feel comfortable to use.</p>
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center justify-between gap-4 border-b border-border py-4 first:pt-0">
+                <div className="flex items-start gap-3">
+                  <Moon className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
+                  <div><p className="text-sm font-medium">Dark theme</p><p className="mt-1 text-sm text-muted-foreground">Use a darker interface in low light.</p></div>
+                </div>
+                <Switch aria-label="Toggle dark theme" checked={dark} onCheckedChange={setTheme} />
+              </div>
+              <div className="py-5">
+                <div className="flex items-start gap-3">
+                  <Palette className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
+                  <div><p className="text-sm font-medium">Accent color</p><p className="mt-1 text-sm text-muted-foreground">Choose the highlight color for buttons and active controls.</p></div>
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {ACCENT_PRESETS.map((preset) => (
+                    <button
+                      key={preset.value}
+                      type="button"
+                      title={preset.name}
+                      aria-label={`Use ${preset.name}`}
+                      aria-pressed={accent === preset.value}
+                      onClick={() => setAccent(preset.value)}
+                      className={`flex h-11 min-w-11 items-center justify-center border-2 p-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${accent === preset.value ? "border-foreground" : "border-border"}`}
+                      style={{ backgroundColor: preset.value }}
+                    >
+                      {accent === preset.value && <Check className="h-4 w-4 text-white drop-shadow" />}
+                    </button>
+                  ))}
+                  <label className="relative flex h-11 w-11 cursor-pointer items-center justify-center border border-border bg-secondary" title="Custom color">
+                    <Palette className="h-4 w-4" />
+                    <input
+                      type="color"
+                      value={accent}
+                      onChange={(event) => setAccent(event.target.value)}
+                      aria-label="Choose a custom accent color"
+                      className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
-          <Button asChild size="sm" variant="outline">
-            <Link to="/admin">Open</Link>
+        </section>
+
+        <section id="workspace" className="scroll-mt-24 border-b border-border py-7 sm:py-8">
+          <div className="grid gap-6 sm:grid-cols-[200px_minmax(0,1fr)] sm:gap-10">
+            <div>
+              <h2 className="font-display text-lg font-semibold">Workspace</h2>
+              <p className="mt-1 text-sm leading-5 text-muted-foreground">Choose how you use the platform.</p>
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-start justify-between gap-4 border-b border-border pb-5">
+                <div className="flex items-start gap-3">
+                  <Store className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">{mode === "developer" ? "Developer workspace" : "Shopping mode"}</p>
+                    <p className="mt-1 text-sm leading-5 text-muted-foreground">
+                      {mode === "developer" ? "Manage your published products and developer tools." : "Discover apps, save products and manage your library."}
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  aria-label="Switch between user and developer mode"
+                  checked={mode === "developer"}
+                  disabled={setMode.isPending}
+                  onCheckedChange={toggleDeveloper}
+                />
+              </div>
+              {mode === "developer" ? (
+                <div className="divide-y divide-border">
+                  {[
+                    { to: "/console", label: "Developer console", detail: "Products and publishing" },
+                    { to: "/console/store", label: "Public developer profile", detail: "Your public presence" },
+                    { to: "/console/verification", label: "Identity verification", detail: "Verification status" },
+                    { to: "/console/subscription", label: PRO_NAME, detail: subscription.data?.status === "active" ? `Active · ${formatMwk(PRO_PRICE_MWK)} monthly` : "Manage your plan" },
+                  ].map((item) => (
+                    <Link key={item.to} to={item.to} className="group flex items-center gap-3 py-4 hover:text-primary">
+                      <div className="min-w-0 flex-1"><p className="text-sm font-medium">{item.label}</p><p className="mt-1 text-xs text-muted-foreground">{item.detail}</p></div>
+                      <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="divide-y divide-border">
+                  <Link to="/" className="group flex items-center gap-3 py-4 hover:text-primary">
+                    <div className="min-w-0 flex-1"><p className="text-sm font-medium">Browse apps and websites</p><p className="mt-1 text-xs text-muted-foreground">Discover products on MAS.</p></div>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+                  </Link>
+                  <Link to="/library" className="group flex items-center gap-3 py-4 hover:text-primary">
+                    <div className="min-w-0 flex-1"><p className="text-sm font-medium">My library</p><p className="mt-1 text-xs text-muted-foreground">Saved, installed and recently opened products.</p></div>
+                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        <section id="activity" className="scroll-mt-24 border-b border-border py-7 sm:py-8">
+          <div className="grid gap-6 sm:grid-cols-[200px_minmax(0,1fr)] sm:gap-10">
+            <div>
+              <h2 className="font-display text-lg font-semibold">Activity & help</h2>
+              <p className="mt-1 text-sm leading-5 text-muted-foreground">Keep up with your account and get help.</p>
+            </div>
+            <div className="min-w-0 divide-y divide-border">
+              <Link to="/notifications" className="group flex items-center gap-3 py-4 first:pt-0 hover:text-primary">
+                <Bell className="h-5 w-5 shrink-0 text-muted-foreground" />
+                <div className="min-w-0 flex-1"><p className="text-sm font-medium">Notifications</p><p className="mt-1 text-xs text-muted-foreground">Store updates, review decisions and account messages.</p></div>
+                <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+              </Link>
+              <Link to="/library" className="group flex items-center gap-3 py-4 hover:text-primary">
+                <Library className="h-5 w-5 shrink-0 text-muted-foreground" />
+                <div className="min-w-0 flex-1"><p className="text-sm font-medium">Your library</p><p className="mt-1 text-xs text-muted-foreground">Manage saved and installed products.</p></div>
+                <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+              </Link>
+              <a href="mailto:support@malawianappstore.com" className="group flex items-center gap-3 py-4 hover:text-primary">
+                <CircleHelp className="h-5 w-5 shrink-0 text-muted-foreground" />
+                <div className="min-w-0 flex-1"><p className="text-sm font-medium">Contact support</p><p className="mt-1 text-xs text-muted-foreground">Get help with your account or the store.</p></div>
+                <ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground" />
+              </a>
+              {isAdmin && (
+                <Link to="/admin" className="group flex items-center gap-3 py-4 hover:text-primary">
+                  <Shield className="h-5 w-5 shrink-0 text-muted-foreground" />
+                  <div className="min-w-0 flex-1"><p className="text-sm font-medium">Admin panel</p><p className="mt-1 text-xs text-muted-foreground">Platform management.</p></div>
+                  <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+                </Link>
+              )}
+              <div className="flex items-center gap-3 py-4">
+                <Mail className="h-5 w-5 shrink-0 text-muted-foreground" />
+                <div className="min-w-0 flex-1"><p className="text-sm font-medium">Sign-in email</p><p className="mt-1 break-all text-xs text-muted-foreground">{account.data?.email ?? "Loading email…"}</p></div>
+                <span className="text-xs text-muted-foreground">{account.data?.provider === "google" ? "Google" : "Email"}</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div className="flex flex-col gap-3 py-6 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs leading-5 text-muted-foreground">Your account settings are saved to your profile or device as appropriate.</p>
+          <Button variant="outline" className="w-full rounded-none border-destructive/40 text-destructive hover:bg-destructive/5 hover:text-destructive sm:w-auto" onClick={signOut}>
+            <LogOut className="mr-2 h-4 w-4" /> Sign out
           </Button>
-        </section>
-      )}
-
-      {mode === "developer" && (
-        <section className="surface-card mt-4 space-y-3 p-4">
-          <h2 className="font-display text-base font-semibold">Developer tools</h2>
-          <p className="text-xs text-muted-foreground">
-            Your public profile, social pages, verification and plan live in the developer section.
-          </p>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {[
-              { to: "/console", label: "Developer console" },
-              { to: "/console/store", label: "My public profile" },
-              { to: "/console/verification", label: "Verification" },
-              { to: "/console/subscription", label: PRO_NAME },
-            ].map((l) => (
-              <Button key={l.to} asChild size="sm" variant="outline">
-                <Link to={l.to}>{l.label}</Link>
-              </Button>
-            ))}
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Plan:{" "}
-            {subscription.data?.status === "active"
-              ? `Active · ${formatMwk(PRO_PRICE_MWK)} monthly`
-              : "Not subscribed"}
-          </p>
-        </section>
-      )}
-
-      <Button variant="outline" className="mt-4 w-full" onClick={signOut}>
-        <LogOut className="mr-2 h-4 w-4" /> Sign out
-      </Button>
+        </div>
+      </div>
 
       <DeveloperTermsDialog
         open={termsOpen}
