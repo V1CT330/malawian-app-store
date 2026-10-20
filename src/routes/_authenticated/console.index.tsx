@@ -1,6 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AlertTriangle, CheckCircle2, LayoutList, PlusCircle, Sparkles } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowRight,
+  BarChart3,
+  CheckCircle2,
+  Eye,
+  LayoutList,
+  PlusCircle,
+  Rocket,
+  Sparkles,
+  TrendingUp,
+} from "lucide-react";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
 import {
@@ -71,44 +82,54 @@ function ConsoleDashboard() {
     },
   });
 
-  const rating =
-    listings.filter((l) => l.rating_count > 0).reduce((a, l) => a + Number(l.rating_avg), 0) /
-    Math.max(1, listings.filter((l) => l.rating_count > 0).length);
-
+  const ratedListings = listings.filter((listing) => listing.rating_count > 0);
+  const rating = ratedListings.reduce((total, listing) => total + Number(listing.rating_avg), 0) /
+    Math.max(1, ratedListings.length);
   const reputation = reputationQuery.data ?? 0;
   const subscribed = subscriptionQuery.data?.status === "active";
+  const published = listings.filter((listing) => listing.status === "published");
+  const drafts = listings.filter((listing) => listing.status === "draft");
+  const pending = listings.filter((listing) => listing.status === "pending");
+  const rejected = listings.filter((listing) => listing.status === "rejected");
+  const liveReady = listings.filter((listing) => listing.status === "published" && readinessScore(listing) === 100).length;
 
   type Task = { key: string; text: string; to: string; tone: "warn" | "info" };
   const tasks: Task[] = [];
-  for (const l of listings) {
-    if (l.status === "rejected")
+  for (const listing of listings) {
+    if (listing.status === "rejected") {
       tasks.push({
-        key: `rej-${l.id}`,
-        text: `${l.name} was rejected. Fix the issues and resubmit.`,
-        to: l.id,
+        key: `rej-${listing.id}`,
+        text: `${listing.name} was rejected. Fix the issues and resubmit.`,
+        to: listing.id,
         tone: "warn",
       });
-    else if (l.status === "draft" && readinessScore(l) < 100)
+    } else if (listing.status === "draft" && readinessScore(listing) < 100) {
       tasks.push({
-        key: `draft-${l.id}`,
-        text: `${l.name} is an incomplete draft (${readinessScore(l)}% ready).`,
-        to: l.id,
+        key: `draft-${listing.id}`,
+        text: `${listing.name} is an incomplete draft (${readinessScore(listing)}% ready).`,
+        to: listing.id,
         tone: "info",
       });
+    }
   }
+
+  const maxDaily = Math.max(1, ...stats.map((row) => Math.max(row.views, row.installs)));
+  const recentStats = stats.slice(-14);
+  const views = sum(stats, "views");
+  const installs = sum(stats, "installs");
 
   return (
     <ConsoleShell
       title={`Welcome back, ${profile?.developer_name || profile?.display_name || "developer"}`}
-      description="Everything you publish on the Malawian App Store, in one place."
+      description="Your publishing command centre. Check performance, fix blockers and manage releases."
       actions={
         <>
-          <Button asChild variant="outline">
+          <Button asChild variant="outline" className="rounded-none">
             <Link to="/console/products">
               <LayoutList className="mr-2 h-4 w-4" /> All products
             </Link>
           </Button>
-          <Button asChild>
+          <Button asChild className="rounded-none">
             <Link to="/upload">
               <PlusCircle className="mr-2 h-4 w-4" /> New product
             </Link>
@@ -116,140 +137,181 @@ function ConsoleDashboard() {
         </>
       }
     >
-      <div className="space-y-6">
-        <SectionCard title="Needs your attention">
-          {listingsQuery.isLoading ? (
-            <RowSkeletons count={2} />
-          ) : tasks.length === 0 ? (
-            <div className="flex items-start gap-3">
-              <CheckCircle2 className="mt-0.5 h-5 w-5 text-brand-green" />
-              <div>
-                <p className="text-sm font-medium">You are all caught up</p>
-                <p className="text-sm text-muted-foreground">
-                  Nothing is blocked. Improve your store presence next.
-                </p>
-                <Button asChild size="sm" variant="outline" className="mt-3">
-                  <Link to="/console/quality">
-                    <Sparkles className="mr-2 h-4 w-4" /> Review listing quality
-                  </Link>
-                </Button>
+      <div className="space-y-5 [&_.surface-card]:rounded-none">
+        <section className="grid gap-0 border border-border bg-background md:grid-cols-[1.4fr_1fr]">
+          <div className="flex flex-col justify-between gap-5 border-b border-border p-5 sm:p-6 md:border-b-0 md:border-r">
+            <div>
+              <div className="mb-3 flex flex-wrap items-center gap-2">
+                <Badge variant="outline" className="rounded-none">DEVELOPER OVERVIEW</Badge>
+                {subscribed && <Badge className="rounded-none">PRO ACTIVE</Badge>}
               </div>
+              <h2 className="font-display text-xl font-semibold tracking-tight sm:text-2xl">Your store, at a glance</h2>
+              <p className="mt-2 max-w-xl text-sm text-muted-foreground">
+                A clear view of what is live, what needs work, and how people are finding your products.
+              </p>
             </div>
-          ) : (
-            <ul className="divide-y divide-border">
-              {tasks.slice(0, 6).map((t) => (
-                <li key={t.key}>
-                  <Link
-                    to="/console/products/$id"
-                    params={{ id: t.to }}
-                    className="flex items-center gap-3 py-3 text-sm hover:text-primary"
-                  >
-                    <AlertTriangle
-                      className={
-                        t.tone === "warn"
-                          ? "h-4 w-4 shrink-0 text-brand-red"
-                          : "h-4 w-4 shrink-0 text-muted-foreground"
-                      }
-                    />
-                    <span className="min-w-0 flex-1">{t.text}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </SectionCard>
-
-        {statsQuery.isLoading ? (
-          <TileSkeletons />
-        ) : (
-          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <MetricTile label="Installs and visits (30d)" value={sum(stats, "installs")} />
-            <MetricTile label="Store views (30d)" value={sum(stats, "views")} />
-            <MetricTile
-              label="Conversion"
-              value={`${conversion(stats)}%`}
-              hint="Views that convert"
-            />
-            <MetricTile
-              label="Average rating"
-              value={Number.isFinite(rating) && rating > 0 ? rating.toFixed(1) : "N/A"}
-              hint={`${listings.reduce((a, l) => a + l.rating_count, 0)} ratings`}
-            />
+            <div className="flex flex-wrap gap-2">
+              <Button asChild className="rounded-none">
+                <Link to="/upload"><Rocket className="mr-2 h-4 w-4" /> Publish a product</Link>
+              </Button>
+              <Button asChild variant="outline" className="rounded-none">
+                <Link to="/console/analytics"><BarChart3 className="mr-2 h-4 w-4" /> Open analytics</Link>
+              </Button>
+            </div>
           </div>
-        )}
+          <div className="grid grid-cols-2">
+            {[
+              { label: "Published", value: published.length, note: "Live listings" },
+              { label: "In review", value: pending.length, note: "Awaiting review" },
+              { label: "Drafts", value: drafts.length, note: "Not published" },
+              { label: "Action needed", value: rejected.length + tasks.filter((task) => task.tone === "info").length, note: "Fix or complete" },
+            ].map((item, index) => (
+              <div key={item.label} className={`p-4 sm:p-5 ${index % 2 === 0 ? "border-r" : ""} ${index < 2 ? "border-b" : ""} border-border`}>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{item.label}</p>
+                <p className="mt-2 font-display text-3xl font-bold tabular-nums">{listingsQuery.isLoading ? "—" : item.value}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{item.note}</p>
+              </div>
+            ))}
+          </div>
+        </section>
 
-        <SectionCard
-          title="Products"
-          action={
-            <Button asChild size="sm" variant="ghost">
-              <Link to="/console/products">View all</Link>
-            </Button>
-          }
-        >
-          {listingsQuery.isLoading ? (
-            <RowSkeletons />
-          ) : listings.length === 0 ? (
-            <EmptyState
-              icon={LayoutList}
-              title="Publish your first product"
-              description="Apps, websites, AI agents and browser extensions are all welcome."
-              action={
-                <Button asChild>
-                  <Link to="/upload">Start a listing</Link>
-                </Button>
-              }
-            />
-          ) : (
-            <ul className="divide-y divide-border">
-              {listings.slice(0, 4).map((l) => (
-                <li key={l.id}>
-                  <Link
-                    to="/console/products/$id"
-                    params={{ id: l.id }}
-                    className="flex items-center gap-3 py-3"
-                  >
-                    <img
-                      src={l.icon_url ?? "/favicon.png"}
-                      alt=""
-                      className="h-10 w-10 rounded-xl object-cover"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium">{l.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {l.downloads} {metricLabel(l.kind)} · {l.rating_count} ratings
-                      </p>
-                    </div>
-                    <StatusPill status={l.status} />
-                  </Link>
-                </li>
-              ))}
-            </ul>
+        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+          {statsQuery.isLoading ? <TileSkeletons /> : (
+            <>
+              <MetricTile label="Installs (30d)" value={installs.toLocaleString("en")} hint="Recorded installs" />
+              <MetricTile label="Store views (30d)" value={views.toLocaleString("en")} hint="Product page visits" />
+              <MetricTile label="View-to-install" value={`${conversion(stats)}%`} hint="Views that convert" />
+              <MetricTile label="Average rating" value={Number.isFinite(rating) && rating > 0 ? rating.toFixed(1) : "N/A"} hint={`${listings.reduce((total, listing) => total + listing.rating_count, 0)} ratings`} />
+            </>
           )}
-        </SectionCard>
+        </div>
 
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid gap-5 xl:grid-cols-[1.6fr_1fr]">
           <SectionCard
-            title="Reputation"
-            action={<Badge variant="secondary">{reputationTier(reputation)}</Badge>}
+            title="Performance over the last 30 days"
+            action={<Button asChild size="sm" variant="ghost" className="rounded-none"><Link to="/console/analytics">Detailed analytics <ArrowRight className="ml-1 h-4 w-4" /></Link></Button>}
           >
-            <Progress value={reputation} />
-            <p className="mt-2 text-xs text-muted-foreground">
-              {reputation}/100 from product quality, ratings, update frequency, compliance and
-              responsiveness.
-            </p>
+            {statsQuery.isLoading ? (
+              <div className="h-44 animate-pulse bg-muted" />
+            ) : stats.length === 0 || (views === 0 && installs === 0) ? (
+              <div className="flex min-h-40 flex-col items-center justify-center border border-dashed border-border px-4 py-8 text-center">
+                <TrendingUp className="mb-2 h-5 w-5 text-muted-foreground" />
+                <p className="text-sm font-medium">Performance data will appear here</p>
+                <p className="mt-1 max-w-sm text-xs text-muted-foreground">Views and installs are shown as events are recorded. Open analytics to explore the available reports.</p>
+                <Button asChild size="sm" variant="outline" className="mt-3 rounded-none"><Link to="/console/analytics">View analytics</Link></Button>
+              </div>
+            ) : (
+              <>
+                <div className="mb-4 flex flex-wrap gap-4 text-xs text-muted-foreground">
+                  <span className="inline-flex items-center gap-2"><span className="h-2 w-2 bg-primary" /> Views</span>
+                  <span className="inline-flex items-center gap-2"><span className="h-2 w-2 bg-brand-green" /> Installs</span>
+                </div>
+                <div className="flex h-40 items-end gap-1 border-b border-border pb-1 sm:gap-2">
+                  {recentStats.map((row) => (
+                    <div key={row.day} className="flex h-full min-w-0 flex-1 items-end justify-center gap-0.5" title={`${row.day}: ${row.views} views, ${row.installs} installs`}>
+                      <div className="w-1/2 max-w-4 bg-primary/80" style={{ height: `${Math.max(row.views ? 4 : 0, (row.views / maxDaily) * 100)}%` }} />
+                      <div className="w-1/2 max-w-4 bg-brand-green" style={{ height: `${Math.max(row.installs ? 4 : 0, (row.installs / maxDaily) * 100)}%` }} />
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-2 flex justify-between text-[11px] text-muted-foreground">
+                  <span>{recentStats[0]?.day ?? "Last 14 days"}</span>
+                  <span>{recentStats[recentStats.length - 1]?.day ?? ""}</span>
+                </div>
+              </>
+            )}
           </SectionCard>
-          <SectionCard title="Developer Pro">
-            <p className="text-sm text-muted-foreground">
-              {subscribed
-                ? `Active. Renews ${subscriptionQuery.data?.current_period_end?.slice(0, 10) ?? "monthly"}.`
-                : "MK5,000 per month unlocks priority review, advanced analytics and the AI assistant."}
-            </p>
-            <Button asChild size="sm" variant={subscribed ? "outline" : "default"} className="mt-3">
-              <Link to="/console/subscription">
-                {subscribed ? "Manage subscription" : "Upgrade to Pro"}
-              </Link>
-            </Button>
+
+          <SectionCard title="Publishing health">
+            {listingsQuery.isLoading ? <RowSkeletons count={2} /> : listings.length === 0 ? (
+              <EmptyState icon={Rocket} title="Start publishing" description="Create your first product listing to begin building your store presence." action={<Button asChild className="rounded-none"><Link to="/upload">Create listing</Link></Button>} />
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-end justify-between gap-3">
+                  <div>
+                    <p className="text-3xl font-bold tabular-nums">{Math.round((liveReady / Math.max(1, published.length)) * 100)}%</p>
+                    <p className="text-xs text-muted-foreground">Published listings at full readiness</p>
+                  </div>
+                  <span className="text-sm text-muted-foreground">{liveReady}/{published.length} live</span>
+                </div>
+                <Progress value={published.length ? (liveReady / published.length) * 100 : 0} />
+                <div className="divide-y divide-border border-y border-border">
+                  <div className="flex items-center justify-between py-3 text-sm"><span className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-brand-green" /> Published</span><strong>{published.length}</strong></div>
+                  <div className="flex items-center justify-between py-3 text-sm"><span className="flex items-center gap-2"><Rocket className="h-4 w-4 text-muted-foreground" /> In review</span><strong>{pending.length}</strong></div>
+                  <div className="flex items-center justify-between py-3 text-sm"><span className="flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-muted-foreground" /> Drafts / rejected</span><strong>{drafts.length + rejected.length}</strong></div>
+                </div>
+                <Button asChild variant="outline" className="w-full rounded-none"><Link to="/console/quality">Review listing quality <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
+              </div>
+            )}
           </SectionCard>
+        </div>
+
+        <div className="grid gap-5 xl:grid-cols-[1.35fr_1fr]">
+          <SectionCard title="Products" action={<Button asChild size="sm" variant="ghost" className="rounded-none"><Link to="/console/products">Manage all <ArrowRight className="ml-1 h-4 w-4" /></Link></Button>}>
+            {listingsQuery.isLoading ? <RowSkeletons /> : listings.length === 0 ? (
+              <EmptyState icon={LayoutList} title="Publish your first product" description="Apps, websites, AI agents and browser extensions are all welcome." action={<Button asChild className="rounded-none"><Link to="/upload">Start a listing</Link></Button>} />
+            ) : (
+              <ul className="divide-y divide-border">
+                {listings.slice(0, 5).map((listing) => (
+                  <li key={listing.id}>
+                    <Link to="/console/products/$id" params={{ id: listing.id }} className="flex items-center gap-3 py-3 hover:bg-muted/40">
+                      <img src={listing.icon_url ?? "/favicon.png"} alt="" className="h-11 w-11 rounded-none border border-border object-cover" />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium">{listing.name}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">{listing.downloads} {metricLabel(listing.kind)} · {listing.rating_count} ratings</p>
+                      </div>
+                      <StatusPill status={listing.status} />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </SectionCard>
+
+          <div className="space-y-5">
+            <SectionCard title="Needs your attention" action={<Badge variant="outline" className="rounded-none">{tasks.length} items</Badge>}>
+              {listingsQuery.isLoading ? <RowSkeletons count={2} /> : tasks.length === 0 ? (
+                <div className="flex items-start gap-3">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-brand-green" />
+                  <div>
+                    <p className="text-sm font-medium">You are all caught up</p>
+                    <p className="mt-1 text-sm text-muted-foreground">Nothing is blocked. Keep your listings complete and up to date.</p>
+                  </div>
+                </div>
+              ) : (
+                <ul className="divide-y divide-border">
+                  {tasks.slice(0, 5).map((task) => (
+                    <li key={task.key}>
+                      <Link to="/console/products/$id" params={{ id: task.to }} className="flex items-start gap-3 py-3 text-sm hover:text-primary">
+                        <AlertTriangle className={`mt-0.5 h-4 w-4 shrink-0 ${task.tone === "warn" ? "text-brand-red" : "text-muted-foreground"}`} />
+                        <span className="min-w-0 flex-1">{task.text}</span>
+                        <ArrowRight className="mt-0.5 h-4 w-4 shrink-0" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </SectionCard>
+
+            <SectionCard title="Developer reputation" action={<Badge variant="secondary" className="rounded-none">{reputationTier(reputation)}</Badge>}>
+              <div className="flex items-end justify-between gap-3">
+                <p className="font-display text-3xl font-bold tabular-nums">{reputation}<span className="ml-1 text-sm font-normal text-muted-foreground">/100</span></p>
+                <p className="text-xs text-muted-foreground">Quality · ratings · updates</p>
+              </div>
+              <Progress value={reputation} className="mt-3" />
+            </SectionCard>
+
+            <SectionCard title="Developer Pro" action={subscribed ? <Badge className="rounded-none">Active</Badge> : <Badge variant="outline" className="rounded-none">Optional</Badge>}>
+              <p className="text-sm text-muted-foreground">
+                {subscribed
+                  ? `Your subscription is active. Renews ${subscriptionQuery.data?.current_period_end?.slice(0, 10) ?? "monthly"}.`
+                  : "MK5,000 per month unlocks priority review, advanced analytics and the AI assistant."}
+              </p>
+              <Button asChild size="sm" variant={subscribed ? "outline" : "default"} className="mt-3 w-full rounded-none">
+                <Link to="/console/subscription">{subscribed ? "Manage subscription" : "Explore Developer Pro"}</Link>
+              </Button>
+            </SectionCard>
+          </div>
         </div>
       </div>
     </ConsoleShell>
