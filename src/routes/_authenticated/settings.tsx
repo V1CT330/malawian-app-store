@@ -1,14 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
-  Bell,
   Camera,
-  Check,
   ChevronRight,
   LogOut,
   Moon,
   Store,
-  UserRound,
 } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
@@ -197,7 +194,6 @@ function SettingsPage() {
             <a href="#profile" className="shrink-0 border-b-2 border-primary pb-3 font-medium">Profile</a>
             <a href="#preferences" className="shrink-0 border-b-2 border-transparent pb-3 text-muted-foreground hover:text-foreground">Appearance</a>
             <a href="#workspace" className="shrink-0 border-b-2 border-transparent pb-3 text-muted-foreground hover:text-foreground">Workspace</a>
-            <a href="#notifications" className="shrink-0 border-b-2 border-transparent pb-3 text-muted-foreground hover:text-foreground">Notifications</a>
           </nav>
         </header>
 
@@ -365,21 +361,6 @@ function SettingsPage() {
           </div>
         </section>
 
-        <section id="notifications" className="scroll-mt-24 border-b border-border py-7 sm:py-8">
-          <div className="grid gap-6 sm:grid-cols-[200px_minmax(0,1fr)] sm:gap-10">
-            <div>
-              <h2 className="font-display text-lg font-semibold">Notifications</h2>
-              <p className="mt-1 text-sm leading-5 text-muted-foreground">View updates and messages about your account.</p>
-            </div>
-            <div className="min-w-0 divide-y divide-border">
-              <Link to="/notifications" className="group flex items-center gap-3 py-4 first:pt-0 hover:text-primary">
-                <Bell className="h-5 w-5 shrink-0 text-muted-foreground" />
-                <div className="min-w-0 flex-1"><p className="text-sm font-medium">Notifications</p><p className="mt-1 text-xs text-muted-foreground">Store updates, review decisions and account messages.</p></div>
-                <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-              </Link>
-            </div>
-          </div>
-        </section>
 
         <div className="flex flex-col gap-3 py-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs leading-5 text-muted-foreground">Your account settings are saved to your profile or device as appropriate.</p>
