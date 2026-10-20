@@ -148,22 +148,38 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
                      (text.length < 100 || /lovable/i.test(href)); // avoid hiding big paragraphs
             }
 
-            function scrub() {
+            function scrubNode(root) {
+              if (!(root instanceof Element)) return;
+              const candidates = [];
+              if (root.matches(SELECTORS)) candidates.push(root);
+              candidates.push(...root.querySelectorAll(SELECTORS));
+              candidates.forEach(el => {
+                if (el.isConnected && shouldHide(el)) {
+                  el.style.setProperty('display', 'none', 'important');
+                  el.remove();
+                }
+              });
+            }
+
+            function scrubInitialContent() {
               document.querySelectorAll(SELECTORS).forEach(el => {
                 if (shouldHide(el)) {
                   el.style.setProperty('display', 'none', 'important');
                   el.remove();
                 }
               });
-              // scrub meta generator
               document.querySelectorAll('meta[name="generator"], meta[property="og:site_name"]').forEach(m => {
                 if (/lovable/i.test(m.content)) m.remove();
               });
             }
 
             function start() {
-              scrub();
-              const observer = new MutationObserver(scrub);
+              scrubInitialContent();
+              // Inspect only newly inserted subtrees instead of rescanning the entire
+              // document on every React mutation.
+              const observer = new MutationObserver(records => {
+                records.forEach(record => record.addedNodes.forEach(scrubNode));
+              });
               observer.observe(document.body, { childList: true, subtree: true });
             }
             // Wait until React has hydrated so the scrubber never alters server HTML.
