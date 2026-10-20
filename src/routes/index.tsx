@@ -83,7 +83,7 @@ function StorePage() {
       const [listingsResult, profilesResult] = await Promise.all([
         supabase
           .from("listings")
-          .select("*")
+          .select("id,developer_id,slug,name,tagline,description,category,kind,icon_url,downloads,rating_avg,rating_count,created_at,status")
           .eq("status", "published")
           .order("created_at", { ascending: false }),
         supabase.from("public_profiles").select("id,developer_name,display_name"),
@@ -94,7 +94,7 @@ function StorePage() {
         (profilesResult.data ?? []).map((profile) => [profile.id, profile]),
       );
       return (listingsResult.data ?? []).map((listing) => ({
-        ...(listing as Listing),
+        ...(listing as unknown as Listing),
         developer: developers.get(listing.developer_id) ?? null,
       }));
     },
