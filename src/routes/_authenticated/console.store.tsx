@@ -93,10 +93,14 @@ function DeveloperProfilePage() {
         .eq("id", userId!);
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Profile saved");
-      queryClient.invalidateQueries({ queryKey: ["profile", userId] });
-      extra.refetch();
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["profile", userId] }),
+        queryClient.invalidateQueries({ queryKey: ["social", "profiles"] }),
+        queryClient.invalidateQueries({ queryKey: ["developer", userId] }),
+      ]);
+      await extra.refetch();
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -110,9 +114,13 @@ function DeveloperProfilePage() {
 
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Social pages saved");
-      queryClient.invalidateQueries({ queryKey: ["profile", userId] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["profile", userId] }),
+        queryClient.invalidateQueries({ queryKey: ["social", "profiles"] }),
+        queryClient.invalidateQueries({ queryKey: ["developer", userId] }),
+      ]);
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -126,9 +134,14 @@ function DeveloperProfilePage() {
         .eq("id", userId!);
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Profile photo updated");
-      queryClient.invalidateQueries({ queryKey: ["profile", userId] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["profile", userId] }),
+        queryClient.invalidateQueries({ queryKey: ["social", "profiles"] }),
+        queryClient.invalidateQueries({ queryKey: ["developer", userId] }),
+        queryClient.invalidateQueries({ queryKey: ["signed-url"] }),
+      ]);
     },
     onError: (e: Error) => toast.error(e.message),
   });
