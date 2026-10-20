@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ChevronRight, RefreshCw } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
 import { ListingCard, ListingTile } from "@/components/ListingCard";
@@ -105,29 +105,40 @@ function StorePage() {
   });
 
   const normalizedSearch = search.trim().toLowerCase();
-  const listings = (data ?? []).filter((l) => {
-    const matchesSearch =
-      !normalizedSearch ||
-      l.name.toLowerCase().includes(normalizedSearch) ||
-      (l.tagline ?? "").toLowerCase().includes(normalizedSearch) ||
-      (l.description ?? "").toLowerCase().includes(normalizedSearch) ||
-      l.category.toLowerCase().includes(normalizedSearch) ||
-      l.kind.toLowerCase().includes(normalizedSearch) ||
-      (l.developer?.developer_name ?? l.developer?.display_name ?? "")
-        .toLowerCase()
-        .includes(normalizedSearch);
-    const matchesKind = kind === "all" || l.kind === kind;
-    const matchesCategory = category === "All" || l.category === category;
-    return matchesSearch && matchesKind && matchesCategory;
-  });
+  const listings = useMemo(
+    () =>
+      (data ?? []).filter((l) => {
+        const matchesSearch =
+          !normalizedSearch ||
+          l.name.toLowerCase().includes(normalizedSearch) ||
+          (l.tagline ?? "").toLowerCase().includes(normalizedSearch) ||
+          (l.description ?? "").toLowerCase().includes(normalizedSearch) ||
+          l.category.toLowerCase().includes(normalizedSearch) ||
+          l.kind.toLowerCase().includes(normalizedSearch) ||
+          (l.developer?.developer_name ?? l.developer?.display_name ?? "")
+            .toLowerCase()
+            .includes(normalizedSearch);
+        const matchesKind = kind === "all" || l.kind === kind;
+        const matchesCategory = category === "All" || l.category === category;
+        return matchesSearch && matchesKind && matchesCategory;
+      }),
+    [data, normalizedSearch, kind, category],
+  );
 
   const hasFilters = normalizedSearch !== "" || kind !== "all" || category !== "All";
   const browsing = !hasFilters;
-  const topCharts = [...listings].sort((a, b) => b.downloads - a.downloads).slice(0, 8);
-  const topRated = [...listings]
-    .sort((a, b) => b.rating_avg * b.rating_count - a.rating_avg * a.rating_count)
-    .slice(0, 8);
-  const fresh = listings.slice(0, 8);
+  const topCharts = useMemo(
+    () => [...listings].sort((a, b) => b.downloads - a.downloads).slice(0, 8),
+    [listings],
+  );
+  const topRated = useMemo(
+    () =>
+      [...listings]
+        .sort((a, b) => b.rating_avg * b.rating_count - a.rating_avg * a.rating_count)
+        .slice(0, 8),
+    [listings],
+  );
+  const fresh = useMemo(() => listings.slice(0, 8), [listings]);
 
   const updateSearch = (value: string) => {
     const next = value.slice(0, 120);
