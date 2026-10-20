@@ -43,12 +43,12 @@ function DeveloperPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("listings")
-        .select("*")
+        .select("id,developer_id,slug,name,tagline,description,category,kind,icon_url,downloads,rating_avg,rating_count,created_at,status")
         .eq("developer_id", id)
         .eq("status", "published")
         .order("downloads", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as Listing[];
+      return (data ?? []) as unknown as Listing[];
     },
   });
 
