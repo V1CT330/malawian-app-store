@@ -528,7 +528,7 @@ function SocialPage() {
         </SheetContent>
       </Sheet>
 
-      <section className="min-h-[calc(100vh-4rem)] w-full border-b border-border/70 bg-muted/30">
+      <section className="min-h-[calc(100vh-4rem)] w-full min-w-0 max-w-full overflow-x-clip border-b border-border/70 bg-muted/30">
         <div className="flex items-center justify-between gap-2 border-b border-border/70 bg-background px-4 py-3.5 sm:px-6">
           <div>
              <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">Social</h1>
@@ -551,7 +551,7 @@ function SocialPage() {
           })}
         </nav>
 
-        <main className="min-h-[220px] min-w-0">
+        <main className="min-h-[220px] w-full min-w-0 max-w-full overflow-x-clip">
           {!userId ? (
             <div className="px-4 py-8 text-sm text-muted-foreground">Sign in to use Social.</div>
           ) : activeSection === "Feed" ? (
