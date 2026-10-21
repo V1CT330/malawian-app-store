@@ -15,6 +15,7 @@ import {
   Menu,
   MessageCircle,
   MoreHorizontal,
+  Pencil,
   Package,
   Plus,
   Search,
@@ -123,6 +124,8 @@ function SocialPage() {
   const [postDraft, setPostDraft] = useState("");
   const [postMedia, setPostMedia] = useState<File | null>(null);
   const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingCommentDraft, setEditingCommentDraft] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRecipient, setSelectedRecipient] = useState<string | null>(null);
   const [messageDraft, setMessageDraft] = useState("");
@@ -433,6 +436,57 @@ function SocialPage() {
     onError: (error: Error) => toast.error(error.message || "Could not add comment"),
   });
 
+  const editComment = useMutation({
+    mutationFn: async ({ commentId, body }: { commentId: string; body: string }) => {
+      const nextBody = body.trim();
+      if (!nextBody) throw new Error("A comment cannot be empty");
+      if (nextBody.length > 1000) throw new Error("Comments must be 1,000 characters or fewer");
+      const comment = (commentsQuery.data ?? []).find((item) => item.id === commentId);
+      if (!comment || comment.author_id !== userId) throw new Error("You can only edit your own comments");
+      const { data, error } = await socialDb
+        .from("social_post_comments")
+        .update({ body: nextBody })
+        .eq("id", commentId)
+        .eq("author_id", userId)
+        .select("id")
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) throw new Error("Comment was not updated. Refresh and try again.");
+    },
+    onSuccess: async () => {
+      setEditingCommentId(null);
+      setEditingCommentDraft("");
+      await queryClient.invalidateQueries({ queryKey: ["social", "comments"] });
+      toast.success("Comment updated");
+    },
+    onError: (error: Error) => toast.error(error.message || "Could not edit comment"),
+  });
+
+  const deleteComment = useMutation({
+    mutationFn: async (commentId: string) => {
+      const comment = (commentsQuery.data ?? []).find((item) => item.id === commentId);
+      if (!comment || comment.author_id !== userId) throw new Error("You can only delete your own comments");
+      const { data, error } = await socialDb
+        .from("social_post_comments")
+        .delete()
+        .eq("id", commentId)
+        .eq("author_id", userId)
+        .select("id")
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) throw new Error("Comment was not deleted. Refresh and try again.");
+    },
+    onSuccess: async () => {
+      if (editingCommentId) {
+        setEditingCommentId(null);
+        setEditingCommentDraft("");
+      }
+      await queryClient.invalidateQueries({ queryKey: ["social", "comments"] });
+      toast.success("Comment deleted");
+    },
+    onError: (error: Error) => toast.error(error.message || "Could not delete comment"),
+  });
+
   const sendConnection = useMutation({
     mutationFn: async (recipientId: string) => {
       const existing = relationshipMap.get(recipientId);
@@ -739,9 +793,38 @@ function SocialPage() {
                         }
                       }} className="flex flex-1 items-center justify-center gap-2 px-2 py-1.5 hover:text-foreground"><Share2 className="h-5 w-5" /></button>
                     </div>
+                    {commentsQuery.isError && <p role="alert" className="pt-3 text-xs text-destructive">Comments could not load. Refresh to try again.</p>}
                     {postComments.slice(-5).map((comment) => {
                       const commentAuthor = profileMap.get(comment.author_id) ?? (comment.author_id === userId ? profile as SocialProfile : null);
-                      return <div key={comment.id} className="flex items-start gap-2 pt-3"><Avatar profile={commentAuthor} size="sm" /><div className="min-w-0 flex-1 border border-border/60 bg-muted/40 px-3 py-2"><p className="text-xs font-semibold">{displayName(commentAuthor)}</p><p className="whitespace-pre-wrap break-words text-sm">{comment.body}</p></div></div>;
+                      const isOwnComment = comment.author_id === userId;
+                      const isEditing = editingCommentId === comment.id;
+                      return (
+                        <div key={comment.id} className={cn("flex items-start gap-2 pt-3", isOwnComment && "flex-row-reverse")}>
+                          <Avatar profile={commentAuthor} size="sm" />
+                          <div className={cn("social-comment-bubble min-w-0 max-w-[88%] flex-1 border border-border/60 px-3 py-2", isOwnComment ? "bg-primary/10" : "bg-muted/50")}>
+                            <div className="mb-1 flex items-center justify-between gap-3">
+                              <p className="truncate text-xs font-semibold">{displayName(commentAuthor)}</p>
+                              {isOwnComment && !isEditing && (
+                                <div className="flex shrink-0 items-center gap-1">
+                                  <button type="button" onClick={() => { setEditingCommentId(comment.id); setEditingCommentDraft(comment.body); }} aria-label="Edit comment" title="Edit comment" className="rounded-full p-1 text-muted-foreground hover:bg-background hover:text-foreground"><Pencil className="h-3.5 w-3.5" /></button>
+                                  <button type="button" disabled={deleteComment.isPending} onClick={() => { if (window.confirm("Delete this comment? This cannot be undone.")) deleteComment.mutate(comment.id); }} aria-label="Delete comment" title="Delete comment" className="rounded-full p-1 text-muted-foreground hover:bg-background hover:text-destructive disabled:opacity-50"><Trash2 className="h-3.5 w-3.5" /></button>
+                                </div>
+                              )}
+                            </div>
+                            {isEditing ? (
+                              <form onSubmit={(event) => { event.preventDefault(); editComment.mutate({ commentId: comment.id, body: editingCommentDraft }); }} className="space-y-2">
+                                <textarea value={editingCommentDraft} onChange={(event) => setEditingCommentDraft(event.target.value)} maxLength={1000} rows={2} autoFocus aria-label="Edit comment" className="w-full resize-y border border-border bg-background px-2 py-1.5 text-sm outline-none focus:border-primary" />
+                                <div className="flex justify-end gap-2">
+                                  <button type="button" onClick={() => { setEditingCommentId(null); setEditingCommentDraft(""); }} className="px-2 py-1 text-xs text-muted-foreground hover:text-foreground">Cancel</button>
+                                  <button type="submit" disabled={!editingCommentDraft.trim() || editComment.isPending} className="bg-primary px-3 py-1 text-xs font-medium text-primary-foreground disabled:opacity-50">{editComment.isPending ? "Saving…" : "Save"}</button>
+                                </div>
+                              </form>
+                            ) : (
+                              <p className="whitespace-pre-wrap break-words text-sm">{comment.body}</p>
+                            )}
+                          </div>
+                        </div>
+                      );
                     })}
                     <form onSubmit={(event) => submitComment(event, post.id)} className="mt-3 flex items-center gap-2">
                       <label className="sr-only" htmlFor={`comment-${post.id}`}>Write a comment</label>
