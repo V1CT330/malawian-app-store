@@ -4,6 +4,7 @@ import { BellOff, CheckCheck } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
+import { DemoPreview } from "@/components/DemoPreview";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "@/hooks/useSession";
@@ -93,6 +94,7 @@ function NotificationsPage() {
         </Button>
       </div>
 
+      {!list.isLoading && !list.isError && !(list.data ?? []).length && <DemoPreview title="Notification centre preview" description="Examples of updates that can appear here as you use MAS." items={[{ title: "Your app passed review", detail: "Mlimi Connect is now visible in the store.", status: "Publishing" }, { title: "New product review", detail: "A user left a 5-star review on Campus Hub.", status: "Reviews" }, { title: "Developer verification update", detail: "Your submitted documents are being checked.", status: "Account" }]} />}
       <div className="mt-4 space-y-3">
         {list.isLoading ? (
           <Skeleton className="h-16 w-full rounded-2xl" />
