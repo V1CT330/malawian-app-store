@@ -36,6 +36,8 @@ import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useProfile, useSignedUrl, useUnreadCount } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { SocialNotificationsPanel } from "@/components/console/SocialNotificationsPanel";
+import { InvestGrowPanel } from "@/components/console/InvestGrowPanel";
 
 // New social tables are introduced by the additive migration
 // 20261019140000_social_platform_core.sql. Keep generated Supabase types untouched
@@ -51,7 +53,8 @@ const sections = [
   { id: "Feed", icon: Home, description: "Updates from people and communities." },
   { id: "Friends", icon: Users, description: "Friend requests and people on MAS." },
   { id: "Messages", icon: MessageCircle, description: "Private conversations with other MAS members." },
-  { id: "Notifications", icon: Bell, description: "Your account and social activity." },
+  { id: "Notifications", icon: Bell, description: "Your social activity and connection updates." },
+  { id: "Invest & Grow", icon: Users, description: "Connect founders, investors and startup opportunities." },
   { id: "Search", icon: Search, description: "Find members across MAS." },
   { id: "My Profile", icon: UserCircle, description: "Your profile, posts, and published work." },
   { id: "Monetization", icon: Wallet, description: "Explore creator earning options and payout readiness." },
@@ -680,7 +683,8 @@ function SocialPage() {
                   type="button"
                   onClick={() => {
                     setSidebarOpen(false);
-                    toast.info(`${label} section is coming soon.`);
+                    if (label === "Investors") setActiveSection("Invest & Grow");
+                    else toast.info(`${label} opportunities are not yet available.`);
                   }}
                   className="block w-full border-b border-border px-3 py-3 text-left text-sm text-foreground transition-colors hover:bg-secondary"
                 >
@@ -706,7 +710,7 @@ function SocialPage() {
           {sections.map(({ id, icon: Icon }) => {
             const selected = activeSection === id;
             return (
-              <button key={id} type="button" onClick={() => id === "Notifications" ? navigate({ to: "/notifications" }) : setActiveSection(id)} aria-label={id} title={id} aria-current={selected ? "page" : undefined}
+              <button key={id} type="button" onClick={() => setActiveSection(id)} aria-label={id} title={id} aria-current={selected ? "page" : undefined}
                 className={cn("flex min-h-14 min-w-[76px] shrink-0 flex-col items-center justify-center gap-1 border-b-2 px-2 py-2.5 transition-colors duration-200 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:min-w-0 sm:flex-1 sm:flex-row sm:gap-2 sm:px-3 sm:py-3 lg:px-5", selected ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:border-border hover:text-foreground")}>
                 <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
                 <span className="max-w-full truncate text-[10px] leading-none sm:text-xs">{id}</span>
@@ -1015,6 +1019,16 @@ function SocialPage() {
                 </> : <div className="flex flex-1 flex-col items-center justify-center px-6 py-12 text-center"><MessageCircle className="h-8 w-8 text-muted-foreground" /><p className="mt-3 text-sm font-semibold">Your messages</p><p className="mt-1 max-w-xs text-sm text-muted-foreground">Choose a conversation to start messaging.</p></div>}
               </section>
             </div>
+          ) : activeSection === "Notifications" ? (
+            <SocialNotificationsPanel userId={userId} />
+          ) : activeSection === "Invest & Grow" ? (
+            <InvestGrowPanel
+              userId={userId}
+              members={profilesQuery.data ?? []}
+              acceptedIds={acceptedIds}
+              onConnect={(recipientId) => sendConnection.mutate(recipientId)}
+              onMessage={(recipientId) => { setSelectedRecipient(recipientId); setActiveSection("Messages"); }}
+            />
           ) : activeSection === "Monetization" ? (
             <div className="w-full px-4 pb-8 pt-4 sm:px-6 lg:px-8">
               <header className="pb-5">
