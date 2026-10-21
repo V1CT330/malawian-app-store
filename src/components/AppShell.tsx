@@ -46,7 +46,6 @@ export function AppShell({
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      {!isUserSettingsPage && (
       <header
         className="sticky top-0 z-30 bg-background px-3 pb-2 pt-3"
         style={{ paddingTop: "calc(0.75rem + env(safe-area-inset-top))" }}
@@ -85,6 +84,7 @@ export function AppShell({
                 />
               </>
             )}
+{!isUserSettingsPage && (
             <Link
               to={userId ? "/settings" : "/auth"}
               aria-label="Account"
@@ -95,10 +95,10 @@ export function AppShell({
                 <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-destructive" />
               )}
             </Link>
+            )}
           </div>
         </div>
       </header>
-      )}
 
       <main
         className="mas-mobile-main mx-auto w-full max-w-5xl flex-1 px-3 pb-28 sm:pb-12"
