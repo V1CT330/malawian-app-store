@@ -23,6 +23,7 @@ import {
   Store,
   Sun,
   Users,
+  Wallet,
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
@@ -60,6 +61,7 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   store: Store,
   manage: Users,
   settings: Settings,
+  wallet: Wallet,
 };
 
 const navLinkClass =
