@@ -10,6 +10,7 @@ type Role = "founder" | "investor" | "both";
 type Currency = "MWK" | "USD" | "ZAR" | "GBP" | "EUR";
 type Opportunity = { id: string; founder_id: string; title: string; description: string; industry: string; stage: string; funding_goal: number | null; currency: string; use_of_funds: string | null; status: "open" | "paused" | "closed"; created_at: string };
 type InvestmentProfile = { user_id: string; role: Role; organization_name: string | null; headline: string | null; bio: string | null; location: string | null; visibility: "public" | "connections" };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const socialDb = supabase as any;
 const inputClass = "min-w-0 rounded-md border border-border bg-background px-3 py-2 text-sm";
 const labelClass = "grid gap-1.5 text-xs font-medium";
