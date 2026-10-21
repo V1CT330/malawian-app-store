@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { FlaskConical } from "lucide-react";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
+import { DemoPreview } from "@/components/DemoPreview";
 import { EmptyState, RowSkeletons, SectionCard, StatusPill } from "@/components/console/primitives";
 import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/useSession";
@@ -57,6 +58,7 @@ function TestingPage() {
       description="Invite testers per product, then track who is on each channel."
       breadcrumbs={[{ label: "Console", to: "/console" }, { label: "Testing" }]}
     >
+      {!testersQuery.isLoading && testers.length === 0 && <DemoPreview title="Beta testing preview" description="Sample testers and feedback for products before release." items={[{ title: "tester01@example.test", detail: "Mlimi Connect · Internal channel", status: "Invited" }, { title: "tester02@example.test", detail: "Banja Budget · Closed testing", status: "Accepted" }, { title: "tester03@example.test", detail: "Dziko Weather · Closed testing", status: "Feedback received" }]} />}
       <div className="space-y-6">
         <SectionCard title={`Testers (${testers.length})`}>
           {testersQuery.isLoading ? (
