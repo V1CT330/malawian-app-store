@@ -387,7 +387,7 @@ function SettingsPage() {
                         ? "Switching workspace…"
                         : mode === "developer"
                           ? "Developer workspace"
-                          : "Shopping mode"}
+                          : "User mode"}
                     </p>
                     <p className="mt-1 text-sm leading-5 text-muted-foreground">
                       {mode === "developer" ? "Manage your published products and developer tools." : "Discover apps, save products and manage your library."}
