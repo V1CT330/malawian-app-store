@@ -836,7 +836,7 @@ function SocialPage() {
               })}
             </div>
           ) : activeSection === "My Profile" ? (
-            <div className="mx-auto w-full max-w-3xl space-y-3 px-0 pb-8 pt-3 sm:px-4">
+            <div className="mx-auto w-full max-w-3xl space-y-3 px-0 pb-8 pt-0 sm:px-4">
               <section className="border-y border-border bg-background sm:border-x">
                 <div className="h-24 bg-gradient-to-r from-primary/20 via-primary/10 to-muted sm:h-32" aria-hidden="true" />
                 <div className="px-4 pb-5 sm:px-6">
