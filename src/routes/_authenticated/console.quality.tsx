@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ClipboardCheck } from "lucide-react";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
+import { DemoPreview } from "@/components/DemoPreview";
 import { EmptyState, RowSkeletons, SectionCard } from "@/components/console/primitives";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -41,6 +42,7 @@ function QualityPage() {
       description="How complete and discoverable each listing is right now."
       breadcrumbs={[{ label: "Console", to: "/console" }, { label: "Quality" }]}
     >
+      {!listingsQuery.isLoading && listings.length === 0 && <DemoPreview title="Listing quality preview" description="Example readiness checks for a fully populated account." items={[{ title: "Mlimi Connect", detail: "Description, icon, screenshots and privacy details complete.", metric: "100% ready", status: "Ready" }, { title: "Banja Budget", detail: "Add two screenshots and a support URL.", metric: "80% ready", status: "Needs work" }, { title: "Dziko Weather", detail: "Improve keywords and the short description.", metric: "SEO score: 86/100", status: "Optimise" }]} />}
       {listingsQuery.isLoading ? (
         <RowSkeletons count={3} />
       ) : listings.length === 0 ? (
