@@ -3,6 +3,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { MessageSquare, Star } from "lucide-react";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
+import { DemoPreview } from "@/components/DemoPreview";
 import { EmptyState, MetricTile, RowSkeletons, SectionCard } from "@/components/console/primitives";
 import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/useSession";
@@ -88,6 +89,7 @@ function ReviewsPage() {
           <MetricTile label="Products" value={listings.length} />
         </div>
 
+        {!listingsQuery.isLoading && !reviewsQuery.isLoading && reviews.length === 0 && <DemoPreview title="Review inbox preview" description="Sample feedback showing how ratings and replies will appear." items={[{ title: "Mlimi Connect · 5 stars", detail: "“Helpful for keeping track of farm activities.”", metric: "Reply status: Replied", status: "Published" }, { title: "Campus Hub · 4 stars", detail: "“Useful campus resources. Please add more timetables.”", metric: "Reply needed", status: "New" }, { title: "Dziko Weather · 5 stars", detail: "“Simple and easy to understand.”", metric: "Average rating: 4.7/5", status: "Published" }]} />}
         <SectionCard title="Latest reviews">
           {listingsQuery.isLoading || reviewsQuery.isLoading ? (
             <RowSkeletons count={3} />
