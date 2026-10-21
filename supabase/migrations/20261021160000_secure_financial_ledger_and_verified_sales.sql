@@ -72,7 +72,7 @@ $function$;
 REVOKE ALL ON FUNCTION public.guard_order_seller_eligibility() FROM PUBLIC, anon, authenticated;
 DROP TRIGGER IF EXISTS guard_order_seller_eligibility_trg ON public.orders;
 CREATE TRIGGER guard_order_seller_eligibility_trg
-  BEFORE INSERT OR UPDATE OF status ON public.orders
+  BEFORE INSERT OR UPDATE ON public.orders
   FOR EACH ROW EXECUTE FUNCTION public.guard_order_seller_eligibility();
 
 COMMENT ON TABLE public.wallets IS
