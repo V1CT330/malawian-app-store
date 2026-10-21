@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Bell,
@@ -125,7 +125,6 @@ function SocialPage() {
   const { userId, profile } = useProfile();
   const ownAvatar = useSignedUrl(profile?.avatar_url);
   const unread = useUnreadCount();
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [activeSection, setActiveSection] = useState<SectionId>("Feed");
   const [sidebarOpen, setSidebarOpen] = useState(false);
