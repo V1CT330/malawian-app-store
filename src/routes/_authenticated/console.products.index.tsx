@@ -3,6 +3,7 @@ import { LayoutList, PlusCircle, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
+import { DemoPreview } from "@/components/DemoPreview";
 import { EmptyState, RowSkeletons, StatusPill } from "@/components/console/primitives";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -71,6 +72,7 @@ function ProductsPage() {
         </Button>
       }
     >
+      {!listingsQuery.isLoading && listings.length === 0 && <DemoPreview title="Your product catalogue" description="A preview of how a populated developer account can look." items={[{ title: "Mlimi Connect", detail: "Agriculture · Android app", metric: "1,240 installs · 4.8 rating", status: "Live" }, { title: "Campus Hub", detail: "Education · Web app", metric: "620 visits · 4.6 rating", status: "Live" }, { title: "Banja Budget", detail: "Finance · Mobile app", metric: "Draft checklist: 80% complete", status: "Draft" }, { title: "Dziko Weather", detail: "Utilities · Android app", metric: "Review team checking the submission", status: "In review" }]} />}
       <div className="mb-4 flex flex-col gap-3">
         <div className="relative">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
