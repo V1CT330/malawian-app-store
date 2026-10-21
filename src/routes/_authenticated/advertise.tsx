@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
+import { DemoPreview } from "@/components/DemoPreview";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -234,6 +235,7 @@ function AdvertisePage() {
         </Button>
       </section>
 
+      {!campaigns.isLoading && !(campaigns.data ?? []).length && <DemoPreview title="Campaign performance preview" description="Illustrative results for a sample promotion. No campaign has been created or charged." items={[{ title: "Mlimi Connect launch", detail: "Featured placement · All Malawi", metric: "2,450 impressions · 186 clicks", status: "Example" }, { title: "Campus Hub search boost", detail: "Search placement · Lilongwe", metric: "1,120 impressions · 94 clicks", status: "Example" }]} />}
       <section className="surface-card mt-4 p-4">
         <h2 className="font-display text-base font-semibold">Your campaigns</h2>
         {campaigns.isLoading ? (
