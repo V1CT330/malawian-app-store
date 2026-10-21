@@ -83,3 +83,45 @@ COMMENT ON TABLE public.orders IS
   'Client read-only. Order creation and settlement must use trusted server-side payment logic.';
 COMMENT ON TABLE public.payout_requests IS
   'Client read-only until a verified withdrawal workflow is implemented.';
+
+-- Protect KYC and trust fields on profile creation as well as updates.
+-- A self-inserted profile must never be able to claim approved identity verification.
+CREATE OR REPLACE FUNCTION public.guard_profile_fields()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $function$
+BEGIN
+  IF public.has_role(auth.uid(), 'admin') THEN
+    RETURN NEW;
+  END IF;
+
+  -- The Didit webhook and trusted server-side flows use the service role.
+  IF COALESCE(auth.role(), '') = 'service_role' THEN
+    RETURN NEW;
+  END IF;
+
+  IF TG_OP = 'INSERT' THEN
+    NEW.kyc_status := 'none'::public.kyc_status;
+    NEW.suspended := false;
+    NEW.reputation_score := 0;
+    NEW.follower_count := 0;
+    NEW.phone_verified := false;
+  ELSE
+    NEW.kyc_status := OLD.kyc_status;
+    NEW.suspended := OLD.suspended;
+    NEW.reputation_score := OLD.reputation_score;
+    NEW.follower_count := OLD.follower_count;
+    NEW.phone_verified := OLD.phone_verified;
+  END IF;
+
+  RETURN NEW;
+END;
+$function$;
+
+REVOKE ALL ON FUNCTION public.guard_profile_fields() FROM PUBLIC, anon, authenticated;
+DROP TRIGGER IF EXISTS guard_profile_fields_trg ON public.profiles;
+CREATE TRIGGER guard_profile_fields_trg
+  BEFORE INSERT OR UPDATE ON public.profiles
+  FOR EACH ROW EXECUTE FUNCTION public.guard_profile_fields();
