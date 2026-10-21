@@ -5,6 +5,7 @@ import {
   ChevronRight,
   LogOut,
   Moon,
+  Palette,
   Store,
 } from "lucide-react";
 import { useRef, useState } from "react";
@@ -44,7 +45,7 @@ function SettingsPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const mode = useMode();
-  const { dark, setTheme } = useTheme();
+  const { dark, setTheme, accent, setAccent } = useTheme();
   const avatar = useSignedUrl(profile?.avatar_url);
   const avatarInput = useRef<HTMLInputElement>(null);
   const [termsOpen, setTermsOpen] = useState(false);
@@ -320,6 +321,51 @@ function SettingsPage() {
                   <div><p className="text-sm font-medium">Dark theme</p><p className="mt-1 text-sm text-muted-foreground">Use a darker interface in low light.</p></div>
                 </div>
                 <Switch aria-label="Toggle dark theme" checked={dark} onCheckedChange={setTheme} />
+              </div>
+
+              <div className="border-b border-border py-5">
+                <div className="flex items-start gap-3">
+                  <Palette className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium">Accent color</p>
+                    <p className="mt-1 text-sm leading-5 text-muted-foreground">
+                      Customize the highlight color across the store and Developer Mode. Your choice is saved on this device.
+                    </p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {ACCENT_PRESETS.map((preset) => (
+                        <button
+                          key={preset.value}
+                          type="button"
+                          onClick={() => setAccent(preset.value)}
+                          aria-label={`Use ${preset.name} accent color`}
+                          aria-pressed={accent.toLowerCase() === preset.value.toLowerCase()}
+                          title={preset.name}
+                          className={`flex h-9 items-center gap-2 border px-2.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                            accent.toLowerCase() === preset.value.toLowerCase()
+                              ? "border-foreground bg-muted"
+                              : "border-border hover:bg-muted/60"
+                          }`}
+                        >
+                          <span className="h-4 w-4 border border-black/10" style={{ backgroundColor: preset.value }} />
+                          {preset.name}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="mt-4 flex flex-wrap items-center gap-3">
+                      <label className="flex items-center gap-3 border border-border px-3 py-2 text-sm">
+                        <span className="text-muted-foreground">Custom color</span>
+                        <input
+                          aria-label="Choose custom accent color"
+                          type="color"
+                          value={/^#[0-9a-f]{6}$/i.test(accent) ? accent : "#168447"}
+                          onChange={(event) => setAccent(event.target.value)}
+                          className="h-8 w-10 cursor-pointer border-0 bg-transparent p-0"
+                        />
+                      </label>
+                      <span className="font-mono text-xs uppercase text-muted-foreground">{accent}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
             </div>
