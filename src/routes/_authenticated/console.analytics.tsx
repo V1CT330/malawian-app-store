@@ -33,6 +33,7 @@ import {
 } from "recharts";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
+import { DemoPreview } from "@/components/DemoPreview";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -361,6 +362,7 @@ function AnalyticsPage() {
 
   return (
     <ConsoleShell title="Analytics">
+      {!listings.isLoading && all.length === 0 && <DemoPreview title="Analytics dashboard · sample view" description="Illustrative performance data only. Real charts will use events recorded for your products." items={[{ title: "Product page views", detail: "Daily visits across published listings.", metric: "3,840 · sample", status: "30 days" }, { title: "Installs", detail: "Install events attributed to product listings.", metric: "1,275 · sample", status: "30 days" }, { title: "Top device", detail: "Example audience breakdown.", metric: "Android · 78%", status: "Sample" }, { title: "Top location", detail: "Example country breakdown.", metric: "Malawi · 92%", status: "Sample" }]} />}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
