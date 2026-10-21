@@ -10,6 +10,7 @@ import {
   Rocket,
   TrendingUp,
 } from "lucide-react";
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip, Line, LineChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
 import { DemoPreview } from "@/components/DemoPreview";
@@ -116,6 +117,24 @@ function ConsoleDashboard() {
   const recentStats = stats.slice(-14);
   const views = sum(stats, "views");
   const installs = sum(stats, "installs");
+  const currentPeriod = stats.slice(-14);
+  const previousPeriod = stats.slice(-28, -14);
+  const currentViews = sum(currentPeriod, "views");
+  const previousViews = sum(previousPeriod, "views");
+  const currentInstalls = sum(currentPeriod, "installs");
+  const previousInstalls = sum(previousPeriod, "installs");
+  const currentConversion = currentViews ? (currentInstalls / currentViews) * 100 : 0;
+  const previousConversion = previousViews ? (previousInstalls / previousViews) * 100 : 0;
+  const percentDelta = (current: number, previous: number): number | null => {
+    if (previous === 0) return current === 0 ? null : 100;
+    return Math.round(((current - previous) / previous) * 100);
+  };
+  const listingStatusData = [
+    { name: "Published", value: published.length, color: "var(--google-green)" },
+    { name: "In review", value: pending.length, color: "var(--google-blue)" },
+    { name: "Drafts", value: drafts.length, color: "var(--google-yellow)" },
+    { name: "Rejected", value: rejected.length, color: "var(--google-red)" },
+  ].filter((item) => item.value > 0);
 
   return (
     <ConsoleShell
@@ -178,9 +197,9 @@ function ConsoleDashboard() {
         <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
           {statsQuery.isLoading ? <TileSkeletons /> : (
             <>
-              <MetricTile label="Installs (30d)" value={installs.toLocaleString("en")} hint="Recorded installs" />
-              <MetricTile label="Store views (30d)" value={views.toLocaleString("en")} hint="Product page visits" />
-              <MetricTile label="View-to-install" value={`${conversion(stats)}%`} hint="Views that convert" />
+              <MetricTile label="Installs (30d)" value={installs.toLocaleString("en")} delta={percentDelta(currentInstalls, previousInstalls)} hint="Recorded installs" />
+              <MetricTile label="Store views (30d)" value={views.toLocaleString("en")} delta={percentDelta(currentViews, previousViews)} hint="Product page visits" />
+              <MetricTile label="View-to-install" value={`${conversion(stats)}%`} delta={percentDelta(currentConversion, previousConversion)} hint="Views that convert" />
               <MetricTile label="Average rating" value={Number.isFinite(rating) && rating > 0 ? rating.toFixed(1) : "N/A"} hint={`${listings.reduce((total, listing) => total + listing.rating_count, 0)} ratings`} />
             </>
           )}
@@ -203,20 +222,55 @@ function ConsoleDashboard() {
             ) : (
               <>
                 <div className="mb-4 flex flex-wrap gap-4 text-xs text-muted-foreground">
-                  <span className="inline-flex items-center gap-2"><span className="h-2 w-2 bg-primary" /> Views</span>
-                  <span className="inline-flex items-center gap-2"><span className="h-2 w-2 bg-brand-green" /> Installs</span>
+                  <span className="inline-flex items-center gap-2"><span className="h-2 w-2 bg-[var(--google-blue)]" /> Views</span>
+                  <span className="inline-flex items-center gap-2"><span className="h-2 w-2 bg-[var(--google-green)]" /> Installs</span>
                 </div>
-                <div className="flex h-40 items-end gap-1 border-b border-border pb-1 sm:gap-2">
-                  {recentStats.map((row) => (
-                    <div key={row.day} className="flex h-full min-w-0 flex-1 items-end justify-center gap-0.5" title={`${row.day}: ${row.views} views, ${row.installs} installs`}>
-                      <div className="w-1/2 max-w-4 bg-primary/80" style={{ height: `${Math.max(row.views ? 4 : 0, (row.views / maxDaily) * 100)}%` }} />
-                      <div className="w-1/2 max-w-4 bg-brand-green" style={{ height: `${Math.max(row.installs ? 4 : 0, (row.installs / maxDaily) * 100)}%` }} />
+                <div className="h-48 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={recentStats} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.18} />
+                      <XAxis dataKey="day" fontSize={10} minTickGap={18} />
+                      <YAxis fontSize={10} allowDecimals={false} />
+                      <Tooltip />
+                      <Line type="monotone" dataKey="views" name="Views" stroke="var(--google-blue)" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
+                      <Line type="monotone" dataKey="installs" name="Installs" stroke="var(--google-green)" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </>
+            )}
+          </SectionCard>
+
+          <SectionCard title="Listing breakdown">
+            <p className="mb-3 text-xs text-muted-foreground">Actual listings grouped by their current publishing status.</p>
+            {listingsQuery.isLoading ? (
+              <div className="h-48 animate-pulse bg-muted" />
+            ) : listingStatusData.length === 0 ? (
+              <div className="flex min-h-40 items-center justify-center text-center text-sm text-muted-foreground">Your listing breakdown will appear after you create a product.</div>
+            ) : (
+              <>
+                <div className="relative h-48 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={listingStatusData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={52} outerRadius={76} paddingAngle={3} stroke="none">
+                        {listingStatusData.map((entry) => <Cell key={entry.name} fill={entry.color} />)}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="font-display text-2xl font-bold tabular-nums">{listings.length}</span>
+                    <span className="text-xs text-muted-foreground">Products</span>
+                  </div>
+                </div>
+                <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                  {listingStatusData.map((item) => (
+                    <div key={item.name} className="flex min-w-0 items-center gap-2">
+                      <span className="h-2.5 w-2.5 shrink-0" style={{ backgroundColor: item.color }} />
+                      <span className="min-w-0 flex-1 text-muted-foreground">{item.name}</span>
+                      <strong className="tabular-nums">{item.value}</strong>
                     </div>
                   ))}
-                </div>
-                <div className="mt-2 flex justify-between text-[11px] text-muted-foreground">
-                  <span>{recentStats[0]?.day ?? "Last 14 days"}</span>
-                  <span>{recentStats[recentStats.length - 1]?.day ?? ""}</span>
                 </div>
               </>
             )}
