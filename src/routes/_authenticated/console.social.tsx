@@ -28,6 +28,7 @@ import {
 import { toast } from "sonner";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
+import { DemoPreview } from "@/components/DemoPreview";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useProfile, useSignedUrl, useUnreadCount } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
@@ -968,7 +969,7 @@ function SocialPage() {
                     </article>
                   ))
                 ) : (
-                  <div className="px-4 py-7 text-center"><p className="text-sm font-medium">No posts yet</p><p className="mt-1 text-sm text-muted-foreground">Share an update from the Feed tab to get started.</p><button type="button" onClick={() => setActiveSection("Feed")} className="mt-3 border border-border px-3 py-2 text-sm hover:bg-secondary">Create a post</button></div>
+                  <div className="px-4 py-7 text-center"><p className="text-sm font-medium">No posts yet</p><p className="mt-1 text-sm text-muted-foreground">Share an update from the Feed tab to get started.</p><button type="button" onClick={() => setActiveSection("Feed")} className="mt-3 border border-border px-3 py-2 text-sm hover:bg-secondary">Create a post</button><DemoPreview title="Profile posts · sample view" description="Examples of updates a developer might share." items={[{ title: "Mlimi Connect is live", detail: "We’ve launched a new way to organise farm activities.", metric: "12 reactions · 3 comments", status: "Sample post" }, { title: "Looking for beta testers", detail: "Help test the next Campus Hub release.", metric: "6 replies · 2 shares", status: "Sample post" }]} /></div>
                 )}
               </section>
             </div>
