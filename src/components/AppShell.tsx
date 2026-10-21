@@ -10,7 +10,7 @@ import { type ReactNode } from "react";
 
 import logo from "@/assets/logo-mark.png";
 import { GeminiIcon } from "@/components/GeminiIcon";
-import { useProfile, useUnreadCount } from "@/hooks/useSession";
+import { useMode, useProfile, useUnreadCount } from "@/hooks/useSession";
 import { SOCIAL_LINKS } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -35,8 +35,10 @@ export function AppShell({
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const { userId, profile } = useProfile();
+  const mode = useMode();
   const unread = useUnreadCount();
   const isSettingsPage = pathname === "/settings";
+  const isUserSettingsPage = isSettingsPage && mode !== "developer";
   const initial = (profile?.display_name || profile?.developer_name || "U")
     .slice(0, 1)
     .toUpperCase();
@@ -44,6 +46,7 @@ export function AppShell({
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
+      {!isUserSettingsPage && (
       <header
         className="sticky top-0 z-30 bg-background px-3 pb-2 pt-3"
         style={{ paddingTop: "calc(0.75rem + env(safe-area-inset-top))" }}
@@ -95,8 +98,12 @@ export function AppShell({
           </div>
         </div>
       </header>
+      )}
 
-      <main className="mas-mobile-main mx-auto w-full max-w-5xl flex-1 px-3 pb-28 pt-1 sm:pb-12">
+      <main
+        className="mas-mobile-main mx-auto w-full max-w-5xl flex-1 px-3 pb-28 sm:pb-12"
+        style={{ paddingTop: isUserSettingsPage ? "calc(0.5rem + env(safe-area-inset-top))" : undefined }}
+      >
         {children}
       </main>
 
