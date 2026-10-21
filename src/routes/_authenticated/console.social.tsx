@@ -3,6 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Bell,
+  ArrowLeft,
   BadgeCheck,
   Check,
   ExternalLink,
@@ -701,13 +702,14 @@ function SocialPage() {
             <Menu className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
-        <nav aria-label="Social menu" className="sticky top-0 z-20 flex w-full items-stretch justify-evenly border-b border-border bg-background/95 px-1 shadow-sm backdrop-blur sm:px-3">
+        <nav aria-label="Social menu" className="sticky top-0 z-20 flex w-full min-w-0 items-stretch justify-start overflow-x-auto border-b border-border bg-background/95 px-1 shadow-sm backdrop-blur sm:justify-evenly sm:px-3">
           {sections.map(({ id, icon: Icon }) => {
             const selected = activeSection === id;
             return (
               <button key={id} type="button" onClick={() => id === "Notifications" ? navigate({ to: "/notifications" }) : setActiveSection(id)} aria-label={id} title={id} aria-current={selected ? "page" : undefined}
-                className={cn("flex min-h-12 min-w-0 flex-1 items-center justify-center border-b-2 px-2 py-3 transition-colors duration-200 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:px-5", selected ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:border-border hover:text-foreground")}>
+                className={cn("flex min-h-14 min-w-[76px] shrink-0 flex-col items-center justify-center gap-1 border-b-2 px-2 py-2.5 transition-colors duration-200 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:min-w-0 sm:flex-1 sm:flex-row sm:gap-2 sm:px-3 sm:py-3 lg:px-5", selected ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:border-border hover:text-foreground")}>
                 <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                <span className="max-w-full truncate text-[10px] leading-none sm:text-xs">{id}</span>
                 {id === "Notifications" && unread > 0 && <span className="ml-1 text-[10px] font-semibold">{unread > 9 ? "9+" : unread}</span>}
               </button>
             );
@@ -721,7 +723,7 @@ function SocialPage() {
           {!userId ? (
             <div className="px-4 py-8 text-sm text-muted-foreground">Sign in to use Social.</div>
           ) : activeSection === "Feed" ? (
-            <div className="w-full space-y-1 pb-6 pt-0">
+            <div className="mx-auto w-full max-w-3xl space-y-1 pb-6 pt-0">
               <form onSubmit={submitPost} className="w-full border-y border-border/80 bg-background px-4 py-3 sm:px-5">
                 <div className="flex items-start gap-3">
                   <Avatar profile={profile as SocialProfile | null} />
@@ -980,7 +982,7 @@ function SocialPage() {
               </section>
             </div>
           ) : activeSection === "Friends" ? (
-            <div className="mx-auto w-full max-w-2xl pb-6 pt-3">
+            <div className="mx-auto w-full max-w-2xl pb-6 pt-3 sm:px-2">
               {incoming.length > 0 && <section className="w-full bg-background">
                 <h3 className="px-4 pt-4 text-sm font-semibold">Friend requests ({incoming.length})</h3>
                 {incoming.map((request) => {
@@ -991,21 +993,21 @@ function SocialPage() {
               <div className="w-full bg-background">{renderPeople()}</div>
             </div>
           ) : activeSection === "Search" ? (
-            <div className="mx-auto w-full max-w-2xl pb-6 pt-0">
+            <div className="mx-auto w-full max-w-2xl pb-6 pt-0 sm:px-2">
               <div className="w-full px-4 py-3"><label htmlFor="social-search" className="sr-only">Search people</label><div className="flex items-center gap-2 rounded-full border border-border bg-background px-4"><Search className="h-4 w-4 shrink-0 text-muted-foreground" /><input id="social-search" autoFocus value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Search people by name or bio…" className="min-w-0 flex-1 bg-transparent py-2.5 text-sm outline-none" /></div></div>
               <div className="w-full bg-background">{renderPeople()}</div>
             </div>
           ) : activeSection === "Messages" ? (
-            <div className="mx-auto grid w-full max-w-4xl grid-cols-1 overflow-hidden rounded-xl border border-border/80 bg-background shadow-sm md:grid-cols-[240px_minmax(0,1fr)]">
-              <aside className="border-b border-border md:border-b-0 md:border-r">
+            <div className="mx-auto grid w-full max-w-5xl grid-cols-1 overflow-hidden border border-border/80 bg-background md:grid-cols-[240px_minmax(0,1fr)]">
+              <aside className={cn("border-b border-border md:border-b-0 md:border-r", selectedRecipient && "hidden md:block")}>
                 {(profilesQuery.data ?? []).filter((person) => person.id !== userId && (acceptedIds.has(person.id) || (messagesQuery.data ?? []).some((message) => message.sender_id === person.id || message.recipient_id === person.id))).map((person) => {
                   const last = [...(messagesQuery.data ?? [])].reverse().find((message) => message.sender_id === person.id || message.recipient_id === person.id);
                   return <button key={person.id} type="button" onClick={() => setSelectedRecipient(person.id)} className={cn("flex w-full items-center gap-2 border-b border-border px-3 py-3 text-left hover:bg-secondary", selectedRecipient === person.id && "bg-secondary")}><Avatar profile={person} size="sm" /><span className="min-w-0 flex-1 truncate text-sm">{displayName(person)}{last?.sender_id === person.id && last.recipient_id === userId && !last.read_at ? <span className="block text-xs font-semibold text-primary">New message</span> : null}</span></button>;
                 })}
               </aside>
-              <section className="flex min-h-[360px] min-w-0 flex-col">
+              <section className={cn("flex min-h-[min(65vh,560px)] min-w-0 flex-col", !selectedRecipient && "hidden md:flex")}>
                 {selectedRecipient && selectedProfile ? <>
-                  <header className="flex items-center gap-3 border-b border-border px-4 py-3"><Avatar profile={selectedProfile} size="sm" /><div><p className="text-sm font-semibold">{displayName(selectedProfile)}</p><p className="text-xs text-muted-foreground">Private conversation</p></div></header>
+                  <header className="flex items-center gap-3 border-b border-border px-3 py-3 sm:px-4"><button type="button" onClick={() => setSelectedRecipient(null)} className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground hover:bg-secondary md:hidden" aria-label="Back to conversations"><ArrowLeft className="h-5 w-5" /></button><Avatar profile={selectedProfile} size="sm" /><div className="min-w-0"><p className="truncate text-sm font-semibold">{displayName(selectedProfile)}</p><p className="text-xs text-muted-foreground">Private conversation</p></div></header>
                   <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
                     {threadMessages.length ? threadMessages.map((message) => <div key={message.id} className={cn("flex", message.sender_id === userId ? "justify-end" : "justify-start")}><div className={cn("max-w-[85%] whitespace-pre-wrap break-words px-3 py-2 text-sm", message.sender_id === userId ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground")}>{message.body}<time className="mt-1 block text-[10px] opacity-70">{new Date(message.created_at).toLocaleString()}</time></div></div>) : <p className="py-8 text-center text-sm text-muted-foreground">Say hello to start this conversation.</p>}
                   </div>
