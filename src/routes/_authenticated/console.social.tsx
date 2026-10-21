@@ -723,7 +723,7 @@ function SocialPage() {
           {!userId ? (
             <div className="px-4 py-8 text-sm text-muted-foreground">Sign in to use Social.</div>
           ) : activeSection === "Feed" ? (
-            <div className="mx-auto w-full max-w-3xl space-y-1 pb-6 pt-0">
+            <div className="w-full space-y-1 pb-6 pt-0">
               <form onSubmit={submitPost} className="w-full border-y border-border/80 bg-background px-4 py-3 sm:px-5">
                 <div className="flex items-start gap-3">
                   <Avatar profile={profile as SocialProfile | null} />
@@ -982,7 +982,7 @@ function SocialPage() {
               </section>
             </div>
           ) : activeSection === "Friends" ? (
-            <div className="mx-auto w-full max-w-2xl pb-6 pt-3 sm:px-2">
+            <div className="w-full pb-6 pt-3">
               {incoming.length > 0 && <section className="w-full bg-background">
                 <h3 className="px-4 pt-4 text-sm font-semibold">Friend requests ({incoming.length})</h3>
                 {incoming.map((request) => {
@@ -993,12 +993,12 @@ function SocialPage() {
               <div className="w-full bg-background">{renderPeople()}</div>
             </div>
           ) : activeSection === "Search" ? (
-            <div className="mx-auto w-full max-w-2xl pb-6 pt-0 sm:px-2">
-              <div className="w-full px-4 py-3"><label htmlFor="social-search" className="sr-only">Search people</label><div className="flex items-center gap-2 rounded-full border border-border bg-background px-4"><Search className="h-4 w-4 shrink-0 text-muted-foreground" /><input id="social-search" autoFocus value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Search people by name or bio…" className="min-w-0 flex-1 bg-transparent py-2.5 text-sm outline-none" /></div></div>
+            <div className="w-full pb-6 pt-0">
+              <div className="w-full px-4 py-3 sm:px-6 lg:px-8"><label htmlFor="social-search" className="sr-only">Search people</label><div className="flex items-center gap-2 rounded-full border border-border bg-background px-4"><Search className="h-4 w-4 shrink-0 text-muted-foreground" /><input id="social-search" autoFocus value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Search people by name or bio…" className="min-w-0 flex-1 bg-transparent py-2.5 text-sm outline-none" /></div></div>
               <div className="w-full bg-background">{renderPeople()}</div>
             </div>
           ) : activeSection === "Messages" ? (
-            <div className="mx-auto grid w-full max-w-5xl grid-cols-1 overflow-hidden border border-border/80 bg-background md:grid-cols-[240px_minmax(0,1fr)]">
+            <div className="grid w-full grid-cols-1 overflow-hidden border-y border-border/80 bg-background md:grid-cols-[240px_minmax(0,1fr)]">
               <aside className={cn("border-b border-border md:border-b-0 md:border-r", selectedRecipient && "hidden md:block")}>
                 {(profilesQuery.data ?? []).filter((person) => person.id !== userId && (acceptedIds.has(person.id) || (messagesQuery.data ?? []).some((message) => message.sender_id === person.id || message.recipient_id === person.id))).map((person) => {
                   const last = [...(messagesQuery.data ?? [])].reverse().find((message) => message.sender_id === person.id || message.recipient_id === person.id);
@@ -1016,7 +1016,7 @@ function SocialPage() {
               </section>
             </div>
           ) : activeSection === "Monetization" ? (
-            <div className="mx-auto w-full max-w-3xl px-3 pb-8 pt-4 sm:px-4">
+            <div className="w-full px-4 pb-8 pt-4 sm:px-6 lg:px-8">
               <header className="pb-5">
                 <div className="flex items-start gap-3">
                   <Wallet className="mt-1 h-6 w-6 shrink-0 text-primary" />
