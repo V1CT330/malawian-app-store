@@ -206,9 +206,6 @@
 .console-square .social-comment-bubble {
   border-radius: 1rem !important;
 }
-.console-square .social-comment-bubble:has(+ *) {
-  min-width: 0;
-}
 
 /* Console hero / banner surface: soft brand wash behind the page intro. */
 @utility console-hero {
