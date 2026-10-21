@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Rocket } from "lucide-react";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
+import { DemoPreview } from "@/components/DemoPreview";
 import { EmptyState, RowSkeletons, SectionCard, StatusPill } from "@/components/console/primitives";
 import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/useSession";
@@ -52,6 +53,7 @@ function PublishingPage() {
         </Button>
       }
     >
+      {!listingsQuery.isLoading && listings.length === 0 && <DemoPreview title="Publishing pipeline preview" description="Example products moving through the store review process." items={[{ title: "Banja Budget", detail: "Complete store description and screenshots.", status: "Draft" }, { title: "Dziko Weather", detail: "Submitted and waiting for review.", status: "In review" }, { title: "Mlimi Connect", detail: "Available to people browsing the store.", status: "Live" }, { title: "Campus Hub", detail: "Update the privacy policy before resubmitting.", status: "Needs changes" }]} />}
       {listingsQuery.isLoading ? (
         <RowSkeletons count={4} />
       ) : listings.length === 0 ? (
