@@ -4,6 +4,7 @@ import { ChevronRight, RefreshCw } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
+import { DemoPreview } from "@/components/DemoPreview";
 import { ListingCard, ListingTile } from "@/components/ListingCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
@@ -199,6 +200,7 @@ function StorePage() {
         ))}
       </div>
 
+      {!isLoading && !isError && listings.length === 0 && !hasFilters && <DemoPreview title="Explore the MAS store · preview" description="Sample listings to illustrate how the store can look as developers publish products." items={[{ title: "Mlimi Connect", detail: "Agriculture · Tools for farm planning", metric: "4.8 ★ · Sample listing", status: "App" }, { title: "Campus Hub", detail: "Education · Student resources and campus updates", metric: "4.6 ★ · Sample listing", status: "Website" }, { title: "Dziko Weather", detail: "Utilities · Local forecasts and alerts", metric: "4.7 ★ · Sample listing", status: "App" }, { title: "Banja Budget", detail: "Finance · Personal budgeting in Kwacha", metric: "New sample listing", status: "App" }]} />}
       {isLoading ? (
         <div className="flex gap-4 overflow-hidden" aria-label="Loading published listings">
           {[0, 1, 2, 3].map((i) => (
