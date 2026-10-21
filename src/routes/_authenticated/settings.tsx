@@ -18,7 +18,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useMode, useProfile, useSignedUrl } from "@/hooks/useSession";
-import { useTheme } from "@/hooks/useTheme";
+import { ACCENT_PRESETS, useTheme } from "@/hooks/useTheme";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMwk, uploadAsset } from "@/lib/store";
 import { PRO_NAME, PRO_PRICE_MWK } from "@/lib/pro";
