@@ -789,8 +789,8 @@ function SocialPage() {
                       </details>}
                     </div>
                     <p className="whitespace-pre-wrap break-words py-4 text-sm leading-6">{post.body}</p>
-                    {post.media_url && post.media_type === "image" && <div className="mb-4 flex w-full min-w-0 justify-center overflow-hidden bg-muted/20"><img src={post.media_url} alt="Post attachment" loading="lazy" className="block h-auto max-h-[560px] w-full max-w-full object-contain object-center" /></div>}
-                    {post.media_url && post.media_type === "video" && <div className="mb-4 flex w-full min-w-0 justify-center overflow-hidden bg-black"><video src={post.media_url} controls preload="metadata" className="block h-auto max-h-[560px] w-full max-w-full object-contain object-center" aria-label="Post video attachment" /></div>}
+                    {post.media_url && post.media_type === "image" && <div className="mb-4 flex w-full min-w-0 justify-center overflow-hidden bg-muted/20"><img src={post.media_url} alt="Post attachment" loading="lazy" className="mx-auto block h-auto max-h-[560px] w-auto max-w-full object-contain object-center" /></div>}
+                    {post.media_url && post.media_type === "video" && <div className="mb-4 flex w-full min-w-0 justify-center overflow-hidden bg-black"><video src={post.media_url} controls preload="metadata" className="mx-auto block h-auto max-h-[560px] w-auto max-w-full object-contain object-center" aria-label="Post video attachment" /></div>}
                     <div className="relative flex items-center justify-around gap-4 py-2.5 text-sm text-muted-foreground after:absolute after:bottom-0 after:left-[-1rem] after:right-[-1rem] after:border-b after:border-border sm:after:left-[-1.25rem] sm:after:right-[-1.25rem]">
                       <button type="button" disabled={toggleReaction.isPending} onClick={() => toggleReaction.mutate({ postId: post.id, reacted })} className={cn("flex flex-1 items-center justify-center gap-2 px-2 py-1.5 transition-colors hover:text-foreground", reacted && "text-destructive")} aria-label={reacted ? "Unlike post" : "Like post"} aria-pressed={reacted}>
                         <Heart className={cn("h-5 w-5", reacted && "fill-current")} /> <span>{postReactions.length}</span>
@@ -975,8 +975,8 @@ function SocialPage() {
                     <article key={post.id} className="border-b border-border px-4 py-4 last:border-b-0">
                       <time className="text-xs text-muted-foreground" dateTime={post.created_at}>{new Date(post.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</time>
                       <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6">{post.body}</p>
-                      {post.media_url && post.media_type === "image" && <div className="mt-3 flex w-full min-w-0 justify-center overflow-hidden"><img src={post.media_url} alt="Your post attachment" loading="lazy" className="block h-auto max-h-72 max-w-full object-contain object-center" /></div>}
-                      {post.media_url && post.media_type === "video" && <div className="mt-3 flex w-full min-w-0 justify-center overflow-hidden"><video src={post.media_url} controls preload="metadata" className="block h-auto max-h-72 max-w-full object-contain object-center" aria-label="Your post video" /></div>}
+                      {post.media_url && post.media_type === "image" && <div className="mt-3 flex w-full min-w-0 justify-center overflow-hidden"><img src={post.media_url} alt="Your post attachment" loading="lazy" className="mx-auto block h-auto max-h-72 w-auto max-w-full object-contain object-center" /></div>}
+                      {post.media_url && post.media_type === "video" && <div className="mt-3 flex w-full min-w-0 justify-center overflow-hidden"><video src={post.media_url} controls preload="metadata" className="mx-auto block h-auto max-h-72 w-auto max-w-full object-contain object-center" aria-label="Your post video" /></div>}
                     </article>
                   ))
                 ) : (
