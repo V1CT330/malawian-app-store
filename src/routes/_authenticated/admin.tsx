@@ -48,19 +48,6 @@ function AdminPage() {
   const queryClient = useQueryClient();
   const [notice, setNotice] = useState({ title: "", body: "" });
 
-  const claim = useMutation({
-    mutationFn: async () => {
-      const { data, error } = await supabase.rpc("claim_first_admin");
-      if (error) throw error;
-      if (!data) throw new Error("An administrator already exists for this store.");
-    },
-    onSuccess: () => {
-      toast.success("You are now an administrator");
-      queryClient.invalidateQueries({ queryKey: ["is-admin", userId] });
-    },
-    onError: (e: Error) => toast.error(e.message),
-  });
-
   const listings = useQuery({
     queryKey: ["admin-listings"],
     enabled: isAdmin,
@@ -229,12 +216,10 @@ function AdminPage() {
           <Shield className="mx-auto h-6 w-6 text-muted-foreground" />
           <h1 className="font-display text-xl font-bold">Admin panel</h1>
           <p className="text-sm text-muted-foreground">
-            This area is for store administrators. If you are setting the store up, you can claim
-            the first administrator account.
+            This area is restricted to store administrators. For security, administrator access
+            cannot be claimed from a public sign-in session. The platform owner must provision an
+            administrator account through a trusted operator process.
           </p>
-          <Button onClick={() => claim.mutate()} disabled={claim.isPending}>
-            Claim admin access
-          </Button>
         </div>
       </AppShell>
     );
