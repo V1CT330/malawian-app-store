@@ -47,7 +47,7 @@ export function AppShell({
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header
-        className="sticky top-0 z-30 bg-background px-3 pb-2 pt-3"
+        className={cn("sticky top-0 z-30 bg-background px-3 pb-2 pt-3", isUserSettingsPage && "hidden")}
         style={{ paddingTop: "calc(0.75rem + env(safe-area-inset-top))" }}
       >
         <div className="mx-auto w-full max-w-5xl">
