@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { BriefcaseBusiness } from "lucide-react";
 import { toast } from "sonner";
@@ -42,18 +42,18 @@ export function InvestGrowPanel({ userId, members, acceptedIds, onConnect, onMes
       if (error) throw error;
       return data as InvestmentProfile | null;
     },
-    onSuccess: undefined,
   });
   // Populate the form from the saved record once, without overwriting edits during background refetches.
   const [profileHydrated, setProfileHydrated] = useState(false);
-  if (myProfile.data && !profileHydrated) {
+  useEffect(() => {
+    if (!myProfile.data || profileHydrated) return;
     setRole(myProfile.data.role);
     setOrganization(myProfile.data.organization_name ?? "");
     setHeadline(myProfile.data.headline ?? "");
     setBio(myProfile.data.bio ?? "");
     setLocation(myProfile.data.location ?? "");
     setProfileHydrated(true);
-  }
+  }, [myProfile.data, profileHydrated]);
 
   const directory = useQuery({
     queryKey: ["social", "investment-profiles"],
