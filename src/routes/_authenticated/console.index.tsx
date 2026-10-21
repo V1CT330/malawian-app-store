@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
+import { DemoPreview } from "@/components/DemoPreview";
 import {
   EmptyState,
   MetricTile,
@@ -135,6 +136,7 @@ function ConsoleDashboard() {
         </>
       }
     >
+      {!listingsQuery.isLoading && listings.length === 0 && <DemoPreview title="Developer dashboard · sample view" description="Example metrics and tasks to show the dashboard once your account has products." items={[{ title: "Store visits", detail: "Views across your product pages.", metric: "3,840 · illustrative", status: "Last 30 days" }, { title: "Installs", detail: "Recorded install events from published products.", metric: "1,275 · illustrative", status: "Last 30 days" }, { title: "Publishing checklist", detail: "One draft needs screenshots and a support link.", metric: "80% ready", status: "Action needed" }, { title: "Developer reputation", detail: "A sample account health overview.", metric: "Strong · illustrative", status: "Preview" }]} />}
       <div className="dashboard-content-flat space-y-5 [&_.surface-card]:rounded-none">
         <section className="grid gap-0 border border-border bg-background md:grid-cols-[1.4fr_1fr]">
           <div className="flex flex-col justify-between gap-5 border-b border-border p-5 sm:p-6 md:border-b-0 md:border-r">
