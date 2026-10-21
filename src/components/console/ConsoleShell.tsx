@@ -40,7 +40,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useProfile, useUnreadCount } from "@/hooks/useSession";
+import { useProfile, useSignedUrl, useUnreadCount } from "@/hooks/useSession";
 import { useTheme } from "@/hooks/useTheme";
 import { supabase } from "@/integrations/supabase/client";
 import { CONSOLE_NAV } from "@/lib/console";
@@ -121,6 +121,7 @@ export function ConsoleShell({
 }) {
   const { userId, profile } = useProfile();
   const unread = useUnreadCount();
+  const profileAvatar = useSignedUrl(profile?.avatar_url);
   const { dark, toggle } = useTheme();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -267,9 +268,11 @@ export function ConsoleShell({
               <DropdownMenuTrigger asChild>
                 <button
                   aria-label="Account menu"
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground"
+                  className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-primary text-xs font-semibold text-primary-foreground"
                 >
-                  {initial}
+                  {profileAvatar ? (
+                    <img src={profileAvatar} alt="" className="h-full w-full rounded-full object-cover" />
+                  ) : initial}
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
