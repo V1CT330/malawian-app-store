@@ -113,7 +113,6 @@ function ConsoleDashboard() {
     }
   }
 
-  const maxDaily = Math.max(1, ...stats.map((row) => Math.max(row.views, row.installs)));
   const recentStats = stats.slice(-14);
   const views = sum(stats, "views");
   const installs = sum(stats, "installs");
