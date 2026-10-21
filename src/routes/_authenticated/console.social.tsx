@@ -1014,54 +1014,68 @@ function SocialPage() {
               </section>
             </div>
           ) : activeSection === "Monetization" ? (
-            <div className="mx-auto w-full max-w-3xl space-y-4 px-3 pb-8 pt-4 sm:px-4">
-              <section className="border border-border bg-background p-5 sm:p-6">
+            <div className="mx-auto w-full max-w-3xl px-3 pb-8 pt-4 sm:px-4">
+              <header className="pb-5">
                 <div className="flex items-start gap-3">
-                  <div className="rounded-xl bg-primary/10 p-3 text-primary"><Wallet className="h-6 w-6" /></div>
+                  <Wallet className="mt-1 h-6 w-6 shrink-0 text-primary" />
                   <div className="min-w-0 flex-1">
-                    <h2 className="font-display text-xl font-bold">Creator monetization</h2>
-                    <p className="mt-1 text-sm text-muted-foreground">Build an audience, share useful work, and prepare to earn through MAS Social.</p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="font-display text-xl font-bold">Creator monetization</h2>
+                      <span className="text-xs font-medium text-amber-700 dark:text-amber-300">Setup pending</span>
+                    </div>
+                    <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">Build an audience, share useful work, and prepare to earn through MAS Social.</p>
                   </div>
-                  <span className="shrink-0 border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-xs font-medium text-amber-700 dark:text-amber-300">Setup pending</span>
                 </div>
-                <p className="mt-4 border-l-2 border-amber-500 px-3 py-2 text-sm text-muted-foreground">
-                  Social payments are not active yet. MAS must connect verified checkout, earnings records, refunds and payouts before these earning options can accept money.
+                <p className="mt-4 border-l-2 border-amber-500 pl-3 text-sm leading-6 text-muted-foreground">
+                  Social payments are not active yet. Verified checkout, earnings records, refunds and payouts must be connected before these options can accept money.
                 </p>
+              </header>
+
+              <section aria-label="Creator earning options" className="divide-y divide-border border-y border-border">
+                <article className="flex gap-3 py-4">
+                  <Heart className="mt-1 h-5 w-5 shrink-0 text-primary" />
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1"><h3 className="font-semibold">Tips and support</h3><span className="text-xs text-muted-foreground">Planned · free and paid accounts</span></div>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">Let followers support eligible creators without requiring creators to subscribe first.</p>
+                  </div>
+                </article>
+                <article className="flex gap-3 py-4">
+                  <Users className="mt-1 h-5 w-5 shrink-0 text-primary" />
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1"><h3 className="font-semibold">Paid memberships</h3><span className="text-xs text-muted-foreground">Planned · creator subscription required</span></div>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">Offer member-only updates, private communities and recurring benefits.</p>
+                  </div>
+                </article>
+                <article className="flex gap-3 py-4">
+                  <Package className="mt-1 h-5 w-5 shrink-0 text-primary" />
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1"><h3 className="font-semibold">Paid posts and products</h3><span className="text-xs text-muted-foreground">Planned · payments required</span></div>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">Sell tutorials and digital resources or link to products that can lead to eligible purchases.</p>
+                  </div>
+                </article>
+                <article className="flex gap-3 py-4">
+                  <Megaphone className="mt-1 h-5 w-5 shrink-0 text-primary" />
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1"><h3 className="font-semibold">Sponsored content</h3><span className="text-xs text-muted-foreground">Planned · advertiser rules required</span></div>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">Partner with advertisers through approved, clearly labelled sponsored posts.</p>
+                  </div>
+                </article>
+                <article className="flex gap-3 py-4">
+                  <Users className="mt-1 h-5 w-5 shrink-0 text-primary" />
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1"><h3 className="font-semibold">Referral commissions</h3><span className="text-xs text-muted-foreground">Planned · tracking required</span></div>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">Earn from trackable referrals that result in verified purchases. Self-referrals and fraud should not qualify.</p>
+                  </div>
+                </article>
               </section>
-              <section className="grid gap-3 sm:grid-cols-2">
-                <article className="border border-border bg-background p-4">
-                  <div className="flex items-center gap-2"><Heart className="h-5 w-5 text-primary" /><h3 className="font-semibold">Tips and support</h3></div>
-                  <p className="mt-2 text-sm text-muted-foreground">Let followers support eligible creators without requiring the creator to buy a subscription first.</p>
-                  <p className="mt-3 text-xs font-medium text-muted-foreground">Planned · eligible free and paid accounts</p>
-                </article>
-                <article className="border border-border bg-background p-4">
-                  <div className="flex items-center gap-2"><Users className="h-5 w-5 text-primary" /><h3 className="font-semibold">Paid memberships</h3></div>
-                  <p className="mt-2 text-sm text-muted-foreground">Subscribers can offer member-only updates, private communities and recurring creator benefits.</p>
-                  <p className="mt-3 text-xs font-medium text-muted-foreground">Planned · creator subscription required</p>
-                </article>
-                <article className="border border-border bg-background p-4">
-                  <div className="flex items-center gap-2"><Package className="h-5 w-5 text-primary" /><h3 className="font-semibold">Paid posts and products</h3></div>
-                  <p className="mt-2 text-sm text-muted-foreground">Share tutorials, digital resources and product links that can lead to eligible purchases.</p>
-                  <p className="mt-3 text-xs font-medium text-muted-foreground">Planned · payment integration required</p>
-                </article>
-                <article className="border border-border bg-background p-4">
-                  <div className="flex items-center gap-2"><Megaphone className="h-5 w-5 text-primary" /><h3 className="font-semibold">Sponsored content</h3></div>
-                  <p className="mt-2 text-sm text-muted-foreground">Approved creators can partner with advertisers. Sponsored posts must be clearly labelled.</p>
-                  <p className="mt-3 text-xs font-medium text-muted-foreground">Planned · advertiser and creator rules required</p>
-                </article>
-                <article className="border border-border bg-background p-4 sm:col-span-2">
-                  <div className="flex items-center gap-2"><Users className="h-5 w-5 text-primary" /><h3 className="font-semibold">Referral commissions</h3></div>
-                  <p className="mt-2 text-sm text-muted-foreground">Earn from trackable referrals that result in eligible, verified purchases. Fraudulent or self-referrals should not qualify.</p>
-                  <p className="mt-3 text-xs font-medium text-muted-foreground">Planned · attribution and fraud controls required</p>
-                </article>
-              </section>
-              <section className="border border-border bg-background p-4 sm:p-5">
-                <h3 className="font-semibold">Manage your monetization setup</h3>
-                <p className="mt-1 text-sm text-muted-foreground">The wallet is intended to be the shared earnings record for marketplace sales and Social income. No earnings balance is displayed until real transactions are recorded.</p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <Link to="/console/wallet" className="inline-flex min-h-10 items-center border border-border px-3 py-2 text-sm font-medium hover:bg-secondary">Wallet & earnings <ExternalLink className="ml-2 h-4 w-4" /></Link>
-                  <Link to="/console/subscription" className="inline-flex min-h-10 items-center border border-border px-3 py-2 text-sm font-medium hover:bg-secondary">Developer Pro <ExternalLink className="ml-2 h-4 w-4" /></Link>
-                  <Link to="/advertise" className="inline-flex min-h-10 items-center border border-border px-3 py-2 text-sm font-medium hover:bg-secondary">Advertising <ExternalLink className="ml-2 h-4 w-4" /></Link>
+
+              <section className="mt-6">
+                <h3 className="font-semibold">Manage your setup</h3>
+                <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">The wallet is intended to bring marketplace sales and eligible Social earnings together. Balances will appear only after real transactions are recorded.</p>
+                <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
+                  <Link to="/console/wallet" className="inline-flex items-center text-sm font-medium text-primary hover:underline">Wallet & earnings <ExternalLink className="ml-1.5 h-4 w-4" /></Link>
+                  <Link to="/console/subscription" className="inline-flex items-center text-sm font-medium text-primary hover:underline">Developer Pro <ExternalLink className="ml-1.5 h-4 w-4" /></Link>
+                  <Link to="/advertise" className="inline-flex items-center text-sm font-medium text-primary hover:underline">Advertising <ExternalLink className="ml-1.5 h-4 w-4" /></Link>
                 </div>
               </section>
             </div>
