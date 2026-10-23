@@ -717,7 +717,7 @@ function SocialPage() {
       </Sheet>
 
       <section className="min-h-[calc(100vh-4rem)] w-full min-w-0 max-w-full overflow-x-clip border-b border-border/70 bg-muted/30">
-        <div className="flex items-center justify-between gap-2 border-b border-border/70 bg-background px-4 py-3.5 sm:px-6">
+        <div className="flex items-center justify-between gap-2 bg-background px-4 py-3.5 sm:px-6">
           <div>
              <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">Social</h1>
              <p className="mt-0.5 hidden text-xs text-muted-foreground sm:block">Connect, share, and discover the MAS community.</p>
@@ -726,7 +726,7 @@ function SocialPage() {
             <Menu className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
-        <nav aria-label="Social menu" className="sticky top-0 z-20 flex w-full min-w-0 items-stretch justify-start overflow-x-auto border-b border-border bg-background/95 px-1 shadow-sm backdrop-blur sm:justify-evenly sm:px-3">
+        <nav aria-label="Social menu" className="flex w-full min-w-0 items-stretch justify-start overflow-x-auto border-b border-border bg-background px-1 sm:justify-evenly sm:px-3">
           {sections.map(({ id, icon: Icon }) => {
             const selected = activeSection === id;
             return (
