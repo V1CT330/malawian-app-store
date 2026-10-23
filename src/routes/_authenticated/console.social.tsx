@@ -53,7 +53,7 @@ const sections = [
   { id: "Friends", icon: Users, description: "Friend requests and people on MAS." },
   { id: "Messages", icon: MessageCircle, description: "Private conversations with other MAS members." },
   { id: "Notifications", icon: Bell, description: "Your social activity and connection updates." },
-  { id: "Search", icon: Search, description: "Find members across MAS." },
+  { id: "Search", icon: Search, description: "Search Social content independently of Friends." },
 ] as const;
 
 type SectionId = (typeof sections)[number]["id"] | "Find Investors" | "Monetization";
@@ -597,24 +597,7 @@ function SocialPage() {
     ? (postsQuery.data ?? []).filter((post) => {
         const author = profileMap.get(post.author_id);
         const postText = `${post.body} ${displayName(author)} ${author?.bio ?? ""}`.toLowerCase();
-        return postText.includes(normalizedSearch) ||
-          (commentsByPost.get(post.id) ?? []).some((comment) => {
-            const commentAuthor = profileMap.get(comment.author_id);
-            return `${comment.body} ${displayName(commentAuthor)}`.toLowerCase().includes(normalizedSearch);
-          });
-      })
-    : [];
-  const searchedComments = searchHasTerm
-    ? (commentsQuery.data ?? []).filter((comment) => {
-        const author = profileMap.get(comment.author_id);
-        return `${comment.body} ${displayName(author)}`.toLowerCase().includes(normalizedSearch);
-      })
-    : [];
-  const searchedMessages = searchHasTerm
-    ? (messagesQuery.data ?? []).filter((message) => {
-        const sender = profileMap.get(message.sender_id);
-        const recipient = profileMap.get(message.recipient_id);
-        return `${message.body} ${displayName(sender)} ${displayName(recipient)}`.toLowerCase().includes(normalizedSearch);
+        return postText.includes(normalizedSearch);
       })
     : [];
   const searchedListings = searchHasTerm
@@ -1100,21 +1083,29 @@ function SocialPage() {
                 <label htmlFor="social-search" className="sr-only">Search all Social content</label>
                 <div className="flex items-center gap-2 rounded-full border border-border bg-background px-4">
                   <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
-                  <input id="social-search" autoFocus value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Search posts, people, comments, apps and projects…" className="min-w-0 flex-1 bg-transparent py-2.5 text-sm outline-none" />
+                  <input id="social-search" autoFocus value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Search posts, people, apps and projects…" className="min-w-0 flex-1 bg-transparent py-2.5 text-sm outline-none" />
                   {searchTerm && <button type="button" onClick={() => setSearchTerm("")} aria-label="Clear search" className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>}
                 </div>
               </div>
               {!searchHasTerm ? (
-                <p className="px-4 py-8 text-center text-sm text-muted-foreground">Search across Social for people, posts, comments, published apps and developer projects.</p>
+                <p className="px-4 py-8 text-center text-sm text-muted-foreground">Search posts, people, published apps and developer projects. This search is separate from Friends and does not manage friend requests.</p>
               ) : (
                 <div className="space-y-5 px-4 pb-6 sm:px-6 lg:px-8">
-                  {(profilesQuery.isLoading || postsQuery.isLoading || commentsQuery.isLoading || socialSearchListingsQuery.isLoading || socialSearchProjectsQuery.isLoading) && <p className="py-3 text-sm text-muted-foreground">Searching Social…</p>}
+                  {(profilesQuery.isLoading || postsQuery.isLoading || socialSearchListingsQuery.isLoading || socialSearchProjectsQuery.isLoading) && <p className="py-3 text-sm text-muted-foreground">Searching Social…</p>}
                   {profilesQuery.isError || postsQuery.isError || socialSearchListingsQuery.isError || socialSearchProjectsQuery.isError
                     ? <p role="alert" className="py-3 text-sm text-destructive">Some Social search results could not be loaded.</p>
                     : null}
                   {filteredProfiles.length > 0 && <section>
                     <h2 className="mb-2 text-sm font-semibold">People ({filteredProfiles.length})</h2>
-                    <div className="bg-background">{renderPeople()}</div>
+                    <div className="divide-y divide-border border-y border-border bg-background">
+                      {filteredProfiles.map((person) => <article key={person.id} className="flex items-center gap-3 px-4 py-3">
+                        <Avatar profile={person} />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-semibold">{displayName(person)}</p>
+                          <p className="truncate text-xs text-muted-foreground">{person.bio || (person.is_developer ? "MAS developer" : "MAS member")}</p>
+                        </div>
+                      </article>)}
+                    </div>
                   </section>}
                   {searchedPosts.length > 0 && <section>
                     <h2 className="mb-2 text-sm font-semibold">Posts ({searchedPosts.length})</h2>
@@ -1132,40 +1123,6 @@ function SocialPage() {
                             <button type="button" onClick={() => setActiveSection("Feed")} className="mt-2 text-xs font-medium text-primary hover:underline">View in Feed</button>
                           </div>
                         </article>;
-                      })}
-                    </div>
-                  </section>}
-                  {searchedComments.length > 0 && <section>
-                    <h2 className="mb-2 text-sm font-semibold">Comments ({searchedComments.length})</h2>
-                    <div className="divide-y divide-border border-y border-border bg-background">
-                      {searchedComments.map((comment) => {
-                        const author = profileMap.get(comment.author_id);
-                        const post = (postsQuery.data ?? []).find((item) => item.id === comment.post_id);
-                        return <article key={comment.id} className="flex gap-3 px-4 py-3">
-                          <Avatar profile={author} size="sm" />
-                          <div className="min-w-0 flex-1">
-                            <p className="text-sm font-semibold">{displayName(author)} <span className="font-normal text-muted-foreground">commented</span></p>
-                            <p className="mt-1 whitespace-pre-wrap break-words text-sm">{comment.body}</p>
-                            {post && <p className="mt-1 text-xs text-muted-foreground">On: {post.body.slice(0, 180)}</p>}
-                          </div>
-                        </article>;
-                      })}
-                    </div>
-                  </section>}
-                  {searchedMessages.length > 0 && <section>
-                    <h2 className="mb-2 text-sm font-semibold">Your messages ({searchedMessages.length})</h2>
-                    <div className="divide-y divide-border border-y border-border bg-background">
-                      {searchedMessages.map((message) => {
-                        const otherId = message.sender_id === userId ? message.recipient_id : message.sender_id;
-                        const person = profileMap.get(otherId);
-                        return <button key={message.id} type="button" onClick={() => { setSelectedRecipient(otherId); setActiveSection("Messages"); }} className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-secondary">
-                          <Avatar profile={person} size="sm" />
-                          <span className="min-w-0 flex-1">
-                            <span className="block text-sm font-semibold">{displayName(person)}</span>
-                            <span className="mt-1 block whitespace-pre-wrap break-words text-sm text-muted-foreground">{message.body}</span>
-                            <span className="mt-1 block text-xs text-muted-foreground">{new Date(message.created_at).toLocaleString()}</span>
-                          </span>
-                        </button>;
                       })}
                     </div>
                   </section>}
@@ -1199,7 +1156,7 @@ function SocialPage() {
                       })}
                     </div>
                   </section>}
-                  {searchedPosts.length === 0 && searchedComments.length === 0 && searchedMessages.length === 0 && filteredProfiles.length === 0 && searchedListings.length === 0 && searchedProjects.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">No Social results found for “{searchTerm.trim()}”.</p>}
+                  {searchedPosts.length === 0 && filteredProfiles.length === 0 && searchedListings.length === 0 && searchedProjects.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">No Social results found for “{searchTerm.trim()}”.</p>}
                 </div>
               )}
             </div>
