@@ -56,10 +56,9 @@ const sections = [
   { id: "Notifications", icon: Bell, description: "Your social activity and connection updates." },
   { id: "Search", icon: Search, description: "Find members across MAS." },
   { id: "My Profile", icon: UserCircle, description: "Your profile, posts, and published work." },
-  { id: "Monetization", icon: Wallet, description: "Explore creator earning options and payout readiness." },
 ] as const;
 
-type SectionId = (typeof sections)[number]["id"];
+type SectionId = (typeof sections)[number]["id"] | "Find Investors" | "Monetization";
 type SocialProfile = {
   id: string;
   display_name: string | null;
@@ -689,6 +688,19 @@ function SocialPage() {
                   {label}
                 </button>
               ))}
+            </div>
+            <div className="pt-2">
+              <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Creator tools</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSidebarOpen(false);
+                  setActiveSection("Monetization");
+                }}
+                className="block w-full border-b border-border px-3 py-3 text-left text-sm text-foreground transition-colors hover:bg-secondary"
+              >
+                Monetise
+              </button>
             </div>
           </nav>
         </SheetContent>
