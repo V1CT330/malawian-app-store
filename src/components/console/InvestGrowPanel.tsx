@@ -88,7 +88,7 @@ export function InvestGrowPanel({ userId, members, acceptedIds, onConnect, onMes
       }, { onConflict: "user_id" });
       if (error) throw error;
     },
-    onSuccess: async () => { setProfileHydrated(false); await refresh(); toast.success("Invest & Grow profile saved"); },
+    onSuccess: async () => { setProfileHydrated(false); await refresh(); toast.success("Find Investors profile saved"); },
     onError: (error: Error) => toast.error(error.message || "Could not save profile"),
   });
   const createOpportunity = useMutation({
@@ -121,7 +121,7 @@ export function InvestGrowPanel({ userId, members, acceptedIds, onConnect, onMes
   const memberName = (member?: Member) => member?.developer_name || member?.display_name || "MAS member";
 
   return <div className="w-full space-y-6 bg-background px-4 py-5 sm:px-6 lg:px-8">
-    <header><div className="flex items-center gap-3"><BriefcaseBusiness className="h-6 w-6 text-primary" /><div><h2 className="text-xl font-semibold">Invest & Grow</h2><p className="mt-1 text-sm text-muted-foreground">Founders and investors can discover each other, publish opportunities and continue conversations through MAS Social.</p></div></div><p className="mt-3 text-xs leading-5 text-muted-foreground">Listings are introductions, not verified investments or financial advice. MAS does not process investments here.</p></header>
+    <header><div className="flex items-center gap-3"><BriefcaseBusiness className="h-6 w-6 text-primary" /><div><h2 className="text-xl font-semibold">Find Investors</h2><p className="mt-1 text-sm text-muted-foreground">Founders and investors can discover each other, publish opportunities and continue conversations through MAS Social.</p></div></div><p className="mt-3 text-xs leading-5 text-muted-foreground">Listings are introductions, not verified investments or financial advice. MAS does not process investments here.</p></header>
     <section className="border border-border p-4 sm:p-5"><h3 className="font-semibold">Your founder / investor profile</h3><form onSubmit={submitProfile} className="mt-4 grid gap-3 sm:grid-cols-2">
       <label className={labelClass}>I am here as<select value={role} onChange={(e) => setRole(e.target.value as Role)} className={inputClass}><option value="founder">Founder / entrepreneur</option><option value="investor">Investor</option><option value="both">Both</option></select></label>
       <label className={labelClass}>Organization / startup<input value={organization} onChange={(e) => setOrganization(e.target.value)} maxLength={120} placeholder="Company or startup name" className={inputClass} /></label>
@@ -129,7 +129,7 @@ export function InvestGrowPanel({ userId, members, acceptedIds, onConnect, onMes
       <label className={cn(labelClass, "sm:col-span-2")}>About you / investment interests<textarea value={bio} onChange={(e) => setBio(e.target.value)} maxLength={1500} rows={3} placeholder="Tell members what you do and what you want to connect about." className={inputClass} /></label>
       <label className={labelClass}>Location<input value={location} onChange={(e) => setLocation(e.target.value)} maxLength={120} placeholder="e.g. Lilongwe, Malawi" className={inputClass} /></label>
       <div className="flex items-end"><button type="submit" disabled={saveProfile.isPending} className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50">{saveProfile.isPending ? "Saving…" : "Save profile"}</button></div>
-    </form>{myProfile.isError && <p role="alert" className="mt-3 text-sm text-destructive">Invest & Grow needs the latest MAS Social database migration before this profile can load.</p>}</section>
+    </form>{myProfile.isError && <p role="alert" className="mt-3 text-sm text-destructive">Find Investors needs the latest MAS Social database migration before this profile can load.</p>}</section>
     <section className="border border-border p-4 sm:p-5"><h3 className="font-semibold">Publish a startup opportunity</h3><p className="mt-1 text-sm text-muted-foreground">Describe the problem, solution, stage and what support you need. Never upload passwords, bank details or private identity documents.</p>
       <form onSubmit={submitOpportunity} className="mt-4 grid gap-3 sm:grid-cols-2">
         <label className={labelClass}>Opportunity title *<input required minLength={3} maxLength={120} value={title} onChange={(e) => setTitle(e.target.value)} className={inputClass} placeholder="What are you building?" /></label>
