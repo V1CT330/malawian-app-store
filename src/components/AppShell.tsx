@@ -115,7 +115,7 @@ export function AppShell({
       </footer>
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur"
+        className="fixed inset-x-0 bottom-0 z-30 w-full bg-background/95 backdrop-blur"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
         aria-label="Primary navigation"
       >
