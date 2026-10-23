@@ -726,15 +726,14 @@ function SocialPage() {
             <Menu className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
-        <nav aria-label="Social menu" className="flex w-full min-w-0 items-stretch justify-start overflow-x-auto border-b border-border bg-background px-1 sm:justify-evenly sm:px-3">
+        <nav aria-label="Social menu" className="sticky top-0 z-20 flex w-full min-w-0 items-stretch justify-evenly border-b border-border bg-background px-1 sm:px-3">
           {sections.map(({ id, icon: Icon }) => {
             const selected = activeSection === id;
             return (
               <button key={id} type="button" onClick={() => setActiveSection(id)} aria-label={id} title={id} aria-current={selected ? "page" : undefined}
-                className={cn("flex min-h-14 min-w-[76px] shrink-0 flex-col items-center justify-center gap-1 border-b-2 px-2 py-2.5 transition-colors duration-200 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:min-w-0 sm:flex-1 sm:flex-row sm:gap-2 sm:px-3 sm:py-3 lg:px-5", selected ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:border-border hover:text-foreground")}>
+                className={cn("flex min-h-12 min-w-0 flex-1 flex-col items-center justify-center border-b-2 px-1 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring", selected ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:border-border hover:text-foreground")}>
                 <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
-                <span className="max-w-full truncate text-[10px] leading-none sm:text-xs">{id}</span>
-                {id === "Notifications" && unread > 0 && <span className="ml-1 text-[10px] font-semibold">{unread > 9 ? "9+" : unread}</span>}
+                {id === "Notifications" && unread > 0 && <span className="text-[10px] font-semibold">{unread > 9 ? "9+" : unread}</span>}
               </button>
             );
           })}
