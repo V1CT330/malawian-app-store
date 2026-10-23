@@ -610,6 +610,13 @@ function SocialPage() {
         return `${comment.body} ${displayName(author)}`.toLowerCase().includes(normalizedSearch);
       })
     : [];
+  const searchedMessages = searchHasTerm
+    ? (messagesQuery.data ?? []).filter((message) => {
+        const sender = profileMap.get(message.sender_id);
+        const recipient = profileMap.get(message.recipient_id);
+        return `${message.body} ${displayName(sender)} ${displayName(recipient)}`.toLowerCase().includes(normalizedSearch);
+      })
+    : [];
   const searchedListings = searchHasTerm
     ? (socialSearchListingsQuery.data ?? []).filter((listing) =>
         `${listing.name ?? ""} ${listing.tagline ?? ""} ${listing.kind ?? ""}`.toLowerCase().includes(normalizedSearch),
@@ -1145,6 +1152,23 @@ function SocialPage() {
                       })}
                     </div>
                   </section>}
+                  {searchedMessages.length > 0 && <section>
+                    <h2 className="mb-2 text-sm font-semibold">Your messages ({searchedMessages.length})</h2>
+                    <div className="divide-y divide-border border-y border-border bg-background">
+                      {searchedMessages.map((message) => {
+                        const otherId = message.sender_id === userId ? message.recipient_id : message.sender_id;
+                        const person = profileMap.get(otherId);
+                        return <button key={message.id} type="button" onClick={() => { setSelectedRecipient(otherId); setActiveSection("Messages"); }} className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-secondary">
+                          <Avatar profile={person} size="sm" />
+                          <span className="min-w-0 flex-1">
+                            <span className="block text-sm font-semibold">{displayName(person)}</span>
+                            <span className="mt-1 block whitespace-pre-wrap break-words text-sm text-muted-foreground">{message.body}</span>
+                            <span className="mt-1 block text-xs text-muted-foreground">{new Date(message.created_at).toLocaleString()}</span>
+                          </span>
+                        </button>;
+                      })}
+                    </div>
+                  </section>}
                   {searchedListings.length > 0 && <section>
                     <h2 className="mb-2 text-sm font-semibold">Published apps ({searchedListings.length})</h2>
                     <div className="divide-y divide-border border-y border-border bg-background">
@@ -1175,7 +1199,7 @@ function SocialPage() {
                       })}
                     </div>
                   </section>}
-                  {searchedPosts.length === 0 && searchedComments.length === 0 && filteredProfiles.length === 0 && searchedListings.length === 0 && searchedProjects.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">No Social results found for “{searchTerm.trim()}”.</p>}
+                  {searchedPosts.length === 0 && searchedComments.length === 0 && searchedMessages.length === 0 && filteredProfiles.length === 0 && searchedListings.length === 0 && searchedProjects.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">No Social results found for “{searchTerm.trim()}”.</p>}
                 </div>
               )}
             </div>
