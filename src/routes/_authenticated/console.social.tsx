@@ -161,6 +161,41 @@ function SocialPage() {
     },
   });
 
+  const socialSearchListingsQuery = useQuery({
+    queryKey: ["social", "search-listings"],
+    enabled: Boolean(userId),
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("listings")
+        .select("id,slug,name,tagline,kind,icon_url,downloads,rating_avg,rating_count")
+        .eq("status", "published")
+        .order("updated_at", { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const socialSearchProjectsQuery = useQuery({
+    queryKey: ["social", "search-projects"],
+    enabled: Boolean(userId),
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data, error } = await socialDb
+        .from("developer_portfolio_projects")
+        .select("id,developer_id,title,description,project_type,url,image_url,created_at")
+        .order("created_at", { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      return (data ?? []) as {
+        id: string; developer_id: string; title: string; description: string | null;
+        project_type: "app" | "website" | "game" | "tool" | "other";
+        url: string; image_url: string | null; created_at: string;
+      }[];
+    },
+  });
+
   const myListingsQuery = useQuery({
     queryKey: ["social", "my-published-listings", userId],
     enabled: Boolean(userId && profile?.is_developer),
@@ -552,10 +587,40 @@ function SocialPage() {
     // Results are newest-first; preserve the latest relationship for each member.
     if (!relationshipMap.has(otherId)) relationshipMap.set(otherId, item);
   });
+  const normalizedSearch = searchTerm.trim().toLowerCase();
   const filteredProfiles = (profilesQuery.data ?? []).filter((item) =>
     item.id !== userId &&
-    `${displayName(item)} ${item.bio ?? ""}`.toLowerCase().includes(searchTerm.trim().toLowerCase()),
+    `${displayName(item)} ${item.bio ?? ""}`.toLowerCase().includes(normalizedSearch),
   );
+  const searchHasTerm = normalizedSearch.length > 0;
+  const searchedPosts = searchHasTerm
+    ? (postsQuery.data ?? []).filter((post) => {
+        const author = profileMap.get(post.author_id);
+        const postText = `${post.body} ${displayName(author)} ${author?.bio ?? ""}`.toLowerCase();
+        return postText.includes(normalizedSearch) ||
+          (commentsByPost.get(post.id) ?? []).some((comment) => {
+            const commentAuthor = profileMap.get(comment.author_id);
+            return `${comment.body} ${displayName(commentAuthor)}`.toLowerCase().includes(normalizedSearch);
+          });
+      })
+    : [];
+  const searchedComments = searchHasTerm
+    ? (commentsQuery.data ?? []).filter((comment) => {
+        const author = profileMap.get(comment.author_id);
+        return `${comment.body} ${displayName(author)}`.toLowerCase().includes(normalizedSearch);
+      })
+    : [];
+  const searchedListings = searchHasTerm
+    ? (socialSearchListingsQuery.data ?? []).filter((listing) =>
+        `${listing.name ?? ""} ${listing.tagline ?? ""} ${listing.kind ?? ""}`.toLowerCase().includes(normalizedSearch),
+      )
+    : [];
+  const searchedProjects = searchHasTerm
+    ? (socialSearchProjectsQuery.data ?? []).filter((project) => {
+        const author = profileMap.get(project.developer_id);
+        return `${project.title} ${project.description ?? ""} ${project.project_type} ${displayName(author)}`.toLowerCase().includes(normalizedSearch);
+      })
+    : [];
   const selectedProfile = selectedRecipient ? profileMap.get(selectedRecipient) : null;
   const threadMessages = (messagesQuery.data ?? []).filter((item) =>
     selectedRecipient && (
@@ -1024,8 +1089,95 @@ function SocialPage() {
             </div>
           ) : activeSection === "Search" ? (
             <div className="w-full pb-6 pt-0">
-              <div className="w-full px-4 py-3 sm:px-6 lg:px-8"><label htmlFor="social-search" className="sr-only">Search people</label><div className="flex items-center gap-2 rounded-full border border-border bg-background px-4"><Search className="h-4 w-4 shrink-0 text-muted-foreground" /><input id="social-search" autoFocus value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Search people by name or bio…" className="min-w-0 flex-1 bg-transparent py-2.5 text-sm outline-none" /></div></div>
-              <div className="w-full bg-background">{renderPeople()}</div>
+              <div className="w-full px-4 py-3 sm:px-6 lg:px-8">
+                <label htmlFor="social-search" className="sr-only">Search all Social content</label>
+                <div className="flex items-center gap-2 rounded-full border border-border bg-background px-4">
+                  <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+                  <input id="social-search" autoFocus value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Search posts, people, comments, apps and projects…" className="min-w-0 flex-1 bg-transparent py-2.5 text-sm outline-none" />
+                  {searchTerm && <button type="button" onClick={() => setSearchTerm("")} aria-label="Clear search" className="text-muted-foreground hover:text-foreground"><X className="h-4 w-4" /></button>}
+                </div>
+              </div>
+              {!searchHasTerm ? (
+                <p className="px-4 py-8 text-center text-sm text-muted-foreground">Search across Social for people, posts, comments, published apps and developer projects.</p>
+              ) : (
+                <div className="space-y-5 px-4 pb-6 sm:px-6 lg:px-8">
+                  {(profilesQuery.isLoading || postsQuery.isLoading || commentsQuery.isLoading || socialSearchListingsQuery.isLoading || socialSearchProjectsQuery.isLoading) && <p className="py-3 text-sm text-muted-foreground">Searching Social…</p>}
+                  {profilesQuery.isError || postsQuery.isError || socialSearchListingsQuery.isError || socialSearchProjectsQuery.isError
+                    ? <p role="alert" className="py-3 text-sm text-destructive">Some Social search results could not be loaded.</p>
+                    : null}
+                  {filteredProfiles.length > 0 && <section>
+                    <h2 className="mb-2 text-sm font-semibold">People ({filteredProfiles.length})</h2>
+                    <div className="bg-background">{renderPeople()}</div>
+                  </section>}
+                  {searchedPosts.length > 0 && <section>
+                    <h2 className="mb-2 text-sm font-semibold">Posts ({searchedPosts.length})</h2>
+                    <div className="divide-y divide-border border-y border-border bg-background">
+                      {searchedPosts.map((post) => {
+                        const author = profileMap.get(post.author_id);
+                        return <article key={post.id} className="flex gap-3 px-4 py-4">
+                          <Avatar profile={author} />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-semibold">{displayName(author)}</p>
+                            <time className="text-xs text-muted-foreground" dateTime={post.created_at}>{new Date(post.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</time>
+                            <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6">{post.body}</p>
+                            {post.media_url && post.media_type === "image" && <img src={post.media_url} alt="" loading="lazy" className="mt-3 max-h-72 max-w-full object-contain" />}
+                            {post.media_url && post.media_type === "video" && <video src={post.media_url} controls preload="metadata" className="mt-3 max-h-72 max-w-full" />}
+                            <button type="button" onClick={() => setActiveSection("Feed")} className="mt-2 text-xs font-medium text-primary hover:underline">View in Feed</button>
+                          </div>
+                        </article>;
+                      })}
+                    </div>
+                  </section>}
+                  {searchedComments.length > 0 && <section>
+                    <h2 className="mb-2 text-sm font-semibold">Comments ({searchedComments.length})</h2>
+                    <div className="divide-y divide-border border-y border-border bg-background">
+                      {searchedComments.map((comment) => {
+                        const author = profileMap.get(comment.author_id);
+                        const post = (postsQuery.data ?? []).find((item) => item.id === comment.post_id);
+                        return <article key={comment.id} className="flex gap-3 px-4 py-3">
+                          <Avatar profile={author} size="sm" />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-semibold">{displayName(author)} <span className="font-normal text-muted-foreground">commented</span></p>
+                            <p className="mt-1 whitespace-pre-wrap break-words text-sm">{comment.body}</p>
+                            {post && <p className="mt-1 text-xs text-muted-foreground">On: {post.body.slice(0, 180)}</p>}
+                          </div>
+                        </article>;
+                      })}
+                    </div>
+                  </section>}
+                  {searchedListings.length > 0 && <section>
+                    <h2 className="mb-2 text-sm font-semibold">Published apps ({searchedListings.length})</h2>
+                    <div className="divide-y divide-border border-y border-border bg-background">
+                      {searchedListings.map((listing) => <article key={listing.id} className="flex items-center gap-3 px-4 py-3">
+                        {listing.icon_url ? <img src={listing.icon_url} alt="" loading="lazy" className="h-10 w-10 rounded-lg object-cover" /> : <Package className="h-10 w-10 rounded-lg bg-muted p-2 text-muted-foreground" />}
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-semibold">{listing.name}</p>
+                          <p className="text-xs text-muted-foreground">{listing.tagline || listing.kind || "Published MAS listing"}</p>
+                        </div>
+                        {listing.slug && <Link to="/store/$slug" params={{ slug: listing.slug }} className="shrink-0 text-xs font-medium text-primary hover:underline">Open app</Link>}
+                      </article>)}
+                    </div>
+                  </section>}
+                  {searchedProjects.length > 0 && <section>
+                    <h2 className="mb-2 text-sm font-semibold">Developer projects ({searchedProjects.length})</h2>
+                    <div className="divide-y divide-border border-y border-border bg-background">
+                      {searchedProjects.map((project) => {
+                        const author = profileMap.get(project.developer_id);
+                        return <article key={project.id} className="flex gap-3 px-4 py-3">
+                          {project.image_url ? <img src={project.image_url} alt="" loading="lazy" className="h-12 w-12 rounded-lg object-cover" /> : <Globe className="h-12 w-12 rounded-lg bg-muted p-3 text-muted-foreground" />}
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-semibold">{project.title}</p>
+                            <p className="text-xs text-muted-foreground">{displayName(author)} · {project.project_type}</p>
+                            {project.description && <p className="mt-1 break-words text-sm text-muted-foreground">{project.description}</p>}
+                          </div>
+                          <a href={project.url} target="_blank" rel="noreferrer noopener" className="shrink-0 text-xs font-medium text-primary hover:underline">Open</a>
+                        </article>;
+                      })}
+                    </div>
+                  </section>}
+                  {searchedPosts.length === 0 && searchedComments.length === 0 && filteredProfiles.length === 0 && searchedListings.length === 0 && searchedProjects.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">No Social results found for “{searchTerm.trim()}”.</p>}
+                </div>
+              )}
             </div>
           ) : activeSection === "Messages" ? (
             <div className="grid w-full grid-cols-1 overflow-hidden border-y border-border/80 bg-background md:grid-cols-[240px_minmax(0,1fr)]">
