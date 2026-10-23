@@ -399,7 +399,7 @@ function SettingsPage() {
                 </div>
                 <div className="mt-4 grid grid-cols-1 gap-3">
                   <Button
-                    className="h-12 w-full rounded-none bg-gradient-to-r from-violet-600 to-indigo-600 px-3 font-semibold text-white shadow-sm transition-all hover:from-violet-700 hover:to-indigo-700"
+                    className="h-12 w-full rounded-none border border-black bg-white px-3 font-semibold text-black shadow-none transition-colors hover:bg-gray-100"
                     disabled={setMode.isPending}
                     onClick={() => {
                       if (mode === "developer") {
@@ -412,7 +412,7 @@ function SettingsPage() {
                     {setMode.isPending ? "Switching…" : "Developer Mode"}
                   </Button>
                   <Button
-                    className="h-12 w-full rounded-none border border-emerald-500 bg-gradient-to-r from-emerald-500 to-teal-500 px-3 font-semibold text-white shadow-sm transition-all hover:from-emerald-600 hover:to-teal-600"
+                    className="h-12 w-full rounded-none border border-black bg-white px-3 font-semibold text-black shadow-none transition-colors hover:bg-gray-100"
                     onClick={() => navigate({ to: "/console/social" })}
                   >
                     Social
