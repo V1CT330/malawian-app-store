@@ -397,7 +397,7 @@ function SettingsPage() {
                     </p>
                   </div>
                 </div>
-                <div className="mt-4 grid grid-cols-2 gap-3">
+                <div className="mt-4 grid grid-cols-1 gap-3">
                   <Button
                     className="h-12 w-full rounded-none bg-gradient-to-r from-violet-600 to-indigo-600 px-3 font-semibold text-white shadow-sm transition-all hover:from-violet-700 hover:to-indigo-700"
                     disabled={setMode.isPending}
