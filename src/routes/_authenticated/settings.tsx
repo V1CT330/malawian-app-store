@@ -379,10 +379,10 @@ function SettingsPage() {
               <p className="mt-1 text-sm leading-5 text-muted-foreground">Choose how you use the platform.</p>
             </div>
             <div className="min-w-0">
-              <div className="flex items-start justify-between gap-4 border-b border-border pb-5">
+              <div className="border-b border-border pb-5">
                 <div className="flex items-start gap-3">
                   <Store className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium">
                       {setMode.isPending
                         ? "Switching workspace…"
@@ -393,14 +393,37 @@ function SettingsPage() {
                     <p className="mt-1 text-sm leading-5 text-muted-foreground">
                       {mode === "developer" ? "Manage your published products and developer tools." : "Discover apps, save products and manage your library."}
                     </p>
+                    <Button
+                      className="mt-3 rounded-none"
+                      variant={mode === "developer" ? "outline" : "default"}
+                      disabled={setMode.isPending}
+                      onClick={() => toggleDeveloper(mode !== "developer")}
+                    >
+                      {setMode.isPending
+                        ? "Switching…"
+                        : mode === "developer"
+                          ? "Switch to User Mode"
+                          : "Switch to Developer Mode"}
+                    </Button>
                   </div>
                 </div>
-                <Switch
-                  aria-label="Switch between user and developer mode"
-                  checked={mode === "developer"}
-                  disabled={setMode.isPending}
-                  onCheckedChange={toggleDeveloper}
-                />
+                <div className="mt-4 border-t border-border pt-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-sm font-medium">Social</p>
+                      <p className="mt-1 text-sm leading-5 text-muted-foreground">
+                        Open Social to connect and interact with the MAS community.
+                      </p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="shrink-0 rounded-none"
+                      onClick={() => navigate({ to: "/console/social" })}
+                    >
+                      Switch to Social
+                    </Button>
+                  </div>
+                </div>
               </div>
               {mode === "developer" ? (
                 <div className="divide-y divide-border">
