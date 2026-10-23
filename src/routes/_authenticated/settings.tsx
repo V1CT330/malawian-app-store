@@ -413,7 +413,7 @@ function SettingsPage() {
                   </Button>
                   <Button
                     className="h-12 w-full rounded-none border border-emerald-500 bg-gradient-to-r from-emerald-500 to-teal-500 px-3 font-semibold text-white shadow-sm transition-all hover:from-emerald-600 hover:to-teal-600"
-                    onClick={() => navigate({ to: mode === "developer" ? "/console/social" : "/social" })}
+                    onClick={() => navigate({ to: "/console/social" })}
                   >
                     Social
                   </Button>
