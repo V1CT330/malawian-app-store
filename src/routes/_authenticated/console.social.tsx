@@ -54,7 +54,6 @@ const sections = [
   { id: "Friends", icon: Users, description: "Friend requests and people on MAS." },
   { id: "Messages", icon: MessageCircle, description: "Private conversations with other MAS members." },
   { id: "Notifications", icon: Bell, description: "Your social activity and connection updates." },
-  { id: "Find Investors", icon: Users, description: "Discover investors, founders and startup opportunities." },
   { id: "Search", icon: Search, description: "Find members across MAS." },
   { id: "My Profile", icon: UserCircle, description: "Your profile, posts, and published work." },
   { id: "Monetization", icon: Wallet, description: "Explore creator earning options and payout readiness." },
