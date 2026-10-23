@@ -10,7 +10,7 @@ import { type ReactNode } from "react";
 
 import logo from "@/assets/logo-mark.png";
 import { GeminiIcon } from "@/components/GeminiIcon";
-import { useMode, useProfile, useUnreadCount } from "@/hooks/useSession";
+import { useMode, useUnreadCount } from "@/hooks/useSession";
 import { SOCIAL_LINKS } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -34,14 +34,10 @@ export function AppShell({
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
-  const { userId, profile } = useProfile();
   const mode = useMode();
   const unread = useUnreadCount();
   const isSettingsPage = pathname === "/settings";
   const isUserSettingsPage = isSettingsPage && mode !== "developer";
-  const initial = (profile?.display_name || profile?.developer_name || "U")
-    .slice(0, 1)
-    .toUpperCase();
   // Keep the shopper navigation fixed; developer links must not replace it.
 
   return (
@@ -83,18 +79,6 @@ export function AppShell({
                   className="min-w-0 min-h-10 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground sm:text-sm"
                 />
               </>
-            )}
-{!isUserSettingsPage && (
-            <Link
-              to={userId ? "/settings" : "/auth"}
-              aria-label="Account"
-              className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground"
-            >
-              {initial}
-              {unread > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-destructive" />
-              )}
-            </Link>
             )}
           </div>
         </div>
