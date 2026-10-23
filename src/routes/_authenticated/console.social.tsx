@@ -54,7 +54,7 @@ const sections = [
   { id: "Friends", icon: Users, description: "Friend requests and people on MAS." },
   { id: "Messages", icon: MessageCircle, description: "Private conversations with other MAS members." },
   { id: "Notifications", icon: Bell, description: "Your social activity and connection updates." },
-  { id: "Invest & Grow", icon: Users, description: "Connect founders, investors and startup opportunities." },
+  { id: "Find Investors", icon: Users, description: "Discover investors, founders and startup opportunities." },
   { id: "Search", icon: Search, description: "Find members across MAS." },
   { id: "My Profile", icon: UserCircle, description: "Your profile, posts, and published work." },
   { id: "Monetization", icon: Wallet, description: "Explore creator earning options and payout readiness." },
@@ -676,13 +676,13 @@ function SocialPage() {
             ))}
             <div className="pt-2">
               <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Opportunities</p>
-              {["Collabo", "Investors", "Grants", "Crowdfund"].map((label) => (
+              {["Collabo", "Find Investors", "Grants", "Crowdfund"].map((label) => (
                 <button
                   key={label}
                   type="button"
                   onClick={() => {
                     setSidebarOpen(false);
-                    if (label === "Investors") setActiveSection("Invest & Grow");
+                    if (label === "Find Investors") setActiveSection("Find Investors");
                     else toast.info(`${label} opportunities are not yet available.`);
                   }}
                   className="block w-full border-b border-border px-3 py-3 text-left text-sm text-foreground transition-colors hover:bg-secondary"
@@ -1020,7 +1020,7 @@ function SocialPage() {
             </div>
           ) : activeSection === "Notifications" ? (
             <SocialNotificationsPanel userId={userId} />
-          ) : activeSection === "Invest & Grow" ? (
+          ) : activeSection === "Find Investors" ? (
             <InvestGrowPanel
               userId={userId}
               members={profilesQuery.data ?? []}
