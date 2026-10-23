@@ -390,39 +390,33 @@ function SettingsPage() {
                           ? "Developer workspace"
                           : "User mode"}
                     </p>
-                    <p className="mt-1 text-sm leading-5 text-muted-foreground">
-                      {mode === "developer" ? "Manage your published products and developer tools." : "Discover apps, save products and manage your library."}
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                      {mode === "developer"
+                        ? "Manage your published products and developer tools."
+                        : "Discover apps, save products and manage your library."}
                     </p>
-                    <Button
-                      className="mt-3 rounded-none"
-                      variant={mode === "developer" ? "outline" : "default"}
-                      disabled={setMode.isPending}
-                      onClick={() => toggleDeveloper(mode !== "developer")}
-                    >
-                      {setMode.isPending
-                        ? "Switching…"
-                        : mode === "developer"
-                          ? "Switch to User Mode"
-                          : "Switch to Developer Mode"}
-                    </Button>
                   </div>
                 </div>
-                <div className="mt-4 border-t border-border pt-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-sm font-medium">Social</p>
-                      <p className="mt-1 text-sm leading-5 text-muted-foreground">
-                        Open Social to connect and interact with the MAS community.
-                      </p>
-                    </div>
-                    <Button
-                      variant="outline"
-                      className="shrink-0 rounded-none"
-                      onClick={() => navigate({ to: "/console/social" })}
-                    >
-                      Switch to Social
-                    </Button>
-                  </div>
+                <div className="mt-4 grid grid-cols-2 gap-3">
+                  <Button
+                    className="h-12 w-full rounded-none bg-gradient-to-r from-violet-600 to-indigo-600 px-3 font-semibold text-white shadow-sm transition-all hover:from-violet-700 hover:to-indigo-700"
+                    disabled={setMode.isPending}
+                    onClick={() => {
+                      if (mode === "developer") {
+                        navigate({ to: "/console" });
+                      } else {
+                        toggleDeveloper(true);
+                      }
+                    }}
+                  >
+                    {setMode.isPending ? "Switching…" : "Developer Mode"}
+                  </Button>
+                  <Button
+                    className="h-12 w-full rounded-none border border-emerald-500 bg-gradient-to-r from-emerald-500 to-teal-500 px-3 font-semibold text-white shadow-sm transition-all hover:from-emerald-600 hover:to-teal-600"
+                    onClick={() => navigate({ to: mode === "developer" ? "/console/social" : "/social" })}
+                  >
+                    Social
+                  </Button>
                 </div>
               </div>
               {mode === "developer" ? (
