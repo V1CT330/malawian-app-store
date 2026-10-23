@@ -665,7 +665,6 @@ function SocialPage() {
               { label: "App Store", to: "/store" },
               { label: "Developer Dashboard", to: "/console" },
               { label: "Social", to: "/console/social" },
-              { label: "My Profile", to: "/console/settings" },
             ].map((item) => (
               <Link key={item.to} to={item.to} onClick={() => setSidebarOpen(false)} className="block border-b border-border px-3 py-3 text-sm text-foreground transition-colors hover:bg-secondary">
                 {item.label}
