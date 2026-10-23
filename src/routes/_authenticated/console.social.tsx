@@ -11,7 +11,6 @@ import {
   Heart,
   Home,
   ImagePlus,
-  Forward,
   Trash2,
   Wallet,
   Megaphone,
@@ -115,6 +114,24 @@ function Avatar({ profile, size = "md" }: { profile?: SocialProfile | null; size
     >
       {label.slice(0, 1).toUpperCase()}
     </span>
+  );
+}
+
+function FacebookShareIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M14.5 5 20 10.5 14.5 16" />
+      <path d="M20 10.5H10.75A6.75 6.75 0 0 0 4 17.25" />
+    </svg>
   );
 }
 
@@ -823,7 +840,7 @@ function SocialPage() {
                         } else {
                           void navigator.clipboard.writeText(shareText).then(() => toast.success("Post copied for sharing")).catch(() => toast.error("Could not copy post"));
                         }
-                      }} className="flex flex-1 items-center justify-center gap-2 px-2 py-1.5 hover:text-foreground"><Forward className="h-5 w-5" /></button>
+                      }} className="flex flex-1 items-center justify-center gap-2 px-2 py-1.5 hover:text-foreground"><FacebookShareIcon className="h-5 w-5" /></button>
                     </div>
                     {commentsQuery.isError && <p role="alert" className="pt-3 text-xs text-destructive">Comments could not load. Refresh to try again.</p>}
                     {postComments.slice(-5).map((comment) => {
@@ -885,7 +902,7 @@ function SocialPage() {
                           void navigator.clipboard.writeText(url).then(() => toast.success("Profile link copied")).catch(() => toast.error("Could not copy profile link"));
                         }
                       }} className="inline-flex items-center gap-2 border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary">
-                        <Forward className="h-4 w-4" /> Share
+                        <FacebookShareIcon className="h-4 w-4" /> Share
                       </button>}
                       <Link to="/settings" className="inline-flex items-center gap-2 border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary">
                         Edit profile
