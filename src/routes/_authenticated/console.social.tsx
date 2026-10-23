@@ -119,18 +119,8 @@ function Avatar({ profile, size = "md" }: { profile?: SocialProfile | null; size
 
 function FacebookShareIcon({ className }: { className?: string }) {
   return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <path d="M14.5 5 20 10.5 14.5 16" />
-      <path d="M20 10.5H10.75A6.75 6.75 0 0 0 4 17.25" />
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <path d="M14.1 3.8a1.4 1.4 0 0 1 2.4-1l5.1 5.1a1.5 1.5 0 0 1 0 2.1l-5.1 5.1a1.4 1.4 0 0 1-2.4-1v-2.4h-3.3a5.7 5.7 0 0 0-5.7 5.7 1.4 1.4 0 1 1-2.8 0 8.5 8.5 0 0 1 8.5-8.5h3.3z" />
     </svg>
   );
 }
