@@ -11,7 +11,7 @@ import {
   Heart,
   Home,
   ImagePlus,
-  Share2,
+  Forward,
   Trash2,
   Wallet,
   Megaphone,
@@ -823,7 +823,7 @@ function SocialPage() {
                         } else {
                           void navigator.clipboard.writeText(shareText).then(() => toast.success("Post copied for sharing")).catch(() => toast.error("Could not copy post"));
                         }
-                      }} className="flex flex-1 items-center justify-center gap-2 px-2 py-1.5 hover:text-foreground"><Share2 className="h-5 w-5" /></button>
+                      }} className="flex flex-1 items-center justify-center gap-2 px-2 py-1.5 hover:text-foreground"><Forward className="h-5 w-5" /></button>
                     </div>
                     {commentsQuery.isError && <p role="alert" className="pt-3 text-xs text-destructive">Comments could not load. Refresh to try again.</p>}
                     {postComments.slice(-5).map((comment) => {
@@ -885,7 +885,7 @@ function SocialPage() {
                           void navigator.clipboard.writeText(url).then(() => toast.success("Profile link copied")).catch(() => toast.error("Could not copy profile link"));
                         }
                       }} className="inline-flex items-center gap-2 border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary">
-                        <Share2 className="h-4 w-4" /> Share
+                        <Forward className="h-4 w-4" /> Share
                       </button>}
                       <Link to="/settings" className="inline-flex items-center gap-2 border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-secondary">
                         Edit profile
