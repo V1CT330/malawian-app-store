@@ -120,7 +120,7 @@ function Avatar({ profile, size = "md" }: { profile?: SocialProfile | null; size
 function FacebookShareIcon({ className }: { className?: string }) {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M14.1 3.8a1.4 1.4 0 0 1 2.4-1l5.1 5.1a1.5 1.5 0 0 1 0 2.1l-5.1 5.1a1.4 1.4 0 0 1-2.4-1v-2.4h-3.3a5.7 5.7 0 0 0-5.7 5.7 1.4 1.4 0 1 1-2.8 0 8.5 8.5 0 0 1 8.5-8.5h3.3z" />
+      <path d="M13.35 3.05a2.1 2.1 0 0 1 3 0l5.6 5.6a2.1 2.1 0 0 1 0 3l-5.6 5.6a2.1 2.1 0 0 1-3.6-1.5v-2.1h-2.1c-3.2 0-5.4 1.9-6.1 5.1a1.55 1.55 0 0 1-3.05-.65c1-4.8 4.3-7.55 9.15-7.55h2.1V4.55c0-.57.22-1.1.6-1.5Z" />
     </svg>
   );
 }
