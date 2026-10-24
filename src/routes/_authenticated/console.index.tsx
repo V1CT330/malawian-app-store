@@ -6,7 +6,6 @@ import {
   BarChart3,
   CheckCircle2,
   LayoutList,
-  PlusCircle,
   Rocket,
   TrendingUp,
 } from "lucide-react";
@@ -140,18 +139,11 @@ function ConsoleDashboard() {
       title={`Welcome back, ${profile?.developer_name || profile?.display_name || "developer"}`}
       description="Your publishing command centre. Check performance, fix blockers and manage releases."
       actions={
-        <>
-          <Button asChild variant="outline" className="rounded-none">
-            <Link to="/console/products">
-              <LayoutList className="mr-2 h-4 w-4" /> All products
-            </Link>
-          </Button>
-          <Button asChild className="rounded-none">
-            <Link to="/upload">
-              <PlusCircle className="mr-2 h-4 w-4" /> New product
-            </Link>
-          </Button>
-        </>
+        <Button asChild variant="outline" className="rounded-none">
+          <Link to="/console/products">
+            <LayoutList className="mr-2 h-4 w-4" /> All products
+          </Link>
+        </Button>
       }
     >
       {!listingsQuery.isLoading && listings.length === 0 && <DemoPreview title="Developer dashboard · sample view" description="Example metrics and tasks to show the dashboard once your account has products." items={[{ title: "Store visits", detail: "Views across your product pages.", metric: "3,840 · illustrative", status: "Last 30 days" }, { title: "Installs", detail: "Recorded install events from published products.", metric: "1,275 · illustrative", status: "Last 30 days" }, { title: "Publishing checklist", detail: "One draft needs screenshots and a support link.", metric: "80% ready", status: "Action needed" }, { title: "Developer reputation", detail: "A sample account health overview.", metric: "Strong · illustrative", status: "Preview" }]} />}
