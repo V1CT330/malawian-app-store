@@ -543,6 +543,7 @@ function ReleasesTab({ listing }: { listing: PortalListing }) {
             <Label htmlFor="release-package">{listing.kind === "app" ? "Android APK package" : "ZIP package"}</Label>
             <Input
               id="release-package"
+              key={packageFile ? packageFile.name : "release-package"}
               type="file"
               accept={listing.kind === "app" ? ".apk,application/vnd.android.package-archive" : ".zip,application/zip"}
               onChange={(e) => setPackageFile(e.target.files?.[0] ?? null)}
