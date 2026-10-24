@@ -340,7 +340,7 @@ function ListingDetail() {
                 </>
               ) : (
                 <>
-                  <Download className="mr-2 h-4 w-4" /> Download APK
+                  <Download className="mr-2 h-4 w-4" /> {listing.kind === "app" ? "Download APK" : "Download package"}
                 </>
               )}
             </>
