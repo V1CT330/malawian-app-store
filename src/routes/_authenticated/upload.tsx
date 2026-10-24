@@ -100,16 +100,28 @@ function UploadPage() {
         .single();
       if (error) throw error;
 
-      const filePath = kind !== "website" && file ? await uploadAsset(userId, file, "builds") : null;
-      const { error: versionError } = await supabase.from("listing_versions").insert({
-        listing_id: listing.id,
-        version: version.trim() || "1.0.0",
-        changelog: "First release",
-        file_url: filePath,
-        size_bytes: kind !== "website" ? file?.size ?? null : null,
-        status: kind === "website" ? "released" : "pending",
-      });
-      if (versionError) throw versionError;
+      let filePath: string | null = null;
+      try {
+        filePath = kind !== "website" && file ? await uploadAsset(userId, file, "builds") : null;
+        const { error: versionError } = await supabase.from("listing_versions").insert({
+          listing_id: listing.id,
+          version: version.trim() || "1.0.0",
+          changelog: "First release",
+          file_url: filePath,
+          size_bytes: kind !== "website" ? file?.size ?? null : null,
+          status: kind === "website" ? "released" : "pending",
+        });
+        if (versionError) throw versionError;
+      } catch (error) {
+        const { error: listingCleanupError } = await supabase.from("listings").delete().eq("id", listing.id);
+        if (listingCleanupError) console.warn("Could not clean up a failed draft listing.");
+        const paths = [iconPath, filePath].filter((path): path is string => Boolean(path));
+        if (paths.length) {
+          const { error: assetCleanupError } = await supabase.storage.from("app-assets").remove(paths);
+          if (assetCleanupError) console.warn("Could not clean up uploaded listing assets.");
+        }
+        throw error;
+      }
 
       if (!profile?.is_developer) {
         await supabase.from("profiles").update({ is_developer: true }).eq("id", userId);
