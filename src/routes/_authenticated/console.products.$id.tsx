@@ -22,7 +22,6 @@ import {
 } from "@/lib/console";
 import { useListing } from "@/lib/console.queries";
 import {
-  asoReport,
   kindLabel,
   logActivity,
   type PortalListing,
@@ -49,7 +48,7 @@ export const Route = createFileRoute("/_authenticated/console/products/$id")({
   component: ProductDetailPage,
 });
 
-const TABS = ["Overview", "Listing", "Releases", "Reviews", "Quality"] as const;
+const TABS = ["Overview", "Listing", "Releases", "Reviews"] as const;
 type Tab = (typeof TABS)[number];
 
 type ReviewRow = {
@@ -220,7 +219,6 @@ function ProductDetailPage() {
       {tab === "Listing" && <ListingTab listing={listing} onSaved={invalidate} />}
       {tab === "Releases" && <ReleasesTab listing={listing} />}
       {tab === "Reviews" && <ReviewsTab listing={listing} />}
-      {tab === "Quality" && <QualityTab listing={listing} />}
     </ConsoleShell>
   );
 }
@@ -681,23 +679,3 @@ function ReviewsTab({ listing }: { listing: PortalListing }) {
   );
 }
 
-function QualityTab({ listing }: { listing: PortalListing }) {
-  const report = asoReport(listing);
-  return (
-    <SectionCard title="Store optimisation">
-      <Progress value={report.score} />
-      <p className="mt-2 text-xs text-muted-foreground">{report.score}/100 store readiness score</p>
-      <ul className="mt-4 divide-y divide-border">
-        {report.checks.map((c) => (
-          <li key={c.label} className="flex items-center gap-3 py-2.5 text-sm">
-            <span className={c.ok ? "text-brand-green" : "text-brand-red"}>
-              {c.ok ? "Pass" : "Fix"}
-            </span>
-            <span className="min-w-0 flex-1">{c.label}</span>
-            <span className="text-xs text-muted-foreground">{c.weight} pts</span>
-          </li>
-        ))}
-      </ul>
-    </SectionCard>
-  );
-}
