@@ -126,20 +126,23 @@ function LibraryPage() {
       versionId: string;
       fileUrl: string | null;
     }) => {
+      if (!fileUrl) throw new Error("This release has no downloadable package.");
+      const url = await signedAssetUrl(fileUrl);
+      if (!url) throw new Error("Could not create a download link. Try again later.");
+      window.open(url, "_blank", "noopener,noreferrer");
+
+      const { error: eventError } = await supabase.rpc("register_install", {
+        _listing_id: listingId,
+        _device: navigator.platform,
+      });
+      if (eventError) throw eventError;
+      // This records the requested update, not proof that Android completed installation.
       const { error } = await supabase
         .from("installed_apps")
         .update({ installed_version_id: versionId })
         .eq("id", id)
         .eq("user_id", userId!);
       if (error) throw error;
-      await supabase.rpc("register_install", {
-        _listing_id: listingId,
-        _device: navigator.platform,
-      });
-      if (fileUrl) {
-        const url = await signedAssetUrl(fileUrl);
-        if (url) window.open(url, "_blank", "noopener");
-      }
     },
     onSuccess: () => {
       toast.success("App updated");
@@ -191,7 +194,7 @@ function LibraryPage() {
                 | null;
               if (!listing) return null;
               const latest = [...(listing.listing_versions ?? [])]
-                .filter((version) => version.status === "published")
+                .filter((version) => version.status === "released" || version.status === "published")
                 .sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
               const updateAvailable = Boolean(latest && latest.id !== row.installed_version_id);
               return (
@@ -222,7 +225,7 @@ function LibraryPage() {
                         variant="outline"
                         onClick={() => void openApp(latest?.file_url ?? null)}
                       >
-                        <ExternalLink className="mr-1.5 h-4 w-4" /> Open
+                        <Download className="mr-1.5 h-4 w-4" /> Download again
                       </Button>
                     )}
                     <Button
