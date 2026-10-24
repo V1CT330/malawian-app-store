@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Shield } from "lucide-react";
+import { Download, Shield } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useIsAdmin, useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
-import { type Listing } from "@/lib/store";
+import { signedAssetUrl, type Listing } from "@/lib/store";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -58,6 +58,20 @@ function AdminPage() {
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as Listing[];
+    },
+  });
+
+  const releases = useQuery({
+    queryKey: ["admin-releases"],
+    enabled: isAdmin,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("listing_versions")
+        .select("id,listing_id,version,release_notes,file_url,size_bytes,status,created_at,listings(name,slug,developer_id)")
+        .eq("status", "pending")
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      return data ?? [];
     },
   });
 
@@ -128,6 +142,67 @@ function AdminPage() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  const decideRelease = useMutation({
+    mutationFn: async ({
+      id,
+      status,
+      version,
+      listingName,
+      developerId,
+      reason,
+    }: {
+      id: string;
+      status: "released" | "rejected";
+      version: string;
+      listingName: string;
+      developerId: string;
+      reason?: string;
+    }) => {
+      const { error } = await supabase
+        .from("listing_versions")
+        .update({ status })
+        .eq("id", id)
+        .eq("status", "pending");
+      if (error) throw error;
+      const { error: notificationError } = await supabase.from("notifications").insert({
+        user_id: developerId,
+        title: `Release ${version} ${status === "released" ? "approved" : "rejected"}`,
+        body:
+          status === "released"
+            ? `${listingName} version ${version} is approved and available for download.`
+            : reason || `${listingName} version ${version} was rejected. Please contact store support for details.`,
+      });
+      if (notificationError) console.warn("Release decision saved, but developer notification failed.");
+    },
+    onSuccess: (_result, variables) => {
+      toast.success(variables.status === "released" ? "Release approved" : "Release rejected");
+      void queryClient.invalidateQueries({ queryKey: ["admin-releases"] });
+      void queryClient.invalidateQueries({ queryKey: ["versions"] });
+      void queryClient.invalidateQueries({ queryKey: ["listing"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  async function openReleasePackage(path: string | null) {
+    if (!path) {
+      toast.error("This release has no package file.");
+      return;
+    }
+    const tab = window.open("about:blank", "_blank");
+    if (!tab) {
+      toast.error("Allow pop-ups to review the release package.");
+      return;
+    }
+    tab.opener = null;
+    const url = await signedAssetUrl(path);
+    if (!url) {
+      tab.close();
+      toast.error("Could not create a secure package link.");
+      return;
+    }
+    tab.location.href = url;
+  }
 
   const feature = useMutation({
     mutationFn: async ({ id, featured }: { id: string; featured: boolean }) => {
@@ -238,6 +313,7 @@ function AdminPage() {
       <Tabs defaultValue="review" className="mt-4">
         <TabsList className="flex-wrap">
           <TabsTrigger value="review">Review</TabsTrigger>
+          <TabsTrigger value="releases">Releases</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
           <TabsTrigger value="kyc">KYC</TabsTrigger>
           <TabsTrigger value="people">People</TabsTrigger>
@@ -299,6 +375,89 @@ function AdminPage() {
                 </article>
               ))}
             </>
+          )}
+        </TabsContent>
+
+        <TabsContent value="releases" className="mt-4 space-y-3">
+          {releases.isLoading ? (
+            <Skeleton className="h-24 w-full rounded-2xl" />
+          ) : (releases.data ?? []).length === 0 ? (
+            <p className="surface-card p-6 text-center text-sm text-muted-foreground">
+              No release packages are awaiting review.
+            </p>
+          ) : (
+            (releases.data ?? []).map((release) => {
+              const product = release.listings as
+                | { name: string; slug: string; developer_id: string }
+                | null;
+              if (!product) return null;
+              return (
+                <article key={release.id} className="surface-card space-y-3 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <Link
+                        to="/apps/$slug"
+                        params={{ slug: product.slug }}
+                        className="font-medium underline"
+                      >
+                        {product.name}
+                      </Link>
+                      <p className="text-sm text-muted-foreground">
+                        Version {release.version} · {release.size_bytes ? `${(release.size_bytes / (1024 * 1024)).toFixed(1)} MB` : "size unknown"}
+                      </p>
+                      {release.release_notes && (
+                        <p className="mt-1 text-sm">{release.release_notes}</p>
+                      )}
+                    </div>
+                    <Badge variant="secondary">pending</Badge>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => void openReleasePackage(release.file_url)}
+                    >
+                      <Download className="mr-1.5 h-4 w-4" /> Review package
+                    </Button>
+                    <Button
+                      size="sm"
+                      disabled={decideRelease.isPending || !release.file_url}
+                      onClick={() =>
+                        decideRelease.mutate({
+                          id: release.id,
+                          status: "released",
+                          version: release.version,
+                          listingName: product.name,
+                          developerId: product.developer_id,
+                        })
+                      }
+                    >
+                      Approve release
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      disabled={decideRelease.isPending}
+                      onClick={() => {
+                        const reason = window.prompt("Reason for rejecting this release package") ?? "";
+                        if (reason.trim()) {
+                          decideRelease.mutate({
+                            id: release.id,
+                            status: "rejected",
+                            version: release.version,
+                            listingName: product.name,
+                            developerId: product.developer_id,
+                            reason: reason.trim(),
+                          });
+                        }
+                      }}
+                    >
+                      Reject release
+                    </Button>
+                  </div>
+                </article>
+              );
+            })
           )}
         </TabsContent>
 
