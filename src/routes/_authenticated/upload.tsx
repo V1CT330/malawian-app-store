@@ -62,8 +62,21 @@ function UploadPage() {
     mutationFn: async () => {
       if (!userId) throw new Error("You must be signed in.");
       if (name.trim().length < 2) throw new Error("Give your listing a name.");
-      if (kind === "website" && !/^https?:\/\//i.test(websiteUrl.trim())) {
+      if (kind === "website" && !/^https:\/\//i.test(websiteUrl.trim())) {
         throw new Error("Enter a valid website URL starting with https://");
+      }
+      if (kind !== "website" && !file) {
+        throw new Error("Choose the app package before creating this listing.");
+      }
+      if (file) {
+        const ext = file.name.split(".").pop()?.toLowerCase();
+        const expectedExt = kind === "app" ? "apk" : "zip";
+        if (ext !== expectedExt) {
+          throw new Error(kind === "app" ? "Upload an Android APK file." : "Upload a ZIP package.");
+        }
+        if (file.size <= 0 || file.size > 50 * 1024 * 1024) {
+          throw new Error("Package must be larger than 0 bytes and no larger than 50 MB.");
+        }
       }
 
       const iconPath = icon ? await uploadAsset(userId, icon, "icons") : null;
@@ -192,8 +205,15 @@ function UploadPage() {
           </div>
         ) : (
           <div>
-            <Label htmlFor="file">App file (APK or ZIP)</Label>
-            <Input id="file" type="file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+            <Label htmlFor="file">{kind === "app" ? "Android APK package" : "ZIP package"}</Label>
+            <Input
+              id="file"
+              type="file"
+              accept={kind === "app" ? ".apk,application/vnd.android.package-archive" : ".zip,application/zip"}
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              required
+            />
+            <p className="mt-1 text-xs text-muted-foreground">Maximum size: 50 MB. App listings require a package file.</p>
           </div>
         )}
 
