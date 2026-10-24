@@ -292,6 +292,7 @@ function OverviewTab({ listing, onEdit }: { listing: PortalListing; onEdit: () =
 
 function ListingTab({ listing, onSaved }: { listing: PortalListing; onSaved: () => void }) {
   const editable = listing.status !== "pending";
+  const [screenshotFiles, setScreenshotFiles] = useState<File[]>([]);
   const [form, setForm] = useState({
     name: listing.name,
     tagline: listing.tagline ?? "",
@@ -300,8 +301,6 @@ function ListingTab({ listing, onSaved }: { listing: PortalListing; onSaved: () 
     website_url: listing.website_url ?? "",
     icon_url: listing.icon_url ?? "",
     tags: listing.tags.join(", "),
-    keywords: listing.keywords.join(", "),
-    screenshots: listing.screenshots.join("\n"),
   });
 
   useEffect(() => {
@@ -313,13 +312,15 @@ function ListingTab({ listing, onSaved }: { listing: PortalListing; onSaved: () 
       website_url: listing.website_url ?? "",
       icon_url: listing.icon_url ?? "",
       tags: listing.tags.join(", "),
-      keywords: listing.keywords.join(", "),
-      screenshots: listing.screenshots.join("\n"),
     });
   }, [listing]);
 
   const save = useMutation({
     mutationFn: async () => {
+      const uploadedScreenshotPaths: string[] = [];
+      for (const file of screenshotFiles) {
+        uploadedScreenshotPaths.push(await uploadAsset(listing.developer_id, file, "screenshots"));
+      }
       const { error } = await supabase
         .from("listings")
         .update({
@@ -333,19 +334,19 @@ function ListingTab({ listing, onSaved }: { listing: PortalListing; onSaved: () 
             .split(",")
             .map((t) => t.trim())
             .filter(Boolean),
-          keywords: form.keywords
-            .split(",")
-            .map((t) => t.trim())
-            .filter(Boolean),
-          screenshots: form.screenshots
-            .split("\n")
-            .map((t) => t.trim())
-            .filter(Boolean),
+          screenshots: [...listing.screenshots, ...uploadedScreenshotPaths],
         })
         .eq("id", listing.id);
-      if (error) throw error;
+      if (error) {
+        if (uploadedScreenshotPaths.length) {
+          await supabase.storage.from("app-assets").remove(uploadedScreenshotPaths);
+        }
+        throw error;
+      }
+      return uploadedScreenshotPaths;
     },
     onSuccess: () => {
+      setScreenshotFiles([]);
       onSaved();
       toast.success("Store listing saved.");
     },
@@ -415,15 +416,6 @@ function ListingTab({ listing, onSaved }: { listing: PortalListing; onSaved: () 
             onChange={(e) => setForm({ ...form, tags: e.target.value })}
           />
         </div>
-        <div>
-          <Label htmlFor="p-keys">Keywords (comma separated)</Label>
-          <Input
-            id="p-keys"
-            value={form.keywords}
-            disabled={!editable}
-            onChange={(e) => setForm({ ...form, keywords: e.target.value })}
-          />
-        </div>
         <div className="sm:col-span-2">
           <Label htmlFor="p-icon">Icon image URL</Label>
           <Input
@@ -434,14 +426,21 @@ function ListingTab({ listing, onSaved }: { listing: PortalListing; onSaved: () 
           />
         </div>
         <div className="sm:col-span-2">
-          <Label htmlFor="p-shots">Screenshot URLs (one per line)</Label>
-          <Textarea
+          <Label htmlFor="p-shots">Upload screenshots</Label>
+          <Input
             id="p-shots"
-            rows={4}
-            value={form.screenshots}
+            type="file"
+            accept="image/*"
+            multiple
             disabled={!editable}
-            onChange={(e) => setForm({ ...form, screenshots: e.target.value })}
+            onChange={(e) => setScreenshotFiles(Array.from(e.target.files ?? []))}
           />
+          <p className="mt-1 text-xs text-muted-foreground">
+            {listing.screenshots.length} screenshot(s) already saved. Select image files directly from your device; new screenshots will be added when you save.
+          </p>
+          {screenshotFiles.length > 0 && (
+            <p className="mt-1 text-xs text-muted-foreground">{screenshotFiles.length} new screenshot(s) selected.</p>
+          )}
         </div>
       </div>
       <Button className="mt-4" disabled={!editable || save.isPending} onClick={() => save.mutate()}>
