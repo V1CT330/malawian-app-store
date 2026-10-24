@@ -63,7 +63,7 @@ export function MetricTile({
       <p className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
         {label}
       </p>
-      <p className="mt-2 font-display text-[32px] font-bold leading-none tabular-nums">{value}</p>
+      <p className={cn("mt-2 font-display text-[32px] font-bold leading-none tabular-nums", delta !== undefined && delta !== null ? delta > 0 ? "text-brand-green" : delta < 0 ? "text-brand-red" : "text-foreground" : "text-foreground")}>{value}</p>
       {delta !== undefined && delta !== null ? (
         <p
           className={cn(
