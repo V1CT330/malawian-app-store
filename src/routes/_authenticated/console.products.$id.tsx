@@ -491,7 +491,7 @@ function ReleasesTab({ listing }: { listing: PortalListing }) {
         release_notes: notes.trim() || null,
         changelog: notes.trim() || null,
         channel: "production",
-        status: "pending",
+        status: listing.kind === "website" ? "released" : "pending",
         file_url: filePath,
         size_bytes: packageFile?.size ?? null,
       });
@@ -508,7 +508,7 @@ function ReleasesTab({ listing }: { listing: PortalListing }) {
       setNotes("");
       setPackageFile(null);
       void queryClient.invalidateQueries({ queryKey: ["console-versions", listing.id] });
-      toast.success("Release submitted for review.");
+      toast.success(listing.kind === "website" ? "Website release saved." : "Release submitted for review.");
     },
     onError: (e: Error) => toast.error(e.message),
   });
