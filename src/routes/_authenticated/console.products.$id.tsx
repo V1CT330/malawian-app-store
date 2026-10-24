@@ -216,7 +216,7 @@ function ProductDetailPage() {
         ))}
       </div>
 
-      {tab === "Overview" && <OverviewTab listing={listing} />}
+      {tab === "Overview" && <OverviewTab listing={listing} onEdit={() => setTab("Listing")} />}
       {tab === "Listing" && <ListingTab listing={listing} onSaved={invalidate} />}
       {tab === "Releases" && <ReleasesTab listing={listing} />}
       {tab === "Reviews" && <ReviewsTab listing={listing} />}
@@ -225,7 +225,7 @@ function ProductDetailPage() {
   );
 }
 
-function OverviewTab({ listing }: { listing: PortalListing }) {
+function OverviewTab({ listing, onEdit }: { listing: PortalListing; onEdit: () => void }) {
   const ready = readinessScore(listing);
   const reqs = submissionRequirements(listing);
   return (
@@ -265,7 +265,11 @@ function OverviewTab({ listing }: { listing: PortalListing }) {
           </p>
         </div>
       </div>
-      <SectionCard title="Submission checklist">
+      <SectionCard title="Submission checklist" action={
+        <Button size="sm" variant="outline" onClick={onEdit}>
+          Edit flagged issues
+        </Button>
+      }>
         <Progress value={ready} />
         <p className="mt-2 text-xs text-muted-foreground">{ready}% complete</p>
         <ul className="mt-3 divide-y divide-border">
