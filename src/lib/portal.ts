@@ -84,7 +84,6 @@ export function asoReport(l: Partial<PortalListing>) {
     { label: "Icon uploaded", ok: Boolean(l.icon_url), weight: 15 },
     { label: "At least 3 screenshots", ok: (l.screenshots?.length ?? 0) >= 3, weight: 15 },
     { label: "Feature banner uploaded", ok: Boolean(l.banner_url), weight: 5 },
-    { label: "5 or more keywords", ok: (l.keywords?.length ?? 0) >= 5, weight: 15 },
     { label: "3 or more tags", ok: (l.tags?.length ?? 0) >= 3, weight: 10 },
   ];
   const score = checks.reduce((sum, c) => sum + (c.ok ? c.weight : 0), 0);
