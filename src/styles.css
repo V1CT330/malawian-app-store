@@ -229,15 +229,23 @@
   border-radius: var(--radius);
 }
 
+/* Flat developer-console design: no floating cards, hover shadows, or gradient hero panels. */
+.console-square [class*="shadow-"],
+.console-square .surface-card,
+.console-square .surface-card:hover,
+.console-square .console-hero,
+.console-square .inset-tile {
+  box-shadow: none !important;
+}
+
+.console-square .console-hero {
+  background-image: none !important;
+  background-color: var(--card) !important;
+}
+
 /* Keep content clear of the fixed bottom navigation and device gesture area. */
 @media (max-width: 639px) {
   .mas-mobile-main {
     padding-bottom: calc(7rem + env(safe-area-inset-bottom));
   }
-}
-
-/* Flat, non-floating cards only inside the developer dashboard overview content. */
-.dashboard-content-flat .surface-card,
-.dashboard-content-flat .surface-card:hover {
-  box-shadow: none !important;
 }
