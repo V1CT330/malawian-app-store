@@ -127,9 +127,15 @@ function LibraryPage() {
       fileUrl: string | null;
     }) => {
       if (!fileUrl) throw new Error("This release has no downloadable package.");
+      const tab = window.open("about:blank", "_blank");
+      if (!tab) throw new Error("Allow pop-ups to download this app.");
+      tab.opener = null;
       const url = await signedAssetUrl(fileUrl);
-      if (!url) throw new Error("Could not create a download link. Try again later.");
-      window.open(url, "_blank", "noopener,noreferrer");
+      if (!url) {
+        tab.close();
+        throw new Error("Could not create a download link. Try again later.");
+      }
+      tab.location.href = url;
 
       const { error: eventError } = await supabase.rpc("register_install", {
         _listing_id: listingId,
@@ -171,8 +177,19 @@ function LibraryPage() {
       toast.info("The developer has not published a download file yet.");
       return;
     }
+    const tab = window.open("about:blank", "_blank");
+    if (!tab) {
+      toast.error("Allow pop-ups to download this app.");
+      return;
+    }
+    tab.opener = null;
     const url = await signedAssetUrl(fileUrl);
-    if (url) window.open(url, "_blank", "noopener");
+    if (!url) {
+      tab.close();
+      toast.error("Could not create a download link. Try again later.");
+      return;
+    }
+    tab.location.href = url;
   }
 
   return (
