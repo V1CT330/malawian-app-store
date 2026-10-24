@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Bookmark, Download, ExternalLink, History, RefreshCw, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { Bookmark, Download, History, RefreshCw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
@@ -36,6 +37,7 @@ export const Route = createFileRoute("/_authenticated/library")({
 function LibraryPage() {
   const { userId } = useSession();
   const queryClient = useQueryClient();
+  const [downloadedUpdates, setDownloadedUpdates] = useState<Record<string, string>>({});
 
   const history = useQuery({
     queryKey: ["install-history", userId],
@@ -116,9 +118,7 @@ function LibraryPage() {
 
   const updateApp = useMutation({
     mutationFn: async ({
-      id,
       listingId,
-      versionId,
       fileUrl,
     }: {
       id: string;
@@ -126,25 +126,48 @@ function LibraryPage() {
       versionId: string;
       fileUrl: string | null;
     }) => {
+      if (!fileUrl) throw new Error("This release has no downloadable package.");
+      const tab = window.open("about:blank", "_blank");
+      if (!tab) throw new Error("Allow pop-ups to download this app.");
+      tab.opener = null;
+      const url = await signedAssetUrl(fileUrl);
+      if (!url) {
+        tab.close();
+        throw new Error("Could not create a download link. Try again later.");
+      }
+      tab.location.href = url;
+
+      const { error: eventError } = await supabase.rpc("register_install", {
+        _listing_id: listingId,
+        _device: navigator.platform,
+      });
+      if (eventError) throw eventError;
+    },
+    onSuccess: (_result, variables) => {
+      setDownloadedUpdates((current) => ({ ...current, [variables.id]: variables.versionId }));
+      toast.success("Update package opened. Install it on Android, then confirm below.");
+      queryClient.invalidateQueries({ queryKey: ["install-history", userId] });
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const confirmUpdate = useMutation({
+    mutationFn: async ({ id, versionId }: { id: string; versionId: string }) => {
       const { error } = await supabase
         .from("installed_apps")
         .update({ installed_version_id: versionId })
         .eq("id", id)
         .eq("user_id", userId!);
       if (error) throw error;
-      await supabase.rpc("register_install", {
-        _listing_id: listingId,
-        _device: navigator.platform,
-      });
-      if (fileUrl) {
-        const url = await signedAssetUrl(fileUrl);
-        if (url) window.open(url, "_blank", "noopener");
-      }
     },
-    onSuccess: () => {
-      toast.success("App updated");
+    onSuccess: (_result, variables) => {
+      setDownloadedUpdates((current) => {
+        const next = { ...current };
+        delete next[variables.id];
+        return next;
+      });
+      toast.success("Library version updated.");
       queryClient.invalidateQueries({ queryKey: ["installed-apps", userId] });
-      queryClient.invalidateQueries({ queryKey: ["install-history", userId] });
     },
     onError: (error: Error) => toast.error(error.message),
   });
@@ -154,8 +177,19 @@ function LibraryPage() {
       toast.info("The developer has not published a download file yet.");
       return;
     }
+    const tab = window.open("about:blank", "_blank");
+    if (!tab) {
+      toast.error("Allow pop-ups to download this app.");
+      return;
+    }
+    tab.opener = null;
     const url = await signedAssetUrl(fileUrl);
-    if (url) window.open(url, "_blank", "noopener");
+    if (!url) {
+      tab.close();
+      toast.error("Could not create a download link. Try again later.");
+      return;
+    }
+    tab.location.href = url;
   }
 
   return (
@@ -191,7 +225,7 @@ function LibraryPage() {
                 | null;
               if (!listing) return null;
               const latest = [...(listing.listing_versions ?? [])]
-                .filter((version) => version.status === "published")
+                .filter((version) => version.status === "released" || version.status === "published")
                 .sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
               const updateAvailable = Boolean(latest && latest.id !== row.installed_version_id);
               return (
@@ -202,27 +236,39 @@ function LibraryPage() {
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2 px-1">
                     {updateAvailable && latest ? (
-                      <Button
-                        size="sm"
-                        disabled={updateApp.isPending}
-                        onClick={() =>
-                          updateApp.mutate({
-                            id: row.id,
-                            listingId: row.listing_id,
-                            versionId: latest.id,
-                            fileUrl: latest.file_url,
-                          })
-                        }
-                      >
-                        <RefreshCw className="mr-1.5 h-4 w-4" /> Update
-                      </Button>
+                      <>
+                        <Button
+                          size="sm"
+                          disabled={updateApp.isPending}
+                          onClick={() =>
+                            updateApp.mutate({
+                              id: row.id,
+                              listingId: row.listing_id,
+                              versionId: latest.id,
+                              fileUrl: latest.file_url,
+                            })
+                          }
+                        >
+                          <RefreshCw className="mr-1.5 h-4 w-4" /> Download update
+                        </Button>
+                        {downloadedUpdates[row.id] === latest.id && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={confirmUpdate.isPending}
+                            onClick={() => confirmUpdate.mutate({ id: row.id, versionId: latest.id })}
+                          >
+                            I installed it
+                          </Button>
+                        )}
+                      </>
                     ) : (
                       <Button
                         size="sm"
                         variant="outline"
                         onClick={() => void openApp(latest?.file_url ?? null)}
                       >
-                        <ExternalLink className="mr-1.5 h-4 w-4" /> Open
+                        <Download className="mr-1.5 h-4 w-4" /> Download again
                       </Button>
                     )}
                     <Button

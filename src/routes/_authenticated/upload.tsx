@@ -62,8 +62,21 @@ function UploadPage() {
     mutationFn: async () => {
       if (!userId) throw new Error("You must be signed in.");
       if (name.trim().length < 2) throw new Error("Give your listing a name.");
-      if (kind === "website" && !/^https?:\/\//i.test(websiteUrl.trim())) {
+      if (kind === "website" && !/^https:\/\//i.test(websiteUrl.trim())) {
         throw new Error("Enter a valid website URL starting with https://");
+      }
+      if (kind !== "website" && !file) {
+        throw new Error("Choose the app package before creating this listing.");
+      }
+      if (file && kind !== "website") {
+        const ext = file.name.split(".").pop()?.toLowerCase();
+        const expectedExt = kind === "app" ? "apk" : "zip";
+        if (ext !== expectedExt) {
+          throw new Error(kind === "app" ? "Upload an Android APK file." : "Upload a ZIP package.");
+        }
+        if (file.size <= 0 || file.size > 50 * 1024 * 1024) {
+          throw new Error("Package must be larger than 0 bytes and no larger than 50 MB.");
+        }
       }
 
       const iconPath = icon ? await uploadAsset(userId, icon, "icons") : null;
@@ -87,15 +100,28 @@ function UploadPage() {
         .single();
       if (error) throw error;
 
-      const filePath = file ? await uploadAsset(userId, file, "builds") : null;
-      const { error: versionError } = await supabase.from("listing_versions").insert({
-        listing_id: listing.id,
-        version: version.trim() || "1.0.0",
-        changelog: "First release",
-        file_url: filePath,
-        size_bytes: file?.size ?? null,
-      });
-      if (versionError) throw versionError;
+      let filePath: string | null = null;
+      try {
+        filePath = kind !== "website" && file ? await uploadAsset(userId, file, "builds") : null;
+        const { error: versionError } = await supabase.from("listing_versions").insert({
+          listing_id: listing.id,
+          version: version.trim() || "1.0.0",
+          changelog: "First release",
+          file_url: filePath,
+          size_bytes: kind !== "website" ? file?.size ?? null : null,
+          status: kind === "website" ? "released" : "pending",
+        });
+        if (versionError) throw versionError;
+      } catch (error) {
+        const { error: listingCleanupError } = await supabase.from("listings").delete().eq("id", listing.id);
+        if (listingCleanupError) console.warn("Could not clean up a failed draft listing.");
+        const paths = [iconPath, filePath].filter((path): path is string => Boolean(path));
+        if (paths.length) {
+          const { error: assetCleanupError } = await supabase.storage.from("app-assets").remove(paths);
+          if (assetCleanupError) console.warn("Could not clean up uploaded listing assets.");
+        }
+        throw error;
+      }
 
       if (!profile?.is_developer) {
         await supabase.from("profiles").update({ is_developer: true }).eq("id", userId);
@@ -126,7 +152,10 @@ function UploadPage() {
                 key={k.value}
                 type="button"
                 variant={kind === k.value ? "default" : "outline"}
-                onClick={() => setKind(k.value)}
+                onClick={() => {
+                  setKind(k.value);
+                  setFile(null);
+                }}
                 className="flex-1"
               >
                 {k.label}
@@ -192,8 +221,15 @@ function UploadPage() {
           </div>
         ) : (
           <div>
-            <Label htmlFor="file">App file (APK or ZIP)</Label>
-            <Input id="file" type="file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+            <Label htmlFor="file">{kind === "app" ? "Android APK package" : "ZIP package"}</Label>
+            <Input
+              id="file"
+              type="file"
+              accept={kind === "app" ? ".apk,application/vnd.android.package-archive" : ".zip,application/zip"}
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              required
+            />
+            <p className="mt-1 text-xs text-muted-foreground">Maximum size: 50 MB. App listings require a package file.</p>
           </div>
         )}
 

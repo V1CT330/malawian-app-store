@@ -50,6 +50,7 @@ function ListingDetail() {
   const queryClient = useQueryClient();
   const [rating, setRating] = useState(5);
   const [body, setBody] = useState("");
+  const [downloadedVersionId, setDownloadedVersionId] = useState<string | null>(null);
 
   const listingQuery = useQuery({
     queryKey: ["listing", slug],
@@ -92,6 +93,7 @@ function ListingDetail() {
         .from("listing_versions")
         .select("*")
         .eq("listing_id", listing!.id)
+        .in("status", ["released", "published"])
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
@@ -203,28 +205,45 @@ function ListingDetail() {
   const install = useMutation({
     mutationFn: async () => {
       if (!listing) throw new Error("Listing unavailable");
+      if (listing.kind === "app" && (!latest?.id || !latest.file_url || !fileUrl)) {
+        throw new Error("This app does not have an approved, downloadable package yet.");
+      }
       const { error: eventError } = await supabase.rpc("register_install", {
         _listing_id: listing.id,
         _device: getDeviceType(),
       });
       if (eventError) throw eventError;
-      if (listing.kind === "app" && userId) {
-        const { error } = await supabase.from("installed_apps").upsert(
-          {
-            user_id: userId,
-            listing_id: listing.id,
-            installed_version_id: latest?.id ?? null,
-          },
-          { onConflict: "user_id,listing_id" },
-        );
-        if (error) throw error;
-      }
     },
     onSuccess: () => {
+      if (listing?.kind === "app" && latest?.id) {
+        setDownloadedVersionId(latest.id);
+        toast.success("APK download opened. Install it on Android, then confirm below.");
+      } else {
+        toast.success("Website opened.");
+      }
       queryClient.invalidateQueries({ queryKey: ["listing", slug] });
       queryClient.invalidateQueries({ queryKey: ["install-history", userId] });
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const confirmInstall = useMutation({
+    mutationFn: async () => {
+      if (!listing || !userId || !latest?.id) throw new Error("Sign in and choose an approved release first.");
+      const { error } = await supabase.from("installed_apps").upsert(
+        {
+          user_id: userId,
+          listing_id: listing.id,
+          installed_version_id: latest.id,
+        },
+        { onConflict: "user_id,listing_id" },
+      );
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      setDownloadedVersionId(null);
+      toast.success("Installation confirmed in your MAS library.");
       queryClient.invalidateQueries({ queryKey: ["installed-app", userId, listing?.id] });
-      queryClient.invalidateQueries({ queryKey: ["installed-apps", userId] });
     },
     onError: (error: Error) => toast.error(error.message),
   });
@@ -232,25 +251,21 @@ function ListingDetail() {
   async function handleGet() {
     if (!listing) return;
     if (listing.kind === "website" && listing.website_url) {
+      window.open(listing.website_url, "_blank", "noopener,noreferrer");
       install.mutate();
-      window.open(listing.website_url, "_blank", "noopener");
       return;
     }
     if (!userId) {
       window.location.href = `/auth?redirect=${encodeURIComponent(`/apps/${listing.slug}`)}`;
       return;
     }
-    if (installedQuery.data && installedQuery.data.installed_version_id === latest?.id) {
-      if (fileUrl) window.open(fileUrl, "_blank", "noopener");
-      else toast.info("This app is installed, but no download file is available.");
+    if (!latest?.file_url || !fileUrl) {
+      toast.info("This app does not have an approved, downloadable package yet.");
       return;
     }
+    // Only record a download attempt after an approved package URL is available.
+    window.open(fileUrl, "_blank", "noopener,noreferrer");
     install.mutate();
-    if (fileUrl) {
-      window.open(fileUrl, "_blank", "noopener");
-      return;
-    }
-    toast.info("Added to your library. The developer has not published a download file yet.");
   }
 
   if (listingQuery.isLoading) {
@@ -317,20 +332,34 @@ function ListingDetail() {
             <>
               {installedQuery.data && installedQuery.data.installed_version_id !== latest?.id ? (
                 <>
-                  <RefreshCw className="mr-2 h-4 w-4" /> Update
+                  <RefreshCw className="mr-2 h-4 w-4" /> Download update
                 </>
               ) : installedQuery.data ? (
                 <>
-                  <ExternalLink className="mr-2 h-4 w-4" /> Open
+                  <Download className="mr-2 h-4 w-4" /> Download again
                 </>
               ) : (
                 <>
-                  <Download className="mr-2 h-4 w-4" /> Install
+                  <Download className="mr-2 h-4 w-4" /> {listing.kind === "app" ? "Download APK" : "Download package"}
                 </>
               )}
             </>
           )}
         </Button>
+
+        {listing.kind === "app" &&
+          userId &&
+          downloadedVersionId === latest?.id &&
+          installedQuery.data?.installed_version_id !== latest?.id && (
+            <Button
+              className="w-full"
+              variant="outline"
+              disabled={confirmInstall.isPending}
+              onClick={() => confirmInstall.mutate()}
+            >
+              I installed it
+            </Button>
+          )}
 
         {userId && (
           <Button

@@ -29,6 +29,7 @@ import {
   type PortalVersion,
 } from "@/lib/portal";
 import { cn } from "@/lib/utils";
+import { uploadAsset } from "@/lib/store";
 
 export const Route = createFileRoute("/_authenticated/console/products/$id")({
   head: () => ({
@@ -450,6 +451,7 @@ function ReleasesTab({ listing }: { listing: PortalListing }) {
   const queryClient = useQueryClient();
   const [version, setVersion] = useState("");
   const [notes, setNotes] = useState("");
+  const [packageFile, setPackageFile] = useState<File | null>(null);
 
   const versionsQuery = useQuery({
     queryKey: ["console-versions", listing.id],
@@ -467,20 +469,46 @@ function ReleasesTab({ listing }: { listing: PortalListing }) {
   const ship = useMutation({
     mutationFn: async () => {
       if (!version.trim()) throw new Error("Give the release a version number.");
+      if (listing.kind !== "website" && !packageFile) {
+        throw new Error("Choose the release package before submitting.");
+      }
+      if (packageFile) {
+        const extension = packageFile.name.split(".").pop()?.toLowerCase();
+        const expected = listing.kind === "app" ? "apk" : "zip";
+        if (extension !== expected) {
+          throw new Error(listing.kind === "app" ? "Upload an Android APK file." : "Upload a ZIP package.");
+        }
+        if (packageFile.size <= 0 || packageFile.size > 50 * 1024 * 1024) {
+          throw new Error("Package must be larger than 0 bytes and no larger than 50 MB.");
+        }
+      }
+
+      let filePath: string | null = null;
+      if (packageFile) filePath = await uploadAsset(listing.developer_id, packageFile, "builds");
       const { error } = await supabase.from("listing_versions").insert({
         listing_id: listing.id,
         version: version.trim(),
         release_notes: notes.trim() || null,
+        changelog: notes.trim() || null,
         channel: "production",
-        status: "pending",
+        status: listing.kind === "website" ? "released" : "pending",
+        file_url: filePath,
+        size_bytes: packageFile?.size ?? null,
       });
-      if (error) throw error;
+      if (error) {
+        if (filePath) {
+          const { error: cleanupError } = await supabase.storage.from("app-assets").remove([filePath]);
+          if (cleanupError) console.warn("Could not clean up an orphaned release package.");
+        }
+        throw error;
+      }
     },
     onSuccess: () => {
       setVersion("");
       setNotes("");
+      setPackageFile(null);
       void queryClient.invalidateQueries({ queryKey: ["console-versions", listing.id] });
-      toast.success("Release submitted.");
+      toast.success(listing.kind === "website" ? "Website release saved." : "Release submitted for review.");
     },
     onError: (e: Error) => toast.error(e.message),
   });
@@ -510,6 +538,20 @@ function ReleasesTab({ listing }: { listing: PortalListing }) {
             />
           </div>
         </div>
+        {listing.kind !== "website" && (
+          <div className="mt-3">
+            <Label htmlFor="release-package">{listing.kind === "app" ? "Android APK package" : "ZIP package"}</Label>
+            <Input
+              id="release-package"
+              key={packageFile ? packageFile.name : "release-package"}
+              type="file"
+              accept={listing.kind === "app" ? ".apk,application/vnd.android.package-archive" : ".zip,application/zip"}
+              onChange={(e) => setPackageFile(e.target.files?.[0] ?? null)}
+              required
+            />
+            <p className="mt-1 text-xs text-muted-foreground">Maximum size: 50 MB. Binary releases remain pending until approved.</p>
+          </div>
+        )}
         <Button className="mt-3" disabled={ship.isPending} onClick={() => ship.mutate()}>
           Submit release
         </Button>
