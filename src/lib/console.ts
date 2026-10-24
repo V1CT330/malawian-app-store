@@ -13,7 +13,7 @@ export const CONSOLE_NAV = [
   { to: "/console/reviews", label: "Reviews", icon: "reviews" },
   { to: "/advertise", label: "Advertise", icon: "advertise" },
   { to: "/spotlight", label: "Spotlight", icon: "spotlight" },
-  { to: "/console/store", label: "Store listing", icon: "store" },
+  { to: "/console/store", label: "Developer profile", icon: "store" },
   { to: "/console/manage", label: "Manage", icon: "manage" },
   { to: "/console/settings", label: "Settings", icon: "settings" },
 ] as const;
