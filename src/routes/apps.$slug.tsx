@@ -92,6 +92,7 @@ function ListingDetail() {
         .from("listing_versions")
         .select("*")
         .eq("listing_id", listing!.id)
+        .in("status", ["released", "published"])
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
@@ -203,17 +204,20 @@ function ListingDetail() {
   const install = useMutation({
     mutationFn: async () => {
       if (!listing) throw new Error("Listing unavailable");
+      if (listing.kind === "app" && (!latest?.id || !latest.file_url || !fileUrl)) {
+        throw new Error("This app does not have an approved, downloadable package yet.");
+      }
       const { error: eventError } = await supabase.rpc("register_install", {
         _listing_id: listing.id,
         _device: getDeviceType(),
       });
       if (eventError) throw eventError;
-      if (listing.kind === "app" && userId) {
+      if (listing.kind === "app" && userId && latest?.id) {
         const { error } = await supabase.from("installed_apps").upsert(
           {
             user_id: userId,
             listing_id: listing.id,
-            installed_version_id: latest?.id ?? null,
+            installed_version_id: latest.id,
           },
           { onConflict: "user_id,listing_id" },
         );
@@ -232,25 +236,21 @@ function ListingDetail() {
   async function handleGet() {
     if (!listing) return;
     if (listing.kind === "website" && listing.website_url) {
+      window.open(listing.website_url, "_blank", "noopener,noreferrer");
       install.mutate();
-      window.open(listing.website_url, "_blank", "noopener");
       return;
     }
     if (!userId) {
       window.location.href = `/auth?redirect=${encodeURIComponent(`/apps/${listing.slug}`)}`;
       return;
     }
-    if (installedQuery.data && installedQuery.data.installed_version_id === latest?.id) {
-      if (fileUrl) window.open(fileUrl, "_blank", "noopener");
-      else toast.info("This app is installed, but no download file is available.");
+    if (!latest?.file_url || !fileUrl) {
+      toast.info("This app does not have an approved, downloadable package yet.");
       return;
     }
+    // Only record a download attempt after an approved package URL is available.
+    window.open(fileUrl, "_blank", "noopener,noreferrer");
     install.mutate();
-    if (fileUrl) {
-      window.open(fileUrl, "_blank", "noopener");
-      return;
-    }
-    toast.info("Added to your library. The developer has not published a download file yet.");
   }
 
   if (listingQuery.isLoading) {
@@ -317,17 +317,17 @@ function ListingDetail() {
             <>
               {installedQuery.data && installedQuery.data.installed_version_id !== latest?.id ? (
                 <>
-                  <RefreshCw className="mr-2 h-4 w-4" /> Update
+                  <RefreshCw className="mr-2 h-4 w-4" /> Download update
                 </>
               ) : installedQuery.data ? (
                 <>
-                  <ExternalLink className="mr-2 h-4 w-4" /> Open
+                  <Download className="mr-2 h-4 w-4" /> Download again
                 </>
               ) : (
                 <>
-                  <Download className="mr-2 h-4 w-4" /> Install
+                  <Download className="mr-2 h-4 w-4" /> Download APK
                 </>
-              )}
+              )
             </>
           )}
         </Button>
