@@ -68,7 +68,7 @@ function UploadPage() {
       if (kind !== "website" && !file) {
         throw new Error("Choose the app package before creating this listing.");
       }
-      if (file) {
+      if (file && kind !== "website") {
         const ext = file.name.split(".").pop()?.toLowerCase();
         const expectedExt = kind === "app" ? "apk" : "zip";
         if (ext !== expectedExt) {
@@ -100,13 +100,13 @@ function UploadPage() {
         .single();
       if (error) throw error;
 
-      const filePath = file ? await uploadAsset(userId, file, "builds") : null;
+      const filePath = kind !== "website" && file ? await uploadAsset(userId, file, "builds") : null;
       const { error: versionError } = await supabase.from("listing_versions").insert({
         listing_id: listing.id,
         version: version.trim() || "1.0.0",
         changelog: "First release",
         file_url: filePath,
-        size_bytes: file?.size ?? null,
+        size_bytes: kind !== "website" ? file?.size ?? null : null,
       });
       if (versionError) throw versionError;
 
@@ -139,7 +139,10 @@ function UploadPage() {
                 key={k.value}
                 type="button"
                 variant={kind === k.value ? "default" : "outline"}
-                onClick={() => setKind(k.value)}
+                onClick={() => {
+                  setKind(k.value);
+                  setFile(null);
+                }}
                 className="flex-1"
               >
                 {k.label}
