@@ -107,6 +107,7 @@ function UploadPage() {
         changelog: "First release",
         file_url: filePath,
         size_bytes: kind !== "website" ? file?.size ?? null : null,
+        status: kind === "website" ? "released" : "pending",
       });
       if (versionError) throw versionError;
 
