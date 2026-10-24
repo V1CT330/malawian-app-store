@@ -186,7 +186,7 @@ function ConsoleDashboard() {
             ].map((item, index) => (
               <div key={item.label} className={`p-4 sm:p-5 ${index % 2 === 0 ? "border-r" : ""} ${index < 2 ? "border-b" : ""} border-border`}>
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{item.label}</p>
-                <p className="mt-2 font-display text-3xl font-bold tabular-nums">{listingsQuery.isLoading ? "—" : item.value}</p>
+                <p className={`mt-2 font-display text-3xl font-bold tabular-nums ${item.label === "Published" ? "text-brand-green" : item.label === "In review" ? "text-amber-600 dark:text-amber-400" : item.label === "Action needed" ? (item.value > 0 ? "text-brand-red" : "text-brand-green") : "text-foreground"}`}>{listingsQuery.isLoading ? "—" : item.value}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{item.note}</p>
               </div>
             ))}
@@ -282,7 +282,7 @@ function ConsoleDashboard() {
               <div className="space-y-4">
                 <div className="flex items-end justify-between gap-3">
                   <div>
-                    <p className="text-3xl font-bold tabular-nums">{Math.round((liveReady / Math.max(1, published.length)) * 100)}%</p>
+                    <p className={`text-3xl font-bold tabular-nums ${published.length > 0 && liveReady === published.length ? "text-brand-green" : published.length > 0 && liveReady / published.length < 0.5 ? "text-brand-red" : "text-amber-600 dark:text-amber-400"}`}>{Math.round((liveReady / Math.max(1, published.length)) * 100)}%</p>
                     <p className="text-xs text-muted-foreground">Published listings at full readiness</p>
                   </div>
                   <span className="text-sm text-muted-foreground">{liveReady}/{published.length} live</span>
@@ -322,7 +322,7 @@ function ConsoleDashboard() {
           </SectionCard>
 
           <div className="space-y-5">
-            <SectionCard title="Needs your attention" action={<Badge variant="outline" className="rounded-none">{tasks.length} items</Badge>}>
+            <SectionCard title="Needs your attention" action={<Badge variant="outline" className={`rounded-none ${tasks.length > 0 ? "border-brand-red/40 bg-brand-red/10 text-brand-red" : "border-brand-green/40 bg-brand-green/10 text-brand-green"}`}>{tasks.length} {tasks.length === 1 ? "item" : "items"}</Badge>}>
               {listingsQuery.isLoading ? <RowSkeletons count={2} /> : tasks.length === 0 ? (
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-brand-green" />
