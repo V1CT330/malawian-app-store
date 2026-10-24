@@ -160,7 +160,7 @@ function StorePage() {
 
   return (
     <AppShell search={search} onSearchChange={updateSearch}>
-      <div className="sticky top-[64px] z-20 -mx-3 mb-3 bg-background px-3">
+      <div className="-mx-3 mb-3 bg-background px-3">
         <div className="flex gap-6 border-b border-border">
           {TABS.map((t) => (
             <button
