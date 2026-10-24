@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { Bookmark, Download, History, RefreshCw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -36,6 +37,7 @@ export const Route = createFileRoute("/_authenticated/library")({
 function LibraryPage() {
   const { userId } = useSession();
   const queryClient = useQueryClient();
+  const [downloadedUpdates, setDownloadedUpdates] = useState<Record<string, string>>({});
 
   const history = useQuery({
     queryKey: ["install-history", userId],
@@ -116,9 +118,7 @@ function LibraryPage() {
 
   const updateApp = useMutation({
     mutationFn: async ({
-      id,
       listingId,
-      versionId,
       fileUrl,
     }: {
       id: string;
@@ -136,7 +136,17 @@ function LibraryPage() {
         _device: navigator.platform,
       });
       if (eventError) throw eventError;
-      // This records the requested update, not proof that Android completed installation.
+    },
+    onSuccess: (_result, variables) => {
+      setDownloadedUpdates((current) => ({ ...current, [variables.id]: variables.versionId }));
+      toast.success("Update package opened. Install it on Android, then confirm below.");
+      queryClient.invalidateQueries({ queryKey: ["install-history", userId] });
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
+  const confirmUpdate = useMutation({
+    mutationFn: async ({ id, versionId }: { id: string; versionId: string }) => {
       const { error } = await supabase
         .from("installed_apps")
         .update({ installed_version_id: versionId })
@@ -144,10 +154,14 @@ function LibraryPage() {
         .eq("user_id", userId!);
       if (error) throw error;
     },
-    onSuccess: () => {
-      toast.success("App updated");
+    onSuccess: (_result, variables) => {
+      setDownloadedUpdates((current) => {
+        const next = { ...current };
+        delete next[variables.id];
+        return next;
+      });
+      toast.success("Library version updated.");
       queryClient.invalidateQueries({ queryKey: ["installed-apps", userId] });
-      queryClient.invalidateQueries({ queryKey: ["install-history", userId] });
     },
     onError: (error: Error) => toast.error(error.message),
   });
@@ -205,20 +219,32 @@ function LibraryPage() {
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2 px-1">
                     {updateAvailable && latest ? (
-                      <Button
-                        size="sm"
-                        disabled={updateApp.isPending}
-                        onClick={() =>
-                          updateApp.mutate({
-                            id: row.id,
-                            listingId: row.listing_id,
-                            versionId: latest.id,
-                            fileUrl: latest.file_url,
-                          })
-                        }
-                      >
-                        <RefreshCw className="mr-1.5 h-4 w-4" /> Update
-                      </Button>
+                      <>
+                        <Button
+                          size="sm"
+                          disabled={updateApp.isPending}
+                          onClick={() =>
+                            updateApp.mutate({
+                              id: row.id,
+                              listingId: row.listing_id,
+                              versionId: latest.id,
+                              fileUrl: latest.file_url,
+                            })
+                          }
+                        >
+                          <RefreshCw className="mr-1.5 h-4 w-4" /> Download update
+                        </Button>
+                        {downloadedUpdates[row.id] === latest.id && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={confirmUpdate.isPending}
+                            onClick={() => confirmUpdate.mutate({ id: row.id, versionId: latest.id })}
+                          >
+                            I installed it
+                          </Button>
+                        )}
+                      </>
                     ) : (
                       <Button
                         size="sm"
