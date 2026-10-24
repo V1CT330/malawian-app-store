@@ -5,13 +5,13 @@ import { cn } from "@/lib/utils";
 
 const STATUS_STYLES: Record<string, string> = {
   draft: "border-border text-muted-foreground",
-  pending: "border-foreground/25 text-foreground",
-  published: "border-brand-green/40 bg-accent text-accent-foreground",
-  rejected: "border-brand-red/40 text-brand-red",
+  pending: "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400",
+  published: "border-brand-green/40 bg-brand-green/10 text-brand-green",
+  rejected: "border-brand-red/40 bg-brand-red/10 text-brand-red",
   archived: "border-border text-muted-foreground",
-  scheduled: "border-foreground/25 text-foreground",
-  released: "border-brand-green/40 bg-accent text-accent-foreground",
-  active: "border-brand-green/40 bg-accent text-accent-foreground",
+  scheduled: "border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400",
+  released: "border-brand-green/40 bg-brand-green/10 text-brand-green",
+  active: "border-brand-green/40 bg-brand-green/10 text-brand-green",
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -35,6 +35,13 @@ export function StatusPill({ status, className }: { status: string; className?: 
         className,
       )}
     >
+      <span aria-hidden="true" className={cn(
+        "mr-1.5 h-1.5 w-1.5 rounded-full",
+        ["published", "released", "active"].includes(status) && "bg-brand-green",
+        ["rejected", "failed", "error"].includes(status) && "bg-brand-red",
+        ["pending", "scheduled", "review"].includes(status) && "bg-amber-500",
+        !["published", "released", "active", "rejected", "failed", "error", "pending", "scheduled", "review"].includes(status) && "bg-current/50",
+      )} />
       {STATUS_LABELS[status] ?? status}
     </span>
   );
@@ -64,8 +71,8 @@ export function MetricTile({
             delta > 0 ? "text-brand-green" : delta < 0 ? "text-brand-red" : "text-muted-foreground",
           )}
         >
-          {delta > 0 ? "+" : ""}
-          {delta}% vs previous period
+          <span aria-hidden="true" className="mr-1">{delta > 0 ? "↑" : delta < 0 ? "↓" : "•"}</span>
+          {delta > 0 ? "+" : ""}{delta}% vs previous period
         </p>
       ) : hint ? (
         <p className="mt-1.5 text-xs text-muted-foreground">{hint}</p>
