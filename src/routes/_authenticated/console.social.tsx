@@ -730,6 +730,30 @@ function SocialPage() {
                 {item.label}
               </Link>
             ))}
+            {["Collabo", "Find Investors", "Grants", "Crowdfund"].map((label) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => {
+                  setSidebarOpen(false);
+                  if (label === "Find Investors") setActiveSection("Find Investors");
+                  else toast.info(`${label} opportunities are not yet available.`);
+                }}
+                className="block w-full border-b border-border px-3 py-3 text-left text-sm text-foreground transition-colors hover:bg-secondary"
+              >
+                {label}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => {
+                setSidebarOpen(false);
+                setActiveSection("Monetization");
+              }}
+              className="block w-full border-b border-border px-3 py-3 text-left text-sm text-foreground transition-colors hover:bg-secondary"
+            >
+              Monetise
+            </button>
             <div className="pt-2">
               <button
                 type="button"
