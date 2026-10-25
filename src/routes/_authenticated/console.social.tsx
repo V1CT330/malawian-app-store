@@ -724,7 +724,7 @@ function SocialPage() {
           <nav aria-label="Site menu" className="space-y-1">
             {[
               { label: "Home", to: "/" },
-              { label: "App Store", to: "/store" },
+              { label: "App Store", to: "/" },
               { label: "Developer Dashboard", to: "/console" },
               { label: "Social", to: "/console/social" },
             ].map((item) => (
@@ -1135,7 +1135,7 @@ function SocialPage() {
                           <p className="text-sm font-semibold">{listing.name}</p>
                           <p className="text-xs text-muted-foreground">{listing.tagline || listing.kind || "Published MAS listing"}</p>
                         </div>
-                        {listing.slug && <Link to="/store/$slug" params={{ slug: listing.slug }} className="shrink-0 text-xs font-medium text-primary hover:underline">Open app</Link>}
+                        {listing.slug && <Link to="/apps/$slug" params={{ slug: listing.slug }} className="shrink-0 text-xs font-medium text-primary hover:underline">Open app</Link>}
                       </article>)}
                     </div>
                   </section>}
