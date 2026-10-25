@@ -723,7 +723,6 @@ function SocialPage() {
           <SheetTitle className="mb-4 px-2 font-semibold">MAS menu</SheetTitle>
           <nav aria-label="Site menu" className="space-y-1">
             {[
-              { label: "Home", to: "/" },
               { label: "App Store", to: "/" },
               { label: "Developer Dashboard", to: "/console" },
             ].map((item) => (
