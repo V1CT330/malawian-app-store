@@ -54,3 +54,31 @@ export const startProCheckout = createServerFn({ method: "POST" })
       throw new Error("PayChangu could not start this payment. Please try again.");
     }
   });
+
+
+/** Cancels renewal server-side; the current paid period remains available. */
+export const cancelProSubscription = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: subscription, error: readError } = await supabaseAdmin
+      .from("subscriptions")
+      .select("id,status,current_period_end")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+
+    if (readError) throw new Error("Could not read subscription status.");
+    if (!subscription || subscription.status !== "active") {
+      throw new Error("There is no active Developer Pro subscription to cancel.");
+    }
+
+    const { error: updateError } = await supabaseAdmin
+      .from("subscriptions")
+      .update({ status: "cancelled" })
+      .eq("id", subscription.id)
+      .eq("status", "active");
+
+    if (updateError) throw new Error("Could not cancel the subscription.");
+    return { currentPeriodEnd: subscription.current_period_end };
+  });
