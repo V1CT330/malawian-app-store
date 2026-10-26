@@ -21,7 +21,7 @@ import {
   WHY_PRO_CLOSING,
 } from "@/lib/pro";
 import { formatMwk } from "@/lib/store";
-import { startProCheckout } from "@/lib/payments.functions";
+import { cancelProSubscription, startProCheckout } from "@/lib/payments.functions";
 import { useServerFn } from "@tanstack/react-start";
 
 export const Route = createFileRoute("/_authenticated/console/subscription")({
@@ -64,8 +64,16 @@ function ProPage() {
     },
   });
 
-  const active = subscription.data?.status === "active";
+  const status = subscription.data?.status;
+  const periodEnd = subscription.data?.current_period_end
+    ? Date.parse(subscription.data.current_period_end)
+    : null;
+  const hasAccess =
+    (status === "active" || status === "cancelled") &&
+    (status === "active" && periodEnd === null ? true : periodEnd !== null && periodEnd > Date.now());
+  const cancelled = status === "cancelled";
   const startCheckout = useServerFn(startProCheckout);
+  const cancelSubscription = useServerFn(cancelProSubscription);
 
   const activate = useMutation({
     mutationFn: () => startCheckout(),
@@ -77,15 +85,9 @@ function ProPage() {
   });
 
   const cancel = useMutation({
-    mutationFn: async () => {
-      const { error } = await supabase
-        .from("subscriptions")
-        .update({ status: "cancelled" })
-        .eq("user_id", userId!);
-      if (error) throw error;
-    },
+    mutationFn: () => cancelSubscription(),
     onSuccess: () => {
-      toast.success("Plan cancelled. Access continues until the period ends.");
+      toast.success("Plan cancelled. Access continues until the paid period ends.");
       queryClient.invalidateQueries({ queryKey: ["subscription", userId] });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -99,24 +101,26 @@ function ProPage() {
       <section className="surface-card p-5 text-center">
         <p className="font-display text-3xl font-bold">{formatMwk(PRO_PRICE_MWK)}</p>
         <p className="text-sm text-muted-foreground">per month</p>
-        {active ? (
+        {hasAccess ? (
           <>
-            <Badge className="mt-3">Active</Badge>
+            <Badge className="mt-3">{cancelled ? "Cancelled" : "Active"}</Badge>
             <p className="mt-2 text-xs text-muted-foreground">
-              Renews{" "}
+              {cancelled ? "Access ends" : "Renews"}{" "}
               {subscription.data?.current_period_end
                 ? new Date(subscription.data.current_period_end).toLocaleDateString()
                 : "monthly"}
             </p>
-            <Button
-              size="sm"
-              variant="outline"
-              className="mt-3"
-              disabled={cancel.isPending}
-              onClick={() => cancel.mutate()}
-            >
-              Cancel plan
-            </Button>
+            {!cancelled && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="mt-3"
+                disabled={cancel.isPending}
+                onClick={() => cancel.mutate()}
+              >
+                {cancel.isPending ? "Cancelling…" : "Cancel plan"}
+              </Button>
+            )}
           </>
         ) : (
           <>
