@@ -102,6 +102,22 @@ function AdminPage() {
     },
   });
 
+  const promotions = useQuery({
+    queryKey: ["admin-promotions"],
+    enabled: isAdmin,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("promotions").select("*").order("created_at", { ascending: false });
+      if (error) throw error;
+      const rows = data ?? [];
+      if (!rows.length) return [];
+      const { data: listingRows, error: listingError } = await supabase
+        .from("listings").select("id,name,slug,developer_id,status").in("id", rows.map((row) => row.listing_id));
+      if (listingError) throw listingError;
+      const byId = new Map((listingRows ?? []).map((listing) => [listing.id, listing]));
+      return rows.map((row) => ({ ...row, listing: byId.get(row.listing_id) ?? null }));
+    },
+  });
+
   const kyc = useQuery({
     queryKey: ["admin-kyc"],
     enabled: isAdmin,
@@ -231,6 +247,18 @@ function AdminPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const decidePromotion = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: "approved" | "rejected" }) => {
+      const { error } = await supabase.from("promotions").update({ status }).eq("id", id).eq("status", "pending");
+      if (error) throw error;
+    },
+    onSuccess: (_data, vars) => {
+      toast.success(vars.status === "approved" ? "Campaign approved. Developer can now pay." : "Campaign rejected.");
+      void queryClient.invalidateQueries({ queryKey: ["admin-promotions"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const decideKyc = useMutation({
     mutationFn: async ({
       id,
@@ -313,6 +341,7 @@ function AdminPage() {
       <Tabs defaultValue="review" className="mt-4">
         <TabsList className="flex-wrap">
           <TabsTrigger value="review">Review</TabsTrigger>
+          <TabsTrigger value="promotions">Ad campaigns</TabsTrigger>
           <TabsTrigger value="releases">Releases</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
           <TabsTrigger value="kyc">KYC</TabsTrigger>
@@ -376,6 +405,44 @@ function AdminPage() {
               ))}
             </>
           )}
+        </TabsContent>
+
+        <TabsContent value="promotions" className="mt-4 space-y-3">
+          {promotions.isLoading ? (
+            <Skeleton className="h-24 w-full rounded-2xl" />
+          ) : promotions.isError ? (
+            <p role="alert" className="surface-card p-6 text-sm">Could not load advertising campaigns.</p>
+          ) : !(promotions.data ?? []).length ? (
+            <p className="surface-card p-6 text-center text-sm text-muted-foreground">No advertising campaigns submitted.</p>
+          ) : (promotions.data ?? []).map((campaign) => (
+            <article key={campaign.id} className="surface-card space-y-3 p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-semibold">{campaign.name || "Promotion campaign"}</p>
+                  {campaign.listing ? (
+                    <Link to="/apps/$slug" params={{ slug: campaign.listing.slug }} className="text-sm underline">{campaign.listing.name}</Link>
+                  ) : <p className="text-sm text-muted-foreground">Listing unavailable</p>}
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {campaign.kind} · {campaign.target_location || "All Malawi"} · {campaign.duration_days} days · budget {formatMwk(Number(campaign.budget_mwk))}
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">MK{campaign.cost_per_click_mwk} per click; impressions are free.</p>
+                </div>
+                <Badge variant="secondary">{campaign.status}{campaign.payment_status === "paid" ? " · paid" : ""}</Badge>
+              </div>
+              {campaign.status === "pending" && (
+                <div className="flex flex-wrap gap-2">
+                  <Button size="sm" disabled={decidePromotion.isPending || campaign.listing?.status !== "published"} onClick={() => decidePromotion.mutate({ id: campaign.id, status: "approved" })}>Approve campaign</Button>
+                  <Button size="sm" variant="destructive" disabled={decidePromotion.isPending} onClick={() => decidePromotion.mutate({ id: campaign.id, status: "rejected" })}>Reject</Button>
+                </div>
+              )}
+              {campaign.status === "approved" && campaign.payment_status === "unpaid" && (
+                <p className="text-sm text-muted-foreground">Approved; waiting for the developer to pay the prepaid budget.</p>
+              )}
+              {campaign.status === "active" && (
+                <p className="text-sm text-muted-foreground">{campaign.impressions} impressions · {campaign.clicks} clicks · {formatMwk(Number(campaign.spent_mwk))} spent.</p>
+              )}
+            </article>
+          ))}
         </TabsContent>
 
         <TabsContent value="releases" className="mt-4 space-y-3">
