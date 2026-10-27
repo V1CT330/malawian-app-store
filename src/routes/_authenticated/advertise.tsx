@@ -67,6 +67,7 @@ function AdvertisePage() {
         .from("listings")
         .select("id,name,status")
         .eq("developer_id", userId!)
+        .eq("status", "published")
         .order("updated_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
