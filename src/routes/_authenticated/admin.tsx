@@ -313,6 +313,7 @@ function AdminPage() {
       <Tabs defaultValue="review" className="mt-4">
         <TabsList className="flex-wrap">
           <TabsTrigger value="review">Review</TabsTrigger>
+          <Link to="/admin/promotions" className="inline-flex min-h-9 items-center rounded-md border border-border px-3 text-sm font-medium">Ad campaigns</Link>
           <TabsTrigger value="releases">Releases</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
           <TabsTrigger value="kyc">KYC</TabsTrigger>
