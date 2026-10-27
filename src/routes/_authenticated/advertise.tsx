@@ -42,7 +42,7 @@ const PLACEMENTS = [
   {
     value: "search",
     label: "Search boost",
-    detail: "Higher position in category and search results",
+    detail: "Sponsored placement for matching text searches",
   },
   { value: "banner", label: "Store banner", detail: "Wide banner across browse pages" },
 ] as const;
