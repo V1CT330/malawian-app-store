@@ -65,7 +65,7 @@ export const startPromotionCheckout = createServerFn({ method: "POST" })
     const { createPaychanguCheckout } = await import("@/lib/payments.server");
     const { data: campaign, error: readError } = await supabaseAdmin
       .from("promotions")
-      .select("id,name,budget_mwk,status,payment_status,owner_id")
+      .select("id,name,budget_mwk,status,payment_status,owner_id,listing_id")
       .eq("id", data.campaignId)
       .eq("owner_id", context.userId)
       .maybeSingle();
@@ -73,6 +73,8 @@ export const startPromotionCheckout = createServerFn({ method: "POST" })
     if (campaign.status !== "approved" || campaign.payment_status !== "unpaid") {
       throw new Error("Only approved, unpaid campaigns can be paid for.");
     }
+    const { data: listing } = await supabaseAdmin.from("listings").select("status").eq("id", campaign.listing_id).maybeSingle();
+    if (listing?.status !== "published") throw new Error("Only published listings can be advertised.");
     const amount = Number(campaign.budget_mwk);
     if (!Number.isSafeInteger(amount) || amount < 1000) throw new Error("Campaign budget is invalid.");
     const origin = new URL(getRequest().url).origin;
