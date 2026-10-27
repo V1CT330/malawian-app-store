@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-const TERMS_VERSION = "2026-10-27";
+export const DEVELOPER_DEVELOPER_TERMS_VERSION = "2026-10-27";
 
 const TERMS = [
   {
@@ -98,7 +98,7 @@ export function DeveloperTermsDialog({
         <DialogHeader>
           <DialogTitle className="font-display">MAS Developer Agreement</DialogTitle>
           <DialogDescription>
-            Version {TERMS_VERSION}. Read the terms before enabling the developer workspace.
+            Version {DEVELOPER_TERMS_VERSION}. Read the terms before enabling the developer workspace.
             They cover developer participation, publishing, intellectual property, payments,
             privacy responsibilities and enforcement.
           </DialogDescription>
@@ -123,7 +123,7 @@ export function DeveloperTermsDialog({
             className="mt-0.5"
           />
           <span>
-            I have read and agree to the MAS Developer Agreement, version {TERMS_VERSION}. I confirm
+            I have read and agree to the MAS Developer Agreement, version {DEVELOPER_TERMS_VERSION}. I confirm
             that I have authority to accept it, have the rights needed to distribute my products,
             and understand that publication and Pro benefits are not guaranteed.
           </span>
