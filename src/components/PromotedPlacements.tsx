@@ -53,7 +53,7 @@ function SponsoredCard({ promotion }: { promotion: Promotion }) {
   );
 }
 
-export function PromotedPlacements() {
+export function PromotedPlacements({ searchResults = false }: { searchResults?: boolean }) {
   const promotions = useQuery({
     queryKey: ["live-promotions"],
     queryFn: async () => {
@@ -94,25 +94,27 @@ export function PromotedPlacements() {
   });
 
   const items = promotions.data ?? [];
-  const featured = items.filter((item) => item.kind === "featured" || item.kind === "banner");
-  if (!featured.length) return null;
+  const placements = searchResults
+    ? items.filter((item) => item.kind === "search")
+    : items.filter((item) => item.kind === "featured" || item.kind === "banner");
+  if (!placements.length) return null;
 
   return (
     <section className="mb-6" aria-label="Sponsored apps and websites">
       <div className="mb-3 flex items-center justify-between gap-2">
         <div>
-          <h2 className="font-display text-[17px] font-semibold leading-tight">Promoted by developers</h2>
+          <h2 className="font-display text-[17px] font-semibold leading-tight">{searchResults ? "Sponsored results" : "Promoted by developers"}</h2>
           <p className="text-xs text-muted-foreground">Sponsored placements support the MAS ecosystem</p>
         </div>
         <Badge variant="outline">Sponsored</Badge>
       </div>
       <div className="-mx-3 flex gap-4 overflow-x-auto px-3 pb-1">
-        {featured.map((promotion) => (
+        {placements.map((promotion) => (
           <SponsoredCard key={promotion.id} promotion={promotion} />
         ))}
       </div>
       <p className="mt-2 text-[11px] text-muted-foreground">
-        Advertisers pay MK{items[0]?.cost_per_click_mwk ?? 50} per click; impressions are free.
+        Advertisers pay MK{placements[0]?.cost_per_click_mwk ?? 50} per click; impressions are free.
       </p>
     </section>
   );
