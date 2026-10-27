@@ -161,7 +161,7 @@ function StorePage() {
 
   return (
     <AppShell search={search} onSearchChange={updateSearch}>
-      {browsing && <PromotedPlacements />}
+      <PromotedPlacements searchResults={hasFilters} />
       <div className="-mx-3 mb-3 bg-background px-3">
         <div className="flex gap-6 border-b border-border">
           {TABS.map((t) => (
