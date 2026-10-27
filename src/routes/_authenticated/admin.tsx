@@ -111,7 +111,7 @@ function AdminPage() {
       const rows = data ?? [];
       if (!rows.length) return [];
       const { data: listingRows, error: listingError } = await supabase
-        .from("listings").select("id,name,slug,developer_id").in("id", rows.map((row) => row.listing_id));
+        .from("listings").select("id,name,slug,developer_id,status").in("id", rows.map((row) => row.listing_id));
       if (listingError) throw listingError;
       const byId = new Map((listingRows ?? []).map((listing) => [listing.id, listing]));
       return rows.map((row) => ({ ...row, listing: byId.get(row.listing_id) ?? null }));
@@ -431,7 +431,7 @@ function AdminPage() {
               </div>
               {campaign.status === "pending" && (
                 <div className="flex flex-wrap gap-2">
-                  <Button size="sm" disabled={decidePromotion.isPending || !campaign.listing} onClick={() => decidePromotion.mutate({ id: campaign.id, status: "approved" })}>Approve campaign</Button>
+                  <Button size="sm" disabled={decidePromotion.isPending || campaign.listing?.status !== "published"} onClick={() => decidePromotion.mutate({ id: campaign.id, status: "approved" })}>Approve campaign</Button>
                   <Button size="sm" variant="destructive" disabled={decidePromotion.isPending} onClick={() => decidePromotion.mutate({ id: campaign.id, status: "rejected" })}>Reject</Button>
                 </div>
               )}
