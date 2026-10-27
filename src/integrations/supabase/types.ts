@@ -1926,6 +1926,10 @@ export type Database = {
         Args: { _reference: string }
         Returns: undefined
       }
+      record_promotion_event: {
+        Args: { _event_id: string; _event_type: string; _promotion_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
