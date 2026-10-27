@@ -65,7 +65,8 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
-  IF auth.uid() IS NOT NULL AND NOT public.has_role(auth.uid(), 'admin') THEN
+  IF auth.uid() IS NOT NULL AND NOT public.has_role(auth.uid(), 'admin')
+    AND COALESCE(current_setting('app.promotion_event', true), 'off') <> 'on' THEN
     IF TG_OP = 'INSERT' THEN
       IF NEW.owner_id <> auth.uid() OR NEW.status <> 'pending' OR NEW.payment_status <> 'unpaid' THEN
         RAISE EXCEPTION 'Campaigns must be submitted for review and payment';
@@ -129,6 +130,7 @@ BEGIN
 
   IF NOT FOUND THEN RETURN false; END IF;
 
+  PERFORM set_config('app.promotion_event', 'on', true);
   IF _event_type = 'impression' THEN
     UPDATE public.promotions SET impressions = impressions + 1 WHERE id = _promotion_id;
   ELSE
