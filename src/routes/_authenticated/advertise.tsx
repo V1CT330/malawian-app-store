@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
@@ -16,6 +17,7 @@ import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchFoundingProgram } from "@/lib/pro";
 import { formatMwk } from "@/lib/store";
+import { startPromotionCheckout } from "@/lib/payments.functions";
 
 export const Route = createFileRoute("/_authenticated/advertise")({
   head: () => ({
@@ -58,6 +60,7 @@ function AdvertisePage() {
   const [budget, setBudget] = useState("10000");
   const [days, setDays] = useState("7");
   const [location, setLocation] = useState<string>("All Malawi");
+  const startCheckout = useServerFn(startPromotionCheckout);
 
   const listings = useQuery({
     queryKey: ["advertise-listings", userId],
@@ -106,6 +109,7 @@ function AdvertisePage() {
         target_location: location,
         starts_at: new Date().toISOString(),
         ends_at: ends.toISOString(),
+        duration_days: length,
         status: "pending",
       });
       if (error) throw error;
@@ -115,6 +119,12 @@ function AdvertisePage() {
       setName("");
       queryClient.invalidateQueries({ queryKey: ["campaigns", userId] });
     },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
+  const checkout = useMutation({
+    mutationFn: (campaignId: string) => startCheckout({ data: { campaignId } }),
+    onSuccess: (session) => { window.location.href = session.checkoutUrl; },
     onError: (e: Error) => toast.error(e.message),
   });
 
@@ -277,7 +287,13 @@ function AdvertisePage() {
                     <p className="text-muted-foreground">budget</p>
                   </div>
                 </div>
-                {c.status !== "paused" && (
+                {c.status === "approved" && c.payment_status === "unpaid" && (
+                  <Button size="sm" className="mt-3" disabled={checkout.isPending} onClick={() => checkout.mutate(c.id)}>
+                    {checkout.isPending ? "Preparing checkout…" : `Pay budget · ${formatMwk(Number(c.budget_mwk))}`}
+                  </Button>
+                )}
+                {c.status === "approved" && c.payment_status === "unpaid" && <p className="mt-2 text-xs text-muted-foreground">Approved. Pay the prepaid budget to start the campaign.</p>}
+                {c.status !== "paused" && c.status !== "completed" && c.status !== "rejected" && (
                   <Button
                     size="sm"
                     variant="outline"
@@ -305,7 +321,7 @@ function AdvertisePage() {
           rows={4}
           className="mt-2 resize-none bg-secondary text-sm"
           value={
-            "Campaigns are reviewed before they go live. Budgets are charged in Malawian Kwacha. Impressions and clicks update as your campaign runs. You can pause a campaign at any time and the remaining budget stays with your account."
+            "Campaigns are reviewed before payment. Approved campaigns require prepaid budgets through PayChangu. Impressions are free; each recorded click costs MK50. Campaigns stop when the budget is used or the campaign duration ends. Contact MAS support for billing disputes."
           }
         />
       </section>
