@@ -107,7 +107,7 @@ export async function settlePayment(txRef: string) {
     const now = new Date();
     const { data: campaign } = await supabaseAdmin
       .from("promotions")
-      .select("id,budget_mwk,status,payment_status,ends_at")
+      .select("id,budget_mwk,status,payment_status,duration_days")
       .eq("id", campaignId)
       .eq("owner_id", session.user_id)
       .maybeSingle();
@@ -122,10 +122,9 @@ export async function settlePayment(txRef: string) {
       Number(campaign.budget_mwk) !== session.amount_mwk) {
       return { ok: false, reason: "campaign_not_approved" as const, purpose: session.purpose };
     }
-    const end = campaign.ends_at ? new Date(campaign.ends_at) : null;
     const { data: activated } = await supabaseAdmin.from("promotions").update({
       status: "active", payment_status: "paid", paid_at: now.toISOString(), starts_at: now.toISOString(),
-      ...(end && end > now ? { ends_at: end.toISOString() } : { ends_at: new Date(now.getTime() + 7 * 864e5).toISOString() }),
+      ends_at: new Date(now.getTime() + Math.max(1, Math.min(90, Number(campaign.duration_days) || 7)) * 864e5).toISOString(),
     }).eq("id", campaignId).eq("status", "approved").eq("payment_status", "unpaid").select("id");
     if (!activated?.length) {
       const { data: latest } = await supabaseAdmin.from("promotions").select("status,payment_status")
