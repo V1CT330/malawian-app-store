@@ -12,6 +12,9 @@ export const Route = createFileRoute("/api/public/payments/return")({
           const { settlePayment } = await import("@/lib/payments.server");
           const r = await settlePayment(txRef).catch(() => ({ ok: false }));
           result = r.ok ? "success" : "pending";
+          const destination = typeof r.purpose === "string" && r.purpose.startsWith("ad_campaign:")
+            ? "/console/advertise" : "/console/subscription";
+          return Response.redirect(`${url.origin}${destination}?payment=${result}`, 302);
         }
         return Response.redirect(`${url.origin}/console/subscription?payment=${result}`, 302);
       },
