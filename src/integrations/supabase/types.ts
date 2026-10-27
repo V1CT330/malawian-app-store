@@ -1115,7 +1115,9 @@ export type Database = {
         Row: {
           budget_mwk: number
           clicks: number
+          cost_per_click_mwk: number
           created_at: string
+          duration_days: number
           ends_at: string | null
           id: string
           impressions: number
@@ -1123,6 +1125,8 @@ export type Database = {
           listing_id: string
           name: string | null
           owner_id: string
+          paid_at: string | null
+          payment_status: string
           spent_mwk: number
           starts_at: string
           status: string
@@ -1131,7 +1135,9 @@ export type Database = {
         Insert: {
           budget_mwk?: number
           clicks?: number
+          cost_per_click_mwk?: number
           created_at?: string
+          duration_days?: number
           ends_at?: string | null
           id?: string
           impressions?: number
@@ -1139,6 +1145,8 @@ export type Database = {
           listing_id: string
           name?: string | null
           owner_id: string
+          paid_at?: string | null
+          payment_status?: string
           spent_mwk?: number
           starts_at?: string
           status?: string
@@ -1147,7 +1155,9 @@ export type Database = {
         Update: {
           budget_mwk?: number
           clicks?: number
+          cost_per_click_mwk?: number
           created_at?: string
+          duration_days?: number
           ends_at?: string | null
           id?: string
           impressions?: number
@@ -1155,6 +1165,8 @@ export type Database = {
           listing_id?: string
           name?: string | null
           owner_id?: string
+          paid_at?: string | null
+          payment_status?: string
           spent_mwk?: number
           starts_at?: string
           status?: string
