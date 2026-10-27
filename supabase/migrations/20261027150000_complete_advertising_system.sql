@@ -3,7 +3,8 @@ ALTER TABLE public.promotions
   ALTER COLUMN status SET DEFAULT 'pending',
   ADD COLUMN IF NOT EXISTS payment_status text NOT NULL DEFAULT 'unpaid',
   ADD COLUMN IF NOT EXISTS paid_at timestamptz,
-  ADD COLUMN IF NOT EXISTS cost_per_click_mwk integer NOT NULL DEFAULT 50;
+  ADD COLUMN IF NOT EXISTS cost_per_click_mwk integer NOT NULL DEFAULT 50,
+  ADD COLUMN IF NOT EXISTS duration_days integer NOT NULL DEFAULT 7;
 
 -- Existing campaigns were not verified as paid; do not serve them automatically.
 UPDATE public.promotions
