@@ -14,6 +14,8 @@ export async function createPaychanguCheckout(input: {
   name: string;
   callbackUrl: string;
   returnUrl: string;
+  title?: string;
+  description?: string;
 }) {
   const res = await fetch(`${API}/payment`, {
     method: "POST",
@@ -32,8 +34,8 @@ export async function createPaychanguCheckout(input: {
       callback_url: input.callbackUrl,
       return_url: input.returnUrl,
       customization: {
-        title: "Developer Pro",
-        description: "Malawian App Store monthly subscription",
+        title: input.title ?? "Developer Pro",
+        description: input.description ?? "Malawian App Store monthly subscription",
       },
     }),
   });
@@ -81,7 +83,7 @@ export async function verifyPaychanguPayment(txRef: string) {
   };
 }
 
-/** Marks the session paid and extends Developer Pro by 30 days. Idempotent. */
+/** Confirms the provider payment before activating its intended product. Idempotent. */
 export async function settlePayment(txRef: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data: session } = await supabaseAdmin
@@ -89,12 +91,53 @@ export async function settlePayment(txRef: string) {
     .select("*")
     .eq("tx_ref", txRef)
     .maybeSingle();
-  if (!session) return { ok: false, reason: "unknown" as const };
-  if (session.status === "paid") return { ok: true, reason: "already" as const };
+  if (!session) return { ok: false, reason: "unknown" as const, purpose: "unknown" };
+  if (session.status === "paid") return { ok: true, reason: "already" as const, purpose: session.purpose };
 
   const v = await verifyPaychanguPayment(txRef);
   if (!v.paid || v.currency !== "MWK" || v.amount < session.amount_mwk) {
-    return { ok: false, reason: "unpaid" as const };
+    return { ok: false, reason: "unpaid" as const, purpose: session.purpose };
+  }
+
+  if (session.purpose.startsWith("ad_campaign:")) {
+    const campaignId = session.purpose.slice("ad_campaign:".length);
+    if (!/^[0-9a-f-]{36}$/i.test(campaignId)) {
+      return { ok: false, reason: "invalid_campaign" as const, purpose: session.purpose };
+    }
+    const now = new Date();
+    const { data: campaign } = await supabaseAdmin
+      .from("promotions")
+      .select("id,budget_mwk,status,payment_status,ends_at")
+      .eq("id", campaignId)
+      .eq("owner_id", session.user_id)
+      .maybeSingle();
+    if (!campaign) return { ok: false, reason: "campaign_not_found" as const, purpose: session.purpose };
+    if (campaign.payment_status === "paid" && campaign.status === "active") {
+      await supabaseAdmin.from("payment_sessions").update({
+        status: "paid", paid_at: now.toISOString(), provider_reference: v.reference,
+      }).eq("id", session.id).eq("status", "pending");
+      return { ok: true, reason: "already" as const, purpose: session.purpose };
+    }
+    if (campaign.status !== "approved" || campaign.payment_status !== "unpaid" ||
+      Number(campaign.budget_mwk) !== session.amount_mwk) {
+      return { ok: false, reason: "campaign_not_approved" as const, purpose: session.purpose };
+    }
+    const end = campaign.ends_at ? new Date(campaign.ends_at) : null;
+    const { data: activated } = await supabaseAdmin.from("promotions").update({
+      status: "active", payment_status: "paid", paid_at: now.toISOString(), starts_at: now.toISOString(),
+      ...(end && end > now ? { ends_at: end.toISOString() } : { ends_at: new Date(now.getTime() + 7 * 864e5).toISOString() }),
+    }).eq("id", campaignId).eq("status", "approved").eq("payment_status", "unpaid").select("id");
+    if (!activated?.length) {
+      const { data: latest } = await supabaseAdmin.from("promotions").select("status,payment_status")
+        .eq("id", campaignId).maybeSingle();
+      if (latest?.status !== "active" || latest.payment_status !== "paid") {
+        return { ok: false, reason: "campaign_activation_failed" as const, purpose: session.purpose };
+      }
+    }
+    await supabaseAdmin.from("payment_sessions").update({
+      status: "paid", paid_at: now.toISOString(), provider_reference: v.reference,
+    }).eq("id", session.id).eq("status", "pending");
+    return { ok: true, reason: "paid" as const, purpose: session.purpose };
   }
 
   const { data: claimed } = await supabaseAdmin
@@ -103,7 +146,7 @@ export async function settlePayment(txRef: string) {
     .eq("id", session.id)
     .eq("status", "pending")
     .select("id");
-  if (!claimed?.length) return { ok: true, reason: "already" as const };
+  if (!claimed?.length) return { ok: true, reason: "already" as const, purpose: session.purpose };
 
   const { data: existing } = await supabaseAdmin
     .from("subscriptions")
@@ -125,5 +168,5 @@ export async function settlePayment(txRef: string) {
   };
   if (existing) await supabaseAdmin.from("subscriptions").update(fields).eq("id", existing.id);
   else await supabaseAdmin.from("subscriptions").insert({ ...fields, user_id: session.user_id });
-  return { ok: true, reason: "paid" as const };
+  return { ok: true, reason: "paid" as const, purpose: session.purpose };
 }
