@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { useMode, useProfile, useSignedUrl } from "@/hooks/useSession";
+import { useIsAdmin, useMode, useProfile, useSignedUrl } from "@/hooks/useSession";
 import { ACCENT_PRESETS, useTheme } from "@/hooks/useTheme";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMwk, uploadAsset } from "@/lib/store";
@@ -45,6 +45,7 @@ function SettingsPage() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const mode = useMode();
+  const isAdmin = useIsAdmin();
   const { dark, setTheme, accent, setAccent } = useTheme();
   const avatar = useSignedUrl(profile?.avatar_url);
   const avatarInput = useRef<HTMLInputElement>(null);
@@ -432,6 +433,15 @@ function SettingsPage() {
                       <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
                     </Link>
                   ))}
+                  {isAdmin && (
+                    <Link to="/admin" className="group flex items-center gap-3 py-4 hover:text-primary">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium">Administration dashboard</p>
+                        <p className="mt-1 text-xs text-muted-foreground">Review submissions and manage MAS</p>
+                      </div>
+                      <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+                    </Link>
+                  )}
                 </div>
               ) : (
                 <div className="divide-y divide-border">
