@@ -59,7 +59,7 @@ export const startProCheckout = createServerFn({ method: "POST" })
 /** Creates a hosted PayChangu checkout for an admin-approved advertising campaign. */
 export const startPromotionCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((data: { campaignId: string }) => data)
+  .inputValidator((data: { campaignId: string }) => data)
   .handler(async ({ context, data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { createPaychanguCheckout } = await import("@/lib/payments.server");
