@@ -1,9 +1,10 @@
 import { useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
-import { ListingTile } from "@/components/ListingCard";
+import { AppIcon, ListingTile } from "@/components/ListingCard";
 import type { Listing } from "@/lib/store";
 
 type Promotion = {
@@ -47,13 +48,20 @@ function SponsoredCard({ promotion }: { promotion: Promotion }) {
     <div ref={ref} className="relative min-w-0">
       <Badge variant="secondary" className="absolute right-2 top-2 z-10">Sponsored</Badge>
       <div onClick={() => void recordEvent(promotion.id, "click")}>
-        <ListingTile listing={promotion.listing} />
+        {promotion.kind === "banner" ? (
+          <Link to="/apps/$slug" params={{ slug: promotion.listing.slug }} className="flex w-[280px] items-center gap-3 rounded-xl border border-border p-3 transition-colors hover:bg-secondary">
+            <AppIcon path={promotion.listing.icon_url} name={promotion.listing.name} className="h-14 w-14 rounded-xl" />
+            <div className="min-w-0"><p className="truncate text-sm font-semibold">{promotion.listing.name}</p><p className="line-clamp-2 text-xs text-muted-foreground">{promotion.listing.tagline || promotion.listing.category}</p><p className="mt-1 text-[10px] text-muted-foreground">Explore sponsored product</p></div>
+          </Link>
+        ) : (
+          <ListingTile listing={promotion.listing} />
+        )}
       </div>
     </div>
   );
 }
 
-export function PromotedPlacements({ searchResults = false }: { searchResults?: boolean }) {
+export function PromotedPlacements({ searchResults = false, searchTerm = "" }: { searchResults?: boolean; searchTerm?: string }) {
   const promotions = useQuery({
     queryKey: ["live-promotions"],
     queryFn: async () => {
@@ -95,7 +103,7 @@ export function PromotedPlacements({ searchResults = false }: { searchResults?: 
 
   const items = promotions.data ?? [];
   const placements = searchResults
-    ? items.filter((item) => item.kind === "search")
+    ? items.filter((item) => item.kind === "search" && (item.listing.name.toLowerCase().includes(searchTerm) || (item.listing.tagline ?? "").toLowerCase().includes(searchTerm) || item.listing.category.toLowerCase().includes(searchTerm)))
     : items.filter((item) => item.kind === "featured" || item.kind === "banner");
   if (!placements.length) return null;
 
