@@ -1021,6 +1021,7 @@ export type Database = {
           created_at: string
           developer_name: string | null
           developer_terms_accepted_at: string | null
+          developer_terms_version: string | null
           display_name: string | null
           facebook_url: string | null
           follower_count: number
@@ -1052,6 +1053,8 @@ export type Database = {
           created_at?: string
           developer_name?: string | null
           developer_terms_accepted_at?: string | null
+          developer_terms_version?: string | null
+          developer_terms_version?: string | null
           display_name?: string | null
           facebook_url?: string | null
           follower_count?: number
