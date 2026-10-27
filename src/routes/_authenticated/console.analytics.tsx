@@ -250,6 +250,27 @@ function AnalyticsPage() {
     [range, customStart, customEnd],
   );
 
+  const subscription = useQuery({
+    queryKey: ["subscription", userId],
+    enabled: Boolean(userId),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("subscriptions")
+        .select("status,current_period_end")
+        .eq("user_id", userId!)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+  const subscriptionStatus = subscription.data?.status;
+  const periodEnd = subscription.data?.current_period_end
+    ? Date.parse(subscription.data.current_period_end)
+    : null;
+  const hasPro =
+    (subscriptionStatus === "active" && (periodEnd === null || periodEnd > Date.now())) ||
+    (subscriptionStatus === "cancelled" && periodEnd !== null && periodEnd > Date.now());
+
   const listings = useQuery({
     queryKey: ["my-listings", userId],
     enabled: Boolean(userId),
@@ -271,7 +292,7 @@ function AnalyticsPage() {
 
   const events = useQuery({
     queryKey: ["advanced-analytics-events", userId, ids.join(","), startIso, endIso],
-    enabled: Boolean(userId) && ids.length > 0,
+    enabled: Boolean(userId && hasPro) && ids.length > 0,
     queryFn: async () => {
       const [installs, views] = await Promise.all([
         fetchEvents("install_events", ids, startIso, endIso),
@@ -358,6 +379,44 @@ function AnalyticsPage() {
     anchor.download = `mas-analytics-${isoDate(bounds.start)}-to-${isoDate(bounds.end)}.csv`;
     anchor.click();
     URL.revokeObjectURL(url);
+  }
+
+  if (subscription.isLoading) {
+    return (
+      <ConsoleShell title="Analytics">
+        <Skeleton className="h-40 w-full" />
+      </ConsoleShell>
+    );
+  }
+
+  if (subscription.isError) {
+    return (
+      <ConsoleShell title="Analytics">
+        <section className="surface-card border border-destructive/40 p-5">
+          <h1 className="font-display text-xl font-semibold">Membership status unavailable</h1>
+          <p className="mt-2 text-sm text-muted-foreground">We couldn't confirm your Developer Pro status. Retry before opening advanced analytics.</p>
+          <Button className="mt-4" variant="outline" onClick={() => void subscription.refetch()}>Retry</Button>
+        </section>
+      </ConsoleShell>
+    );
+  }
+
+  if (!hasPro) {
+    return (
+      <ConsoleShell title="Advanced Analytics">
+        <section className="surface-card max-w-2xl border border-border p-6">
+          <Badge variant="outline">Developer Pro feature</Badge>
+          <h1 className="mt-3 font-display text-2xl font-bold">Unlock advanced analytics</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Track product views, installs, conversion, audience trends and export reports with Developer Pro.
+          </p>
+          <p className="mt-4 font-display text-xl font-semibold">MK5,000 per month</p>
+          <Button asChild className="mt-4">
+            <Link to="/console/subscription">View Developer Pro</Link>
+          </Button>
+        </section>
+      </ConsoleShell>
+    );
   }
 
   return (
