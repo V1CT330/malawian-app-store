@@ -16,6 +16,7 @@ export type Profile = {
   kyc_status: "none" | "pending" | "approved" | "rejected";
   mode: string;
   developer_terms_accepted_at: string | null;
+  developer_terms_version: string | null;
   suspended: boolean;
 
   website_url: string | null;
