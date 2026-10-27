@@ -50,7 +50,6 @@ function ListingDetail() {
   const queryClient = useQueryClient();
   const [rating, setRating] = useState(5);
   const [body, setBody] = useState("");
-  const [downloadedVersionId, setDownloadedVersionId] = useState<string | null>(null);
 
   const listingQuery = useQuery({
     queryKey: ["listing", slug],
@@ -216,8 +215,7 @@ function ListingDetail() {
     },
     onSuccess: () => {
       if (listing?.kind === "app" && latest?.id) {
-        setDownloadedVersionId(latest.id);
-        toast.success("APK download opened. Install it on Android, then confirm below.");
+        toast.success("APK download started. Open it from your downloads to install on Android.");
       } else {
         toast.success("Website opened.");
       }
@@ -227,26 +225,6 @@ function ListingDetail() {
     onError: (error: Error) => toast.error(error.message),
   });
 
-  const confirmInstall = useMutation({
-    mutationFn: async () => {
-      if (!listing || !userId || !latest?.id) throw new Error("Sign in and choose an approved release first.");
-      const { error } = await supabase.from("installed_apps").upsert(
-        {
-          user_id: userId,
-          listing_id: listing.id,
-          installed_version_id: latest.id,
-        },
-        { onConflict: "user_id,listing_id" },
-      );
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      setDownloadedVersionId(null);
-      toast.success("Installation confirmed in your MAS library.");
-      queryClient.invalidateQueries({ queryKey: ["installed-app", userId, listing?.id] });
-    },
-    onError: (error: Error) => toast.error(error.message),
-  });
 
   async function handleGet() {
     if (!listing) return;
@@ -363,19 +341,6 @@ function ListingDetail() {
           )}
         </Button>
 
-        {listing.kind === "app" &&
-          userId &&
-          downloadedVersionId === latest?.id &&
-          installedQuery.data?.installed_version_id !== latest?.id && (
-            <Button
-              className="w-full"
-              variant="outline"
-              disabled={confirmInstall.isPending}
-              onClick={() => confirmInstall.mutate()}
-            >
-              I installed it
-            </Button>
-          )}
 
         {userId && (
           <Button
