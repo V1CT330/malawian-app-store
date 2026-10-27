@@ -12,7 +12,7 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
-import { DeveloperTermsDialog } from "@/components/DeveloperTerms";
+import { DEVELOPER_TERMS_VERSION, DeveloperTermsDialog } from "@/components/DeveloperTerms";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -143,7 +143,7 @@ function SettingsPage() {
         .update({
           mode: next,
           is_developer: next === "developer" ? true : (profile?.is_developer ?? false),
-          ...(acceptTerms ? { developer_terms_accepted_at: new Date().toISOString() } : {}),
+          ...(acceptTerms ? { developer_terms_accepted_at: new Date().toISOString(), developer_terms_version: DEVELOPER_TERMS_VERSION } : {}),
         })
         .eq("id", userId);
       if (error) throw error;
@@ -160,7 +160,7 @@ function SettingsPage() {
               mode: next,
               is_developer: next === "developer" ? true : current.is_developer,
               ...(variables.acceptTerms
-                ? { developer_terms_accepted_at: new Date().toISOString() }
+                ? { developer_terms_accepted_at: new Date().toISOString(), developer_terms_version: DEVELOPER_TERMS_VERSION }
                 : {}),
             }
           : current,
@@ -178,7 +178,7 @@ function SettingsPage() {
       setMode.mutate({ next: "user" });
       return;
     }
-    if (!profile?.developer_terms_accepted_at) {
+    if (!profile?.developer_terms_accepted_at || profile.developer_terms_version !== DEVELOPER_TERMS_VERSION) {
       setTermsOpen(true);
       return;
     }
