@@ -107,7 +107,7 @@ export async function settlePayment(txRef: string) {
     const now = new Date();
     const { data: campaign } = await supabaseAdmin
       .from("promotions")
-      .select("id,budget_mwk,status,payment_status,duration_days")
+      .select("id,budget_mwk,status,payment_status,duration_days,listing_id")
       .eq("id", campaignId)
       .eq("owner_id", session.user_id)
       .maybeSingle();
@@ -118,6 +118,8 @@ export async function settlePayment(txRef: string) {
       }).eq("id", session.id).eq("status", "pending");
       return { ok: true, reason: "already" as const, purpose: session.purpose };
     }
+    const { data: listing } = await supabaseAdmin.from("listings").select("status").eq("id", campaign.listing_id).maybeSingle();
+    if (listing?.status !== "published") return { ok: false, reason: "listing_not_published" as const, purpose: session.purpose };
     if (campaign.status !== "approved" || campaign.payment_status !== "unpaid" ||
       Number(campaign.budget_mwk) !== session.amount_mwk) {
       return { ok: false, reason: "campaign_not_approved" as const, purpose: session.purpose };
