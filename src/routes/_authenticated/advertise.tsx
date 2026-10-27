@@ -47,8 +47,6 @@ const PLACEMENTS = [
   { value: "banner", label: "Store banner", detail: "Wide banner across browse pages" },
 ] as const;
 
-const LOCATIONS = ["All Malawi", "Lilongwe", "Blantyre", "Mzuzu", "Zomba"] as const;
-
 function AdvertisePage() {
   useRequireDeveloper();
   const { userId } = useProfile();
@@ -59,7 +57,6 @@ function AdvertisePage() {
   const [placement, setPlacement] = useState<string>("featured");
   const [budget, setBudget] = useState("10000");
   const [days, setDays] = useState("7");
-  const [location, setLocation] = useState<string>("All Malawi");
   const startCheckout = useServerFn(startPromotionCheckout);
 
   const listings = useQuery({
@@ -106,7 +103,7 @@ function AdvertisePage() {
         name: name.trim() || "Promotion campaign",
         kind: placement,
         budget_mwk: amount,
-        target_location: location,
+        target_location: "All Malawi",
         starts_at: new Date().toISOString(),
         ends_at: ends.toISOString(),
         duration_days: length,
@@ -156,6 +153,7 @@ function AdvertisePage() {
 
       <section className="surface-card space-y-3 p-4">
         <h2 className="font-display text-base font-semibold">Create a campaign</h2>
+        <p className="text-xs text-muted-foreground">Targeting: All Malawi · MK50 per click · impressions are free.</p>
 
         <div>
           <Label htmlFor="campaign-product">Product</Label>
@@ -204,7 +202,7 @@ function AdvertisePage() {
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2">
           <div>
             <Label htmlFor="campaign-budget">Budget in MWK</Label>
             <Input
@@ -222,21 +220,6 @@ function AdvertisePage() {
               value={days}
               onChange={(e) => setDays(e.target.value.replace(/\D/g, ""))}
             />
-          </div>
-          <div>
-            <Label htmlFor="campaign-location">Target location</Label>
-            <select
-              id="campaign-location"
-              className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-            >
-              {LOCATIONS.map((l) => (
-                <option key={l} value={l}>
-                  {l}
-                </option>
-              ))}
-            </select>
           </div>
         </div>
 
