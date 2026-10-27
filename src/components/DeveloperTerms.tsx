@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-export const DEVELOPER_DEVELOPER_TERMS_VERSION = "2026-10-27";
+export const DEVELOPER_TERMS_VERSION = "2026-10-27";
 
 const TERMS = [
   {
