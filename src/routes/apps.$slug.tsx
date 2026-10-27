@@ -263,8 +263,24 @@ function ListingDetail() {
       toast.info("This app does not have an approved, downloadable package yet.");
       return;
     }
-    // Only record a download attempt after an approved package URL is available.
-    window.open(fileUrl, "_blank", "noopener,noreferrer");
+    // Request an attachment URL so the browser downloads the APK without navigating
+    // away from the MAS listing page. The browser/Android download manager may still appear.
+    const { data, error } = await supabase.storage
+      .from("app-assets")
+      .createSignedUrl(latest.file_url, 60 * 60, {
+        download: `${listing.name.replace(/[^a-z0-9-_]+/gi, "-")}-${latest.version}.apk`,
+      });
+    if (error || !data?.signedUrl) {
+      toast.error("Could not prepare the APK download. Please try again.");
+      return;
+    }
+    const link = document.createElement("a");
+    link.href = data.signedUrl;
+    link.download = `${listing.name.replace(/[^a-z0-9-_]+/gi, "-")}-${latest.version}.apk`;
+    link.rel = "noopener";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
     install.mutate();
   }
 
