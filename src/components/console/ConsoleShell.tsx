@@ -41,7 +41,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useProfile, useSignedUrl, useUnreadCount } from "@/hooks/useSession";
+import { useIsAdmin, useProfile, useSignedUrl, useUnreadCount } from "@/hooks/useSession";
 import { useTheme } from "@/hooks/useTheme";
 import { supabase } from "@/integrations/supabase/client";
 import { CONSOLE_NAV } from "@/lib/console";
@@ -122,6 +122,7 @@ export function ConsoleShell({
   fullWidth?: boolean;
 }) {
   const { userId, profile } = useProfile();
+  const isAdmin = useIsAdmin();
   const unread = useUnreadCount();
   const profileAvatar = useSignedUrl(profile?.avatar_url);
   const { dark, toggle } = useTheme();
@@ -291,6 +292,14 @@ export function ConsoleShell({
                 <DropdownMenuItem asChild>
                   <Link to="/console/subscription">Subscription</Link>
                 </DropdownMenuItem>
+                {isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin">
+                      <ShieldCheck className="mr-2 h-4 w-4" />
+                      Administration dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={() => leaveDeveloper.mutate()}>
                   Switch to user mode
