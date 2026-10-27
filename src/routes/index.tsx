@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { DemoPreview } from "@/components/DemoPreview";
 import { ListingCard, ListingTile } from "@/components/ListingCard";
+import { PromotedPlacements } from "@/components/PromotedPlacements";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { CATEGORIES, type Listing } from "@/lib/store";
@@ -160,6 +161,7 @@ function StorePage() {
 
   return (
     <AppShell search={search} onSearchChange={updateSearch}>
+      {browsing && <PromotedPlacements />}
       <div className="-mx-3 mb-3 bg-background px-3">
         <div className="flex gap-6 border-b border-border">
           {TABS.map((t) => (
