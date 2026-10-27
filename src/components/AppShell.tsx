@@ -111,6 +111,14 @@ export function AppShell({
               </a>
             ))}
           </div>
+          <nav aria-label="Legal policies" className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
+            <a href="/legal/terms-of-service" className="hover:text-primary">Terms of Service</a>
+            <a href="/legal/privacy-notice" className="hover:text-primary">Privacy Notice</a>
+            <a href="/legal/acceptable-use" className="hover:text-primary">Acceptable Use</a>
+            <a href="/legal/copyright-takedown" className="hover:text-primary">Copyright &amp; Takedown</a>
+            <a href="/legal/refund-policy" className="hover:text-primary">Refund Policy</a>
+            <a href="/legal/developer-agreement" className="hover:text-primary">Developer Agreement</a>
+          </nav>
         </div>
       </footer>
 
