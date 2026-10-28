@@ -56,12 +56,24 @@ function UploadPage() {
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [version, setVersion] = useState("1.0.0");
   const [icon, setIcon] = useState<File | null>(null);
+  const [screenshotFiles, setScreenshotFiles] = useState<File[]>([]);
   const [file, setFile] = useState<File | null>(null);
 
   const publish = useMutation({
     mutationFn: async () => {
       if (!userId) throw new Error("You must be signed in.");
-      if (name.trim().length < 2) throw new Error("Give your listing a name.");
+      if (name.trim().length < 3) throw new Error("Give your listing a name of at least 3 characters.");
+      if (screenshotFiles.length > 8) throw new Error("Choose no more than 8 screenshots.");
+      for (const screenshot of screenshotFiles) {
+        const ext = screenshot.name.split(".").pop()?.toLowerCase();
+        const supportedImage = ["jpg", "jpeg", "png", "webp", "gif", "avif"].includes(ext ?? "");
+        if (!supportedImage || !screenshot.type.startsWith("image/")) {
+          throw new Error("Screenshots must be JPG, PNG, WebP, GIF, or AVIF images.");
+        }
+        if (screenshot.size <= 0 || screenshot.size > 10 * 1024 * 1024) {
+          throw new Error("Each screenshot must be larger than 0 bytes and no larger than 10 MB.");
+        }
+      }
       if (kind === "website" && !/^https:\/\//i.test(websiteUrl.trim())) {
         throw new Error("Enter a valid website URL starting with https://");
       }
@@ -79,30 +91,42 @@ function UploadPage() {
         }
       }
 
-      const iconPath = icon ? await uploadAsset(userId, icon, "icons") : null;
-      const slug = `${slugify(name)}-${Math.random().toString(36).slice(2, 6)}`;
-
-      const { data: listing, error } = await supabase
-        .from("listings")
-        .insert({
-          developer_id: userId,
-          slug,
-          name: name.trim(),
-          tagline: tagline.trim() || null,
-          description: description.trim() || null,
-          category,
-          kind,
-          icon_url: iconPath,
-          website_url: kind === "website" ? websiteUrl.trim() : null,
-          status: "draft",
-        })
-        .select("id,slug")
-        .single();
-      if (error) throw error;
-
-      let filePath: string | null = null;
+      let listingId: string | null = null;
+      const uploadedPaths: string[] = [];
       try {
-        filePath = kind !== "website" && file ? await uploadAsset(userId, file, "builds") : null;
+        const iconPath = icon ? await uploadAsset(userId, icon, "icons") : null;
+        if (iconPath) uploadedPaths.push(iconPath);
+
+        const screenshotPaths: string[] = [];
+        for (const screenshot of screenshotFiles) {
+          const path = await uploadAsset(userId, screenshot, "screenshots");
+          screenshotPaths.push(path);
+          uploadedPaths.push(path);
+        }
+
+        const slug = `${slugify(name)}-${Math.random().toString(36).slice(2, 6)}`;
+        const { data: listing, error } = await supabase
+          .from("listings")
+          .insert({
+            developer_id: userId,
+            slug,
+            name: name.trim(),
+            tagline: tagline.trim() || null,
+            description: description.trim() || null,
+            category,
+            kind,
+            icon_url: iconPath,
+            screenshots: screenshotPaths,
+            website_url: kind === "website" ? websiteUrl.trim() : null,
+            status: "draft",
+          })
+          .select("id,slug")
+          .single();
+        if (error) throw error;
+        listingId = listing.id;
+
+        const filePath = kind !== "website" && file ? await uploadAsset(userId, file, "builds") : null;
+        if (filePath) uploadedPaths.push(filePath);
         const { error: versionError } = await supabase.from("listing_versions").insert({
           listing_id: listing.id,
           version: version.trim() || "1.0.0",
@@ -112,21 +136,22 @@ function UploadPage() {
           status: kind === "website" ? "released" : "pending",
         });
         if (versionError) throw versionError;
+
+        if (!profile?.is_developer) {
+          await supabase.from("profiles").update({ is_developer: true }).eq("id", userId);
+        }
+        return listing;
       } catch (error) {
-        const { error: listingCleanupError } = await supabase.from("listings").delete().eq("id", listing.id);
-        if (listingCleanupError) console.warn("Could not clean up a failed draft listing.");
-        const paths = [iconPath, filePath].filter((path): path is string => Boolean(path));
-        if (paths.length) {
-          const { error: assetCleanupError } = await supabase.storage.from("app-assets").remove(paths);
+        if (listingId) {
+          const { error: listingCleanupError } = await supabase.from("listings").delete().eq("id", listingId);
+          if (listingCleanupError) console.warn("Could not clean up a failed draft listing.");
+        }
+        if (uploadedPaths.length) {
+          const { error: assetCleanupError } = await supabase.storage.from("app-assets").remove(uploadedPaths);
           if (assetCleanupError) console.warn("Could not clean up uploaded listing assets.");
         }
         throw error;
       }
-
-      if (!profile?.is_developer) {
-        await supabase.from("profiles").update({ is_developer: true }).eq("id", userId);
-      }
-      return listing;
     },
     onSuccess: (listing) => {
       toast.success("Draft saved. Complete the checklist and submit it for review.");
@@ -247,6 +272,21 @@ function UploadPage() {
             <Label htmlFor="version">Version</Label>
             <Input id="version" value={version} onChange={(e) => setVersion(e.target.value)} />
           </div>
+        </div>
+
+        <div>
+          <Label htmlFor="screenshots">Screenshots (optional while drafting)</Label>
+          <Input
+            id="screenshots"
+            type="file"
+            multiple
+            accept=".jpg,.jpeg,.png,.webp,.gif,.avif,image/jpeg,image/png,image/webp,image/gif,image/avif"
+            onChange={(e) => setScreenshotFiles(Array.from(e.target.files ?? []))}
+          />
+          <p className="mt-1 text-xs text-muted-foreground">
+            Add up to 8 images, 10 MB each. At least 2 screenshots are required before publishing.{" "}
+            {screenshotFiles.length > 0 ? `${screenshotFiles.length} selected.` : ""}
+          </p>
         </div>
 
         <Button
