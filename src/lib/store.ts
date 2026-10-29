@@ -1,5 +1,4 @@
 import { supabase } from "@/integrations/supabase/client";
-import { CATEGORIES, SUBSCRIPTION_PRICE_MWK, slugify, formatMwk, formatAmount, formatBytes } from "@/shared/mas-core";
 export { CATEGORIES, SUBSCRIPTION_PRICE_MWK, slugify, formatMwk, formatAmount, formatBytes } from "@/shared/mas-core";
 
 export const SOCIAL_LINKS = [
