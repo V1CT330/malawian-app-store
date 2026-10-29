@@ -1,20 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
-
-export const CATEGORIES = [
-  "Business",
-  "Education",
-  "Entertainment",
-  "Finance",
-  "Health",
-  "News",
-  "Shopping",
-  "Social",
-  "Tools",
-  "Transport",
-  "Other",
-] as const;
-
-export const SUBSCRIPTION_PRICE_MWK = 5000;
+import { CATEGORIES, SUBSCRIPTION_PRICE_MWK, slugify, formatMwk, formatAmount, formatBytes } from "@/shared/mas-core";
+export { CATEGORIES, SUBSCRIPTION_PRICE_MWK, slugify, formatMwk, formatAmount, formatBytes } from "@/shared/mas-core";
 
 export const SOCIAL_LINKS = [
   { label: "Facebook", href: "https://facebook.com/malawianappstore" },
@@ -51,38 +37,6 @@ export type Listing = {
   created_at: string;
   updated_at: string;
 };
-
-export function slugify(value: string) {
-  return (
-    value
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "")
-      .slice(0, 48) || "listing"
-  );
-}
-
-export function formatMwk(amount: number) {
-  return amount === 0 ? "Free" : `MK${amount.toLocaleString("en-MW")}`;
-}
-
-/** Always shows the numeric amount (0 renders as MK0, not "Free"). */
-export function formatAmount(amount: number) {
-  return `MK${Math.round(amount).toLocaleString("en-MW")}`;
-}
-
-export function formatBytes(bytes: number | null | undefined) {
-  if (!bytes) return "N/A";
-  const units = ["B", "KB", "MB", "GB"];
-  let n = bytes;
-  let i = 0;
-  while (n >= 1024 && i < units.length - 1) {
-    n /= 1024;
-    i += 1;
-  }
-  return `${n.toFixed(n < 10 && i > 0 ? 1 : 0)} ${units[i]}`;
-}
 
 /** Buckets are private, so assets are read through short-lived signed URLs. */
 export async function signedAssetUrl(path: string | null | undefined, bucket = "app-assets") {
