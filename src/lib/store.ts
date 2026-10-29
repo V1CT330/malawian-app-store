@@ -8,34 +8,8 @@ export const SOCIAL_LINKS = [
   { label: "TikTok", href: "https://tiktok.com/@malawianappstore" },
 ];
 
-export type Listing = {
-  id: string;
-  developer_id: string;
-  slug: string;
-  name: string;
-  tagline: string | null;
-  description: string | null;
-  category: string;
-  kind: "app" | "website";
-  icon_url: string | null;
-  screenshots: string[];
-  website_url: string | null;
-  price_mwk: number;
-  monetization?: string;
-  price_month_mwk?: number;
-  price_year_mwk?: number;
-  allow_donations?: boolean;
-  crypto_address?: string | null;
-  sponsored?: boolean;
-  status: "draft" | "pending" | "published" | "rejected";
-  featured?: boolean;
-  rejection_reason?: string | null;
-  downloads: number;
-  rating_avg: number;
-  rating_count: number;
-  created_at: string;
-  updated_at: string;
-};
+export type { Listing } from "@/shared/mas-core";
+import type { Listing } from "@/shared/mas-core";
 
 /** Buckets are private, so assets are read through short-lived signed URLs. */
 export async function signedAssetUrl(path: string | null | undefined, bucket = "app-assets") {
