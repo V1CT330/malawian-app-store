@@ -1,4 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
+import { asoReport, reputationTier, visibilityScore } from "@/shared/mas-core";
+export { asoReport, reputationTier, visibilityScore } from "@/shared/mas-core";
 
 export const PRODUCT_KINDS = [
   { value: "app", label: "App" },
@@ -67,36 +69,6 @@ export type PortalVersion = {
   created_at: string;
 };
 
-/** Store-optimisation scoring used by the ASO panel. Pure, so it renders instantly. */
-export function asoReport(l: Partial<PortalListing>) {
-  const checks = [
-    {
-      label: "Name between 3 and 30 characters",
-      ok: (l.name?.length ?? 0) >= 3 && (l.name?.length ?? 0) <= 30,
-      weight: 10,
-    },
-    { label: "Tagline written (40+ characters)", ok: (l.tagline?.length ?? 0) >= 40, weight: 10 },
-    {
-      label: "Description of 200+ characters",
-      ok: (l.description?.length ?? 0) >= 200,
-      weight: 20,
-    },
-    { label: "Icon uploaded", ok: Boolean(l.icon_url), weight: 15 },
-    { label: "At least 3 screenshots", ok: (l.screenshots?.length ?? 0) >= 3, weight: 15 },
-    { label: "Feature banner uploaded", ok: Boolean(l.banner_url), weight: 5 },
-    { label: "3 or more tags", ok: (l.tags?.length ?? 0) >= 3, weight: 10 },
-  ];
-  const score = checks.reduce((sum, c) => sum + (c.ok ? c.weight : 0), 0);
-  return { score, checks, missing: checks.filter((c) => !c.ok).map((c) => c.label) };
-}
-
-export function visibilityScore(l: Partial<PortalListing>, reputation: number) {
-  const aso = asoReport(l).score;
-  const rating = (l.rating_avg ?? 0) * 8;
-  const traction = Math.min(20, Math.round((l.downloads ?? 0) / 5));
-  return Math.min(100, Math.round(aso * 0.5 + rating + traction + reputation * 0.2));
-}
-
 export function scoreTone(score: number) {
   if (score >= 75) return "text-brand-green";
   if (score >= 45) return "text-foreground";
@@ -128,13 +100,6 @@ export async function fetchReputation(developerId: string) {
   const { data, error } = await supabase.rpc("compute_reputation", { _developer: developerId });
   if (error) throw error;
   return Number(data ?? 0);
-}
-
-export function reputationTier(score: number) {
-  if (score >= 80) return "Elite";
-  if (score >= 60) return "Trusted";
-  if (score >= 35) return "Rising";
-  return "New";
 }
 
 export const SUBSCRIPTION_BENEFITS = [
