@@ -9,6 +9,7 @@ import { ListingCard, ListingTile } from "@/components/ListingCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { CATEGORIES, type Listing } from "@/lib/store";
+import { matchesSearch, matchesListingFilters, topByNumber } from "@/shared/mas-core";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
@@ -109,19 +110,11 @@ function StorePage() {
   const listings = useMemo(
     () =>
       (data ?? []).filter((l) => {
-        const matchesSearch =
-          !normalizedSearch ||
-          l.name.toLowerCase().includes(normalizedSearch) ||
-          (l.tagline ?? "").toLowerCase().includes(normalizedSearch) ||
-          (l.description ?? "").toLowerCase().includes(normalizedSearch) ||
-          l.category.toLowerCase().includes(normalizedSearch) ||
-          l.kind.toLowerCase().includes(normalizedSearch) ||
-          (l.developer?.developer_name ?? l.developer?.display_name ?? "")
-            .toLowerCase()
-            .includes(normalizedSearch);
-        const matchesKind = kind === "all" || l.kind === kind;
-        const matchesCategory = category === "All" || l.category === category;
-        return matchesSearch && matchesKind && matchesCategory;
+        const matchesText = matchesSearch(
+          [l.name, l.tagline, l.description, l.category, l.kind, l.developer?.developer_name, l.developer?.display_name],
+          normalizedSearch,
+        );
+        return matchesText && matchesListingFilters(l, { kind, category });
       }),
     [data, normalizedSearch, kind, category],
   );
@@ -129,14 +122,11 @@ function StorePage() {
   const hasFilters = normalizedSearch !== "" || kind !== "all" || category !== "All";
   const browsing = !hasFilters;
   const topCharts = useMemo(
-    () => [...listings].sort((a, b) => b.downloads - a.downloads).slice(0, 8),
+    () => topByNumber(listings, (listing) => listing.downloads),
     [listings],
   );
   const topRated = useMemo(
-    () =>
-      [...listings]
-        .sort((a, b) => b.rating_avg * b.rating_count - a.rating_avg * a.rating_count)
-        .slice(0, 8),
+    () => topByNumber(listings, (listing) => listing.rating_avg * listing.rating_count),
     [listings],
   );
   const fresh = useMemo(() => listings.slice(0, 8), [listings]);
