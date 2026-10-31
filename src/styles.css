@@ -249,3 +249,68 @@
     padding-bottom: calc(7rem + env(safe-area-inset-bottom));
   }
 }
+
+
+/* Device-aware layout safeguards across the MAS web experience. */
+html {
+  min-height: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: clip;
+}
+
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  overflow-x: clip;
+}
+
+img, video, canvas, svg {
+  max-width: 100%;
+}
+
+button, input, textarea, select {
+  max-width: 100%;
+}
+
+@media (max-width: 767px) {
+  .mas-mobile-main {
+    padding-left: max(0.75rem, env(safe-area-inset-left));
+    padding-right: max(0.75rem, env(safe-area-inset-right));
+  }
+
+  [data-mobile="true"] {
+    max-width: calc(100vw - 1rem);
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+@media (max-width: 380px) {
+  .mas-mobile-main {
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .mas-tablet-content {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+  [data-mobile="true"] {
+    padding-top: max(0.75rem, env(safe-area-inset-top));
+  }
+}

@@ -160,7 +160,7 @@ export function ConsoleShell({
 
   return (
     <div className="console-square flex min-h-screen bg-muted/40">
-      <aside className="sticky top-0 hidden h-screen w-[264px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar px-4 py-5 lg:flex">
+      <aside className="sticky top-0 hidden h-screen w-[264px] shrink-0 flex-col overflow-hidden border-r border-sidebar-border bg-sidebar px-4 py-5 xl:flex">
         <Link to="/console" className="mb-6 flex items-center gap-2.5 rounded-2xl px-2 py-1.5">
           <img src={logo} alt="" width={32} height={32} className="h-8 w-8" />
           <span className="font-display text-sm font-bold leading-tight">
@@ -170,7 +170,7 @@ export function ConsoleShell({
             </span>
           </span>
         </Link>
-        <NavList />
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain"><NavList /></div>
         <div className="mt-auto space-y-1 pt-4">
           <Link
             to="/console/assistant"
@@ -195,18 +195,18 @@ export function ConsoleShell({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="lg:hidden"
+                  className="xl:hidden"
                   aria-label="Open console menu"
                 >
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-[260px] bg-sidebar p-3">
-                <SheetTitle className="mb-4 flex items-center gap-2 px-2 font-display text-sm">
+              <SheetContent side="left" className="flex w-[min(18rem,calc(100vw-1rem))] max-w-[calc(100vw-1rem)] flex-col overflow-y-auto bg-sidebar p-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+                <SheetTitle className="mb-4 flex shrink-0 items-center gap-2 px-2 font-display text-sm">
                   <img src={logo} alt="" width={24} height={24} className="h-6 w-6" />
                   Developer console
                 </SheetTitle>
-                <NavList onNavigate={() => setDrawer(false)} />
+                <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain"><NavList onNavigate={() => setDrawer(false)} /></div>
                 <div className="mt-4 space-y-1 border-t border-border pt-3">
                   <Link
                     to="/console/assistant"
