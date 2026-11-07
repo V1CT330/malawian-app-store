@@ -30,7 +30,6 @@ import {
 import { toast } from "sonner";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
-import { DemoPreview } from "@/components/DemoPreview";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useProfile, useSignedUrl, useUnreadCount } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
@@ -793,9 +792,6 @@ function SocialPage() {
           })}
         </nav>
 
-        {userId && !profilesQuery.isLoading && !(profilesQuery.data ?? []).some((person) => person.id !== userId) && activeSection === "Friends" && <DemoPreview title="Friends · sample view" description="Example member cards to preview a populated community." items={[{ title: "Tadala Phiri", detail: "Frontend developer · Blantyre", metric: "Interested in web apps", status: "Sample member" }, { title: "Chisomo Banda", detail: "Product designer · Lilongwe", metric: "Building education tools", status: "Sample member" }, { title: "Thoko Mbewe", detail: "Student developer · Zomba", metric: "Interested in beta testing", status: "Sample member" }]} />}
-        {userId && !profilesQuery.isLoading && !(profilesQuery.data ?? []).some((person) => person.id !== userId) && activeSection === "Search" && <DemoPreview title="Member search · sample view" description="Example results showing how member search can look." items={[{ title: "Tadala Phiri", detail: "Frontend developer · React and TypeScript", status: "Sample profile" }, { title: "Chisomo Banda", detail: "UI/UX designer · Education products", status: "Sample profile" }]} />}
-        {userId && !profilesQuery.isLoading && !(profilesQuery.data ?? []).some((person) => person.id !== userId) && activeSection === "Messages" && <DemoPreview title="Messages · sample view" description="Illustrative conversations only. These messages are not sent and cannot be replied to." items={[{ title: "Tadala Phiri", detail: "“I’d be happy to test your next release.”", metric: "Yesterday · sample conversation", status: "Demo" }, { title: "Chisomo Banda", detail: "“I have a few ideas for the app listing design.”", metric: "Monday · sample conversation", status: "Demo" }]} />}
         <main className="min-h-[220px] w-full min-w-0 max-w-full overflow-x-clip">
           {!userId ? (
             <div className="px-4 py-8 text-sm text-muted-foreground">Sign in to use Social.</div>
@@ -1054,7 +1050,6 @@ function SocialPage() {
                     </article>
                   ))
                 ) : (
-                  <div className="px-4 py-7 text-center"><p className="text-sm font-medium">No posts yet</p><p className="mt-1 text-sm text-muted-foreground">Share an update from the Feed tab to get started.</p><button type="button" onClick={() => setActiveSection("Feed")} className="mt-3 border border-border px-3 py-2 text-sm hover:bg-secondary">Create a post</button><DemoPreview title="Profile posts · sample view" description="Examples of updates a developer might share." items={[{ title: "Mlimi Connect is live", detail: "We’ve launched a new way to organise farm activities.", metric: "12 reactions · 3 comments", status: "Sample post" }, { title: "Looking for beta testers", detail: "Help test the next Campus Hub release.", metric: "6 replies · 2 shares", status: "Sample post" }]} /></div>
                 )}
               </section>
             </div>
