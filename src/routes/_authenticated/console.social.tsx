@@ -717,12 +717,12 @@ function SocialPage() {
             <div className="px-4 py-8 text-sm text-muted-foreground">Sign in to use Social.</div>
           ) : activeSection === "Feed" ? (
             <div className="w-full space-y-0 pb-0 pt-0">
-              <form onSubmit={submitPost} className="w-full border-y border-border/80 bg-background px-4 py-3 sm:px-5">
+              <form onSubmit={submitPost} className="w-full border-y border-border/80 bg-background px-4 py-2 sm:px-5">
                 <div className="flex items-start gap-3">
                   <Avatar profile={profile as SocialProfile | null} />
                   <div className="min-w-0 flex-1">
                     <label htmlFor="social-post" className="sr-only">Write a post</label>
-                    <textarea id="social-post" value={postDraft} onChange={(event) => setPostDraft(event.target.value)} maxLength={2000} rows={3} placeholder="What would you like to share?" className="min-h-24 w-full resize-y rounded-2xl border border-border/70 bg-muted/30 p-3.5 text-sm leading-6 outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/10" />
+                    <textarea id="social-post" value={postDraft} onChange={(event) => setPostDraft(event.target.value)} maxLength={2000} rows={1} placeholder="What would you like to share?" className="min-h-12 w-full resize-y rounded-full border border-border/70 bg-muted/30 px-4 py-2.5 text-sm leading-5 outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/10" />
                     <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
                       <div className="flex min-w-0 flex-wrap items-center gap-3">
                         <label className="flex cursor-pointer items-center gap-2 border border-border/80 px-3 py-2 text-xs font-medium transition-colors hover:bg-muted focus-within:ring-2 focus-within:ring-ring">
@@ -732,7 +732,7 @@ function SocialPage() {
                         {postMedia && <span className="max-w-[170px] truncate text-xs text-muted-foreground">{postMedia.name}<button type="button" onClick={() => setPostMedia(null)} className="ml-2 underline">Remove</button></span>}
                         <span className="text-xs text-muted-foreground">{postDraft.length}/2000</span>
                       </div>
-                      <button type="submit" disabled={!postDraft.trim() || createPost.isPending} className="flex items-center gap-2 bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
+                      <button type="submit" disabled={!postDraft.trim() || createPost.isPending} className="flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
                         <Send className="h-4 w-4" /> {createPost.isPending ? "Posting…" : "Post"}
                       </button>
                     </div>
