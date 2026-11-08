@@ -131,6 +131,7 @@ function SocialPage() {
   const [activeSection, setActiveSection] = useState<SectionId>("Feed");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [postDraft, setPostDraft] = useState("");
+  const [isComposerOpen, setIsComposerOpen] = useState(false);
   const [postMedia, setPostMedia] = useState<File | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRecipient, setSelectedRecipient] = useState<string | null>(null);
@@ -417,6 +418,7 @@ function SocialPage() {
     onSuccess: async () => {
       setPostDraft("");
       setPostMedia(null);
+      setIsComposerOpen(false);
       await invalidateSocial(["social", "posts"], ["social", "reactions"], ["social", "comments"]);
       toast.success("Post shared");
     },
@@ -690,6 +692,7 @@ function SocialPage() {
       </Sheet>
 
       <section className="min-h-[calc(100vh-4rem)] w-full min-w-0 max-w-full overflow-x-clip border-b border-border/70 bg-background">
+        {!isComposerOpen && <>
         <div className="flex items-center justify-between gap-2 bg-background px-4 py-3.5 sm:px-6">
           <div>
              <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">Social</h1>
@@ -711,13 +714,56 @@ function SocialPage() {
             );
           })}
         </nav>
+        </>}
 
         <main className="min-h-[220px] w-full min-w-0 max-w-full overflow-x-clip">
           {!userId ? (
             <div className="px-4 py-8 text-sm text-muted-foreground">Sign in to use Social.</div>
           ) : activeSection === "Feed" ? (
+            isComposerOpen ? (
+              <div className="flex min-h-[calc(100dvh-2rem)] flex-col bg-background">
+                <header className="flex h-16 shrink-0 items-center justify-between border-b border-border px-4">
+                  <div className="flex items-center gap-3">
+                    <button type="button" onClick={() => setIsComposerOpen(false)} aria-label="Back to feed" className="flex h-10 w-10 items-center justify-center rounded-full text-foreground hover:bg-muted">
+                      <ArrowLeft className="h-6 w-6" />
+                    </button>
+                    <h1 className="text-xl font-bold">Create post</h1>
+                  </div>
+                  <button type="submit" form="social-create-post" disabled={!postDraft.trim() || createPost.isPending} className="rounded-full px-3 py-2 text-base font-bold text-primary disabled:text-muted-foreground disabled:opacity-60">
+                    {createPost.isPending ? "Posting…" : "Post"}
+                  </button>
+                </header>
+                <form id="social-create-post" onSubmit={submitPost} className="flex min-h-0 flex-1 flex-col">
+                  <div className="flex shrink-0 items-center gap-3 border-b border-border px-4 py-4">
+                    <Avatar profile={profile as SocialProfile | null} />
+                    <div className="min-w-0">
+                      <p className="truncate text-base font-bold">{displayName(profile as SocialProfile | null)}</p>
+                      <span className="mt-1 inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1.5 text-xs font-semibold"><Globe className="h-4 w-4" /> Public <span aria-hidden="true">▾</span></span>
+                    </div>
+                  </div>
+                  <label htmlFor="social-post" className="sr-only">What's on your mind?</label>
+                  <textarea id="social-post" autoFocus value={postDraft} onChange={(event) => setPostDraft(event.target.value)} maxLength={2000} placeholder="What's on your mind?" className="min-h-[38vh] w-full flex-1 resize-none border-0 bg-muted/70 px-5 py-5 text-2xl leading-relaxed outline-none placeholder:text-muted-foreground focus:ring-0 sm:text-3xl" />
+                  <div className="shrink-0 space-y-3 border-t border-border bg-background px-4 py-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <label className="flex min-h-12 flex-1 cursor-pointer items-center gap-3 rounded-xl px-2 text-base font-medium transition-colors hover:bg-muted">
+                        <ImagePlus className="h-6 w-6 text-green-600" /> Photos/videos
+                        <input type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" className="sr-only" onChange={(event) => setPostMedia(event.target.files?.[0] ?? null)} />
+                      </label>
+                      <span className="text-xs tabular-nums text-muted-foreground">{postDraft.length}/2000</span>
+                    </div>
+                    {postMedia && <div className="flex items-center gap-2 rounded-lg bg-muted px-3 py-2 text-sm"><span className="min-w-0 flex-1 truncate">{postMedia.name}</span><button type="button" onClick={() => setPostMedia(null)} className="text-sm font-medium text-destructive">Remove</button></div>}
+                    <button type="submit" disabled={!postDraft.trim() || createPost.isPending} className="w-full rounded-xl bg-blue-600 px-5 py-3.5 text-base font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
+                      {createPost.isPending ? "Posting…" : "Post"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            ) : (
             <div className="w-full space-y-0 pb-0 pt-0">
-              <form onSubmit={submitPost} className="w-full border-y border-border/80 bg-background px-4 py-2 sm:px-5">
+              <button type="button" onClick={() => setIsComposerOpen(true)} className="flex w-full items-center gap-3 border-y border-border/80 bg-background px-4 py-3 text-left sm:px-5">
+                <Avatar profile={profile as SocialProfile | null} />
+                <span className="min-w-0 flex-1 rounded-full border border-border/70 bg-muted/30 px-4 py-3 text-sm text-muted-foreground">What's on your mind?</span>
+              </button>
                 <div className="flex items-start gap-3">
                   <Avatar profile={profile as SocialProfile | null} />
                   <div className="min-w-0 flex-1">
@@ -738,7 +784,7 @@ function SocialPage() {
                     </div>
                   </div>
                 </div>
-              </form>
+
 
               {postsQuery.isLoading ? <p className="px-4 py-8 text-sm text-muted-foreground">Loading feed…</p> : postsQuery.isError ? (
                 <p role="alert" className="px-4 py-8 text-sm text-destructive">The feed could not load. The social database migration may not have been applied yet.</p>
@@ -819,6 +865,7 @@ function SocialPage() {
                 </div>
               )}
             </div>
+            )
           ) : activeSection === "My Profile" ? (
             <div className="mx-auto w-full max-w-3xl space-y-3 px-0 pb-8 pt-0 sm:px-4">
               <section className="border-y border-border bg-background sm:border-x">
