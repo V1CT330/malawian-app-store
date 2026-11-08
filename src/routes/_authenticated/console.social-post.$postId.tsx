@@ -265,7 +265,7 @@ function SocialPostDiscussionPage() {
         <div className="flex min-w-0 items-start gap-2.5 py-3">
           <Avatar profile={author} size="sm" />
           <div className="min-w-0 flex-1">
-            <div className="rounded-2xl bg-muted/60 px-3 py-2">
+            <div className="rounded-3xl bg-muted/60 px-3 py-2">
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                 <span className="text-xs font-semibold">{displayName(author)}</span>
                 <time className="text-[10px] text-muted-foreground" dateTime={comment.created_at}>{new Date(comment.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</time>
