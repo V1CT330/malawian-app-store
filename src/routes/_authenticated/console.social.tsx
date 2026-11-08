@@ -699,7 +699,7 @@ function SocialPage() {
           <div className="flex min-w-0 items-center gap-3">
              <img src={logo} alt="Malawian App Store" width={32} height={32} className="h-8 w-8 shrink-0 [filter:brightness(0)_saturate(100%)_invert(24%)_sepia(91%)_saturate(2550%)_hue-rotate(202deg)_brightness(96%)_contrast(102%)]" />
              <div className="min-w-0">
-               <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">Social</h1>
+               <h1 className="text-xl font-semibold tracking-tight text-[#1877F2] sm:text-2xl">Social</h1>
                <p className="mt-0.5 hidden text-xs text-muted-foreground sm:block">Connect, share, and discover the MAS community.</p>
              </div>
           </div>
