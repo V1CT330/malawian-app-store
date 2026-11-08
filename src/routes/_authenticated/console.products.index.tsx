@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { LayoutList, PlusCircle, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 
+import { AppIcon } from "@/components/ListingCard";
 import { ConsoleShell } from "@/components/console/ConsoleShell";
 import { EmptyState, RowSkeletons, StatusPill } from "@/components/console/primitives";
 import { Button } from "@/components/ui/button";
@@ -134,11 +135,7 @@ function ProductsPage() {
                 params={{ id: l.id }}
                 className="flex items-center gap-3"
               >
-                <img
-                  src={l.icon_url ?? "/favicon.png"}
-                  alt=""
-                  className="h-12 w-12 rounded-2xl object-cover"
-                />
+                <AppIcon path={l.icon_url} name={l.name} className="h-12 w-12 rounded-2xl" />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium">{l.name}</p>
                   <p className="text-xs text-muted-foreground">
