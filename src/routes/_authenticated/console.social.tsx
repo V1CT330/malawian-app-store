@@ -689,7 +689,7 @@ function SocialPage() {
         </SheetContent>
       </Sheet>
 
-      <section className="min-h-[calc(100vh-4rem)] w-full min-w-0 max-w-full overflow-x-clip border-b border-border/70 bg-muted/30">
+      <section className="min-h-[calc(100vh-4rem)] w-full min-w-0 max-w-full overflow-x-clip border-b border-border/70 bg-background">
         <div className="flex items-center justify-between gap-2 bg-background px-4 py-3.5 sm:px-6">
           <div>
              <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">Social</h1>
@@ -716,7 +716,7 @@ function SocialPage() {
           {!userId ? (
             <div className="px-4 py-8 text-sm text-muted-foreground">Sign in to use Social.</div>
           ) : activeSection === "Feed" ? (
-            <div className="w-full space-y-1 pb-6 pt-0">
+            <div className="w-full space-y-0 pb-6 pt-0">
               <form onSubmit={submitPost} className="w-full border-y border-border/80 bg-background px-4 py-3 sm:px-5">
                 <div className="flex items-start gap-3">
                   <Avatar profile={profile as SocialProfile | null} />
@@ -754,7 +754,7 @@ function SocialPage() {
                 const reacted = postReactions.some((reaction) => reaction.user_id === userId);
                 const postComments = commentsByPost.get(post.id) ?? [];
                 return (
-                  <article key={post.id} className="relative w-full min-w-0 overflow-x-clip border-y border-border/80 bg-background px-4 py-4 shadow-sm sm:px-5">
+                  <article key={post.id} className="relative w-full min-w-0 overflow-x-clip border-b border-border/80 bg-background px-4 py-4 sm:px-5">
                     <div className="flex items-start gap-3">
                       <Avatar profile={author} />
                       <div className="min-w-0 flex-1">
@@ -782,10 +782,10 @@ function SocialPage() {
                     {post.media_url && post.media_type === "image" && <div className="mb-4 flex w-full min-w-0 justify-center overflow-hidden bg-muted/20"><img src={post.media_url} alt="Post attachment" loading="lazy" className="block h-auto max-h-[70svh] sm:max-h-[min(75vh,720px)] w-full max-w-full object-contain object-center" /></div>}
                     {post.media_url && post.media_type === "video" && <div className="mb-4 flex w-full min-w-0 justify-center overflow-hidden bg-black"><video src={post.media_url} controls preload="metadata" className="block h-auto max-h-[70svh] sm:max-h-[min(75vh,720px)] w-full max-w-full object-contain object-center" aria-label="Post video attachment" /></div>}
                     <div className="relative flex items-center justify-around gap-2 py-2.5 text-sm text-muted-foreground after:absolute after:bottom-0 after:left-[-1rem] after:right-[-1rem] after:border-b after:border-border sm:after:left-[-1.25rem] sm:after:right-[-1.25rem]">
-                      <button type="button" disabled={toggleReaction.isPending} onClick={() => toggleReaction.mutate({ postId: post.id, reacted })} className={cn("flex flex-1 items-center justify-center gap-2 rounded-full px-3 py-2 transition-colors hover:bg-muted hover:text-foreground", reacted && "bg-destructive/10 text-destructive")} aria-label={reacted ? "Unlike post" : "Like post"} aria-pressed={reacted}>
+                      <button type="button" disabled={toggleReaction.isPending} onClick={() => toggleReaction.mutate({ postId: post.id, reacted })} className={cn("flex flex-1 items-center justify-center gap-2 rounded-full bg-muted px-3 py-2 transition-colors hover:bg-muted/80 hover:text-foreground", reacted && "text-destructive")} aria-label={reacted ? "Unlike post" : "Like post"} aria-pressed={reacted}>
                         <Heart className={cn("h-5 w-5", reacted && "fill-current")} /> <span>{postReactions.length}</span>
                       </button>
-                      <Link to="/console/social-post/$postId" params={{ postId: post.id }} state={{ fromSocialFeed: true }} aria-label={postComments.length + " comments. Open discussion"} title={postComments.length + " comments"} className="flex flex-1 items-center justify-center gap-2 rounded-full px-3 py-2 transition-colors hover:bg-muted hover:text-foreground"><MessageCircle className="h-5 w-5" /></Link>
+                      <Link to="/console/social-post/$postId" params={{ postId: post.id }} state={{ fromSocialFeed: true }} aria-label={postComments.length + " comments. Open discussion"} title={postComments.length + " comments"} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-muted px-3 py-2 transition-colors hover:bg-muted/80 hover:text-foreground"><MessageCircle className="h-5 w-5" /></Link>
                       <button type="button" aria-label="Share post" title="Share post" onClick={() => {
                         const shareText = post.body + "\n\n" + window.location.origin + "/console/social";
                         if (navigator.share) {
@@ -793,7 +793,7 @@ function SocialPage() {
                         } else {
                           void navigator.clipboard.writeText(shareText).then(() => toast.success("Post copied for sharing")).catch(() => toast.error("Could not copy post"));
                         }
-                      }} className="flex flex-1 items-center justify-center gap-2 rounded-full px-3 py-2 transition-colors hover:bg-muted hover:text-foreground"><FacebookShareIcon className="h-5 w-5" /></button>
+                      }} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-muted px-3 py-2 transition-colors hover:bg-muted/80 hover:text-foreground"><FacebookShareIcon className="h-5 w-5" /></button>
                     </div>
                   </article>
                 );
