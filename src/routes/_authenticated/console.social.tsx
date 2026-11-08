@@ -17,7 +17,6 @@ import {
   Menu,
   MessageCircle,
   MoreHorizontal,
-  Pencil,
   Package,
   Plus,
   Search,
@@ -133,9 +132,6 @@ function SocialPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [postDraft, setPostDraft] = useState("");
   const [postMedia, setPostMedia] = useState<File | null>(null);
-  const [commentDrafts, setCommentDrafts] = useState<Record<string, string>>({});
-  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
-  const [editingCommentDraft, setEditingCommentDraft] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRecipient, setSelectedRecipient] = useState<string | null>(null);
   const [messageDraft, setMessageDraft] = useState("");
@@ -467,71 +463,6 @@ function SocialPage() {
     onError: (error: Error) => toast.error(error.message || "Could not update reaction"),
   });
 
-  const addComment = useMutation({
-    mutationFn: async ({ postId, body }: { postId: string; body: string }) => {
-      const { error } = await socialDb
-        .from("social_post_comments")
-        .insert({ post_id: postId, author_id: userId, body: body.trim() });
-      if (error) throw error;
-    },
-    onSuccess: async (_result, variables) => {
-      setCommentDrafts((current) => ({ ...current, [variables.postId]: "" }));
-      await queryClient.invalidateQueries({ queryKey: ["social", "comments"] });
-    },
-    onError: (error: Error) => toast.error(error.message || "Could not add comment"),
-  });
-
-  const editComment = useMutation({
-    mutationFn: async ({ commentId, body }: { commentId: string; body: string }) => {
-      const nextBody = body.trim();
-      if (!nextBody) throw new Error("A comment cannot be empty");
-      if (nextBody.length > 1000) throw new Error("Comments must be 1,000 characters or fewer");
-      const comment = (commentsQuery.data ?? []).find((item) => item.id === commentId);
-      if (!comment || comment.author_id !== userId) throw new Error("You can only edit your own comments");
-      const { data, error } = await socialDb
-        .from("social_post_comments")
-        .update({ body: nextBody })
-        .eq("id", commentId)
-        .eq("author_id", userId)
-        .select("id")
-        .maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error("Comment was not updated. Refresh and try again.");
-    },
-    onSuccess: async () => {
-      setEditingCommentId(null);
-      setEditingCommentDraft("");
-      await queryClient.invalidateQueries({ queryKey: ["social", "comments"] });
-      toast.success("Comment updated");
-    },
-    onError: (error: Error) => toast.error(error.message || "Could not edit comment"),
-  });
-
-  const deleteComment = useMutation({
-    mutationFn: async (commentId: string) => {
-      const comment = (commentsQuery.data ?? []).find((item) => item.id === commentId);
-      if (!comment || comment.author_id !== userId) throw new Error("You can only delete your own comments");
-      const { data, error } = await socialDb
-        .from("social_post_comments")
-        .delete()
-        .eq("id", commentId)
-        .eq("author_id", userId)
-        .select("id")
-        .maybeSingle();
-      if (error) throw error;
-      if (!data) throw new Error("Comment was not deleted. Refresh and try again.");
-    },
-    onSuccess: async () => {
-      if (editingCommentId) {
-        setEditingCommentId(null);
-        setEditingCommentDraft("");
-      }
-      await queryClient.invalidateQueries({ queryKey: ["social", "comments"] });
-      toast.success("Comment deleted");
-    },
-    onError: (error: Error) => toast.error(error.message || "Could not delete comment"),
-  });
-
   const sendConnection = useMutation({
     mutationFn: async (recipientId: string) => {
       const existing = relationshipMap.get(recipientId);
@@ -657,17 +588,6 @@ function SocialPage() {
       }
     }
     createPost.mutate({ body, file: postMedia });
-  }
-
-  function submitComment(event: FormEvent<HTMLFormElement>, postId: string) {
-    event.preventDefault();
-    const body = (commentDrafts[postId] ?? "").trim();
-    if (!body) return;
-    if (body.length > 1000) {
-      toast.error("Comments must be 1,000 characters or fewer");
-      return;
-    }
-    addComment.mutate({ postId, body });
   }
 
   function submitMessage(event: FormEvent<HTMLFormElement>) {
@@ -865,7 +785,7 @@ function SocialPage() {
                       <button type="button" disabled={toggleReaction.isPending} onClick={() => toggleReaction.mutate({ postId: post.id, reacted })} className={cn("flex flex-1 items-center justify-center gap-2 px-2 py-1.5 transition-colors hover:text-foreground", reacted && "text-destructive")} aria-label={reacted ? "Unlike post" : "Like post"} aria-pressed={reacted}>
                         <Heart className={cn("h-5 w-5", reacted && "fill-current")} /> <span>{postReactions.length}</span>
                       </button>
-                      <Link to="/console/social-post/$postId" params={{ postId: post.id }} aria-label={postComments.length + " comments. Open discussion"} className="flex flex-1 items-center justify-center gap-2 px-2 py-1.5 transition-colors hover:text-foreground"><MessageCircle className="h-5 w-5" /> <span>{postComments.length}</span></Link>
+                      <Link to="/console/social-post/$postId" params={{ postId: post.id }} aria-label={postComments.length + " comments. Open discussion"} className="flex flex-1 items-center justify-center gap-2 px-2 py-1.5 transition-colors hover:text-foreground"><MessageCircle className="h-5 w-5" /> <span>Comment · {postComments.length}</span></Link>
                       <button type="button" aria-label="Share post" title="Share post" onClick={() => {
                         const shareText = post.body + "\n\n" + window.location.origin + "/console/social";
                         if (navigator.share) {
