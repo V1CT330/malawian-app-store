@@ -754,7 +754,7 @@ function SocialPage() {
                 const reacted = postReactions.some((reaction) => reaction.user_id === userId);
                 const postComments = commentsByPost.get(post.id) ?? [];
                 return (
-                  <article key={post.id} className="relative w-full min-w-0 overflow-x-clip border-b-[3px] border-muted-foreground/30 bg-background px-4 py-0 sm:px-5">
+                  <article key={post.id} className="relative w-full min-w-0 overflow-x-clip border-b-[3px] border-muted-foreground/30 bg-background px-4 pt-3 pb-0 sm:px-5">
                     <div className="flex items-start gap-3">
                       <Avatar profile={author} />
                       <div className="min-w-0 flex-1">
