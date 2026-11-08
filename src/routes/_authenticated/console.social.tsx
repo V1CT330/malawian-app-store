@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
+import { AppIcon } from "@/components/ListingCard";
 import { ConsoleShell } from "@/components/console/ConsoleShell";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useProfile, useSignedUrl, useUnreadCount } from "@/hooks/useSession";
@@ -934,7 +935,7 @@ function SocialPage() {
                   ) : myListingsQuery.data?.length ? (
                     <div>{myListingsQuery.data.map((listing) => (
                       <a key={listing.id} href={`/apps/${listing.slug}`} className="flex items-center gap-3 border-b border-border px-4 py-3 last:border-b-0 hover:bg-muted/40">
-                        {listing.icon_url ? <img src={listing.icon_url} alt="" loading="lazy" className="h-11 w-11 shrink-0 object-cover" /> : <span className="flex h-11 w-11 shrink-0 items-center justify-center bg-secondary"><Package className="h-5 w-5" /></span>}
+                        <AppIcon path={listing.icon_url} name={listing.name} className="h-11 w-11 rounded-xl" />
                         <span className="min-w-0 flex-1"><span className="block truncate text-sm font-semibold">{listing.name}</span><span className="mt-0.5 block truncate text-xs text-muted-foreground">{listing.tagline || (listing.kind === "app" ? "App" : "Website")}</span></span>
                         <span className="shrink-0 text-right text-xs text-muted-foreground">{listing.downloads ?? 0} downloads</span>
                       </a>
@@ -1057,7 +1058,7 @@ function SocialPage() {
                     <h2 className="mb-2 text-sm font-semibold">Published apps ({searchedListings.length})</h2>
                     <div className="divide-y divide-border border-y border-border bg-background">
                       {searchedListings.map((listing) => <article key={listing.id} className="flex items-center gap-3 px-4 py-3">
-                        {listing.icon_url ? <img src={listing.icon_url} alt="" loading="lazy" className="h-10 w-10 rounded-lg object-cover" /> : <Package className="h-10 w-10 rounded-lg bg-muted p-2 text-muted-foreground" />}
+                        <AppIcon path={listing.icon_url} name={listing.name} className="h-10 w-10 rounded-lg" />
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-semibold">{listing.name}</p>
                           <p className="text-xs text-muted-foreground">{listing.tagline || listing.kind || "Published MAS listing"}</p>
