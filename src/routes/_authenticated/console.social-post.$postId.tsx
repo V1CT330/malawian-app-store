@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
 import { useProfile, useSignedUrl } from "@/hooks/useSession";
+import logo from "@/assets/logo-mark.png";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -299,6 +300,9 @@ function SocialPostDiscussionPage() {
     <ConsoleShell title="Social" description="Post discussion" hideTopBar hideTitleCard fullWidth>
       <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-3xl flex-col border-x-0 border-border bg-background sm:border-x">
         <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-border bg-background/95 px-4 py-3 backdrop-blur">
+          <Link to="/" aria-label="Malawian App Store home" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-background">
+            <img src={logo} alt="Malawian App Store" width={32} height={32} className="h-8 w-8 object-contain" />
+          </Link>
           <button type="button" onClick={() => { if (fromSocialFeed && window.history.length > 1) window.history.back(); else void navigate({ to: "/console/social" }); }} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground" aria-label="Back to Social feed"><ArrowLeft className="h-5 w-5" /></button>
           <div className="min-w-0"><h1 className="font-semibold">Post discussion</h1><p className="text-xs text-muted-foreground">{(commentsQuery.data ?? []).length} comments</p></div>
         </header>
