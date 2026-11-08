@@ -932,6 +932,7 @@ function SocialPage() {
                     </article>
                   ))
                 ) : (
+                  <p className="px-4 py-5 text-sm text-muted-foreground">You haven't shared any posts yet.</p>
                 )}
               </section>
             </div>
