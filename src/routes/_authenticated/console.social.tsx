@@ -785,7 +785,7 @@ function SocialPage() {
                       <button type="button" disabled={toggleReaction.isPending} onClick={() => toggleReaction.mutate({ postId: post.id, reacted })} className={cn("flex flex-1 items-center justify-center gap-2 px-2 py-1.5 transition-colors hover:text-foreground", reacted && "text-destructive")} aria-label={reacted ? "Unlike post" : "Like post"} aria-pressed={reacted}>
                         <Heart className={cn("h-5 w-5", reacted && "fill-current")} /> <span>{postReactions.length}</span>
                       </button>
-                      <Link to="/console/social-post/$postId" params={{ postId: post.id }} state={{ fromSocialFeed: true }} aria-label={postComments.length + " comments. Open discussion"} className="flex flex-1 items-center justify-center gap-2 px-2 py-1.5 transition-colors hover:text-foreground"><MessageCircle className="h-5 w-5" /> <span>Comment · {postComments.length}</span></Link>
+                      <Link to="/console/social-post/$postId" params={{ postId: post.id }} state={{ fromSocialFeed: true }} aria-label={postComments.length + " comments. Open discussion"} title={postComments.length + " comments"} className="flex flex-1 items-center justify-center gap-2 px-2 py-1.5 transition-colors hover:text-foreground"><MessageCircle className="h-5 w-5" /></Link>
                       <button type="button" aria-label="Share post" title="Share post" onClick={() => {
                         const shareText = post.body + "\n\n" + window.location.origin + "/console/social";
                         if (navigator.share) {
