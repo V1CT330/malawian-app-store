@@ -31,6 +31,7 @@ import { toast } from "sonner";
 import { ConsoleShell } from "@/components/console/ConsoleShell";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useProfile, useSignedUrl, useUnreadCount } from "@/hooks/useSession";
+import logo from "@/assets/logo-mark.png";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { SocialNotificationsPanel } from "@/components/console/SocialNotificationsPanel";
@@ -694,10 +695,15 @@ function SocialPage() {
       <section className="min-h-[calc(100vh-4rem)] w-full min-w-0 max-w-full overflow-x-clip border-b border-border/70 bg-background">
         {!isComposerOpen && <>
         <div className="flex items-center justify-between gap-2 bg-background px-4 py-3.5 sm:px-6">
-          <div>
+          <div className="flex min-w-0 items-center gap-3">
+            <Link to="/" aria-label="Malawian App Store home" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-background">
+              <img src={logo} alt="Malawian App Store" width={36} height={36} className="h-9 w-9 object-contain" />
+            </Link>
+            <div>
              <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">Social</h1>
              <p className="mt-0.5 hidden text-xs text-muted-foreground sm:block">Connect, share, and discover the MAS community.</p>
-           </div>
+            </div>
+          </div>
           <button type="button" onClick={() => setSidebarOpen(true)} aria-label="Open sidebar menu" title="Sidebar menu" className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <Menu className="h-5 w-5" aria-hidden="true" />
           </button>
