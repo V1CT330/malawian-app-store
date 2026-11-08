@@ -226,7 +226,7 @@ export function ConsoleShell({
               </SheetContent>
             </Sheet>
 
-            <Link to="/console" aria-label="Malawian App Store developer home" className="lg:hidden flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-background">
+            <Link to="/console" aria-label="Malawian App Store developer home" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-background">
               <img src={logo} alt="Malawian App Store" width={32} height={32} className="h-8 w-8 object-contain" />
             </Link>
             <div className="min-w-0 flex-1">
