@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip, Line, LineChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
+import { AppIcon } from "@/components/ListingCard";
 import { ConsoleShell } from "@/components/console/ConsoleShell";
 import {
   EmptyState,
@@ -298,7 +299,7 @@ function ConsoleDashboard() {
                 {listings.slice(0, 5).map((listing) => (
                   <li key={listing.id}>
                     <Link to="/console/products/$id" params={{ id: listing.id }} className="flex items-center gap-3 py-3 hover:bg-muted/40">
-                      <img src={listing.icon_url ?? "/favicon.png"} alt="" className="h-11 w-11 rounded-none border border-border object-cover" />
+                      <AppIcon path={listing.icon_url} name={listing.name} className="h-11 w-11 rounded-xl" />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium">{listing.name}</p>
                         <p className="mt-1 text-xs text-muted-foreground">{listing.downloads} {metricLabel(listing.kind)} · {listing.rating_count} ratings</p>
