@@ -798,6 +798,26 @@ function SocialPage() {
                   </article>
                 );
               })}
+              {postsQuery.data?.length > 0 && (
+                <div aria-hidden="true" className="space-y-3 border-b-[3px] border-muted-foreground/30 bg-background px-4 py-5 sm:px-5">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 shrink-0 animate-pulse rounded-full bg-muted" />
+                    <div className="min-w-0 flex-1 space-y-2">
+                      <div className="h-3 w-32 animate-pulse rounded-full bg-muted" />
+                      <div className="h-2.5 w-20 animate-pulse rounded-full bg-muted" />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-3 w-full animate-pulse rounded-full bg-muted" />
+                    <div className="h-3 w-4/5 animate-pulse rounded-full bg-muted" />
+                  </div>
+                  <div className="flex gap-2 pt-1">
+                    <div className="h-9 flex-1 animate-pulse rounded-full bg-muted" />
+                    <div className="h-9 flex-1 animate-pulse rounded-full bg-muted" />
+                    <div className="h-9 flex-1 animate-pulse rounded-full bg-muted" />
+                  </div>
+                </div>
+              )}
             </div>
           ) : activeSection === "My Profile" ? (
             <div className="mx-auto w-full max-w-3xl space-y-3 px-0 pb-8 pt-0 sm:px-4">
