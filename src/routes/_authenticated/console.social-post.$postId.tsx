@@ -249,7 +249,10 @@ function SocialPostDiscussionPage() {
     addComment.mutate();
   }
 
-  function renderComment(comment: SocialComment, depth = 0): ReactNode {
+  function renderComment(comment: SocialComment, depth = 0, ancestors = new Set<string>()): ReactNode {
+    if (ancestors.has(comment.id)) return null;
+    const nextAncestors = new Set(ancestors);
+    nextAncestors.add(comment.id);
     const author = profileMap.get(comment.author_id) ?? (comment.author_id === userId ? profile as SocialProfile : null);
     const children = commentsByParent.get(comment.id) ?? [];
     const own = comment.author_id === userId;
@@ -282,7 +285,7 @@ function SocialPostDiscussionPage() {
             </>}
           </div>
         </div>
-        {children.map((child) => renderComment(child, depth + 1))}
+        {children.map((child) => renderComment(child, depth + 1, nextAncestors))}
       </div>
     );
   }
