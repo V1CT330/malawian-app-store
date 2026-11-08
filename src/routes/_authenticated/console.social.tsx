@@ -865,7 +865,7 @@ function SocialPage() {
                       <button type="button" disabled={toggleReaction.isPending} onClick={() => toggleReaction.mutate({ postId: post.id, reacted })} className={cn("flex flex-1 items-center justify-center gap-2 px-2 py-1.5 transition-colors hover:text-foreground", reacted && "text-destructive")} aria-label={reacted ? "Unlike post" : "Like post"} aria-pressed={reacted}>
                         <Heart className={cn("h-5 w-5", reacted && "fill-current")} /> <span>{postReactions.length}</span>
                       </button>
-                      <span className="flex flex-1 items-center justify-center gap-2 px-2 py-1.5" aria-label={`${postComments.length} comments`}><MessageCircle className="h-5 w-5" /> <span>{postComments.length}</span></span>
+                      <Link to="/console/social-post/$postId" params={{ postId: post.id }} aria-label={postComments.length + " comments. Open discussion"} className="flex flex-1 items-center justify-center gap-2 px-2 py-1.5 transition-colors hover:text-foreground"><MessageCircle className="h-5 w-5" /> <span>{postComments.length}</span></Link>
                       <button type="button" aria-label="Share post" title="Share post" onClick={() => {
                         const shareText = post.body + "\n\n" + window.location.origin + "/console/social";
                         if (navigator.share) {
@@ -875,44 +875,6 @@ function SocialPage() {
                         }
                       }} className="flex flex-1 items-center justify-center gap-2 px-2 py-1.5 hover:text-foreground"><FacebookShareIcon className="h-5 w-5" /></button>
                     </div>
-                    {commentsQuery.isError && <p role="alert" className="pt-3 text-xs text-destructive">Comments could not load. Refresh to try again.</p>}
-                    {postComments.slice(-5).map((comment) => {
-                      const commentAuthor = profileMap.get(comment.author_id) ?? (comment.author_id === userId ? profile as SocialProfile : null);
-                      const isOwnComment = comment.author_id === userId;
-                      const isEditing = editingCommentId === comment.id;
-                      return (
-                        <div key={comment.id} className={cn("flex items-start gap-2 pt-3", isOwnComment && "flex-row-reverse")}>
-                          <Avatar profile={commentAuthor} size="sm" />
-                          <div className={cn("social-comment-bubble min-w-0 max-w-[88%] flex-1 border border-border/60 px-3 py-2", isOwnComment ? "bg-primary/10" : "bg-muted/50")}>
-                            <div className="mb-1 flex items-center justify-between gap-3">
-                              <p className="truncate text-xs font-semibold">{displayName(commentAuthor)}</p>
-                              {isOwnComment && !isEditing && (
-                                <div className="flex shrink-0 items-center gap-1">
-                                  <button type="button" onClick={() => { setEditingCommentId(comment.id); setEditingCommentDraft(comment.body); }} aria-label="Edit comment" title="Edit comment" className="rounded-full p-1 text-muted-foreground hover:bg-background hover:text-foreground"><Pencil className="h-3.5 w-3.5" /></button>
-                                  <button type="button" disabled={deleteComment.isPending} onClick={() => { if (window.confirm("Delete this comment? This cannot be undone.")) deleteComment.mutate(comment.id); }} aria-label="Delete comment" title="Delete comment" className="rounded-full p-1 text-muted-foreground hover:bg-background hover:text-destructive disabled:opacity-50"><Trash2 className="h-3.5 w-3.5" /></button>
-                                </div>
-                              )}
-                            </div>
-                            {isEditing ? (
-                              <form onSubmit={(event) => { event.preventDefault(); editComment.mutate({ commentId: comment.id, body: editingCommentDraft }); }} className="space-y-2">
-                                <textarea value={editingCommentDraft} onChange={(event) => setEditingCommentDraft(event.target.value)} maxLength={1000} rows={2} autoFocus aria-label="Edit comment" className="w-full resize-y border border-border bg-background px-2 py-1.5 text-sm outline-none focus:border-primary" />
-                                <div className="flex justify-end gap-2">
-                                  <button type="button" onClick={() => { setEditingCommentId(null); setEditingCommentDraft(""); }} className="px-2 py-1 text-xs text-muted-foreground hover:text-foreground">Cancel</button>
-                                  <button type="submit" disabled={!editingCommentDraft.trim() || editComment.isPending} className="bg-primary px-3 py-1 text-xs font-medium text-primary-foreground disabled:opacity-50">{editComment.isPending ? "Saving…" : "Save"}</button>
-                                </div>
-                              </form>
-                            ) : (
-                              <p className="whitespace-pre-wrap break-words text-sm">{comment.body}</p>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                    <form onSubmit={(event) => submitComment(event, post.id)} className="mt-3 flex items-center gap-2">
-                      <label className="sr-only" htmlFor={`comment-${post.id}`}>Write a comment</label>
-                      <input id={`comment-${post.id}`} value={commentDrafts[post.id] ?? ""} onChange={(event) => setCommentDrafts((current) => ({ ...current, [post.id]: event.target.value }))} maxLength={1000} placeholder="Write a comment…" className="min-w-0 flex-1 rounded-full border border-border/80 bg-background px-4 py-2.5 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/10" />
-                      <button type="submit" disabled={!(commentDrafts[post.id] ?? "").trim() || addComment.isPending} aria-label="Send comment" className="rounded-full border border-border p-2 hover:bg-secondary disabled:opacity-50"><Send className="h-4 w-4" /></button>
-                    </form>
                   </article>
                 );
               })}
