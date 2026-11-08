@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Rocket } from "lucide-react";
 
+import { AppIcon } from "@/components/ListingCard";
 import { ConsoleShell } from "@/components/console/ConsoleShell";
 import { EmptyState, RowSkeletons, SectionCard, StatusPill } from "@/components/console/primitives";
 import { Button } from "@/components/ui/button";
@@ -83,11 +84,7 @@ function PublishingPage() {
                           params={{ id: l.id }}
                           className="flex items-center gap-3 py-3"
                         >
-                          <img
-                            src={l.icon_url ?? "/favicon.png"}
-                            alt=""
-                            className="h-10 w-10 shrink-0 rounded-xl object-cover"
-                          />
+                          <AppIcon path={l.icon_url} name={l.name} className="h-10 w-10 rounded-xl" />
                           <div className="min-w-0 flex-1">
                             <p className="truncate text-sm font-medium">{l.name}</p>
                             <p className="text-xs text-muted-foreground">
