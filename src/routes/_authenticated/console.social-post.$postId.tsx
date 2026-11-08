@@ -265,27 +265,29 @@ function SocialPostDiscussionPage() {
         <div className="flex min-w-0 items-start gap-2.5 py-3">
           <Avatar profile={author} size="sm" />
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <span className="text-xs font-semibold">{displayName(author)}</span>
-              <time className="text-[10px] text-muted-foreground" dateTime={comment.created_at}>{new Date(comment.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</time>
-              {own && !editing && <div className="ml-auto flex items-center gap-1">
-                {comment.body.trim() && <button type="button" onClick={() => { setEditingCommentId(comment.id); setEditingDraft(comment.body); }} aria-label="Edit comment" className="rounded-full p-1.5 text-muted-foreground hover:bg-secondary"><Pencil className="h-3.5 w-3.5" /></button>}
-                <button type="button" disabled={deleteComment.isPending} onClick={() => { if (window.confirm("Delete this comment? Replies must be deleted first.")) deleteComment.mutate(comment.id); }} aria-label="Delete comment" className="rounded-full p-1.5 text-muted-foreground hover:bg-secondary hover:text-destructive disabled:opacity-50"><Trash2 className="h-3.5 w-3.5" /></button>
-              </div>}
+            <div className="rounded-2xl bg-muted/60 px-3 py-2">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <span className="text-xs font-semibold">{displayName(author)}</span>
+                <time className="text-[10px] text-muted-foreground" dateTime={comment.created_at}>{new Date(comment.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</time>
+                {own && !editing && <div className="ml-auto flex items-center gap-1">
+                  {comment.body.trim() && <button type="button" onClick={() => { setEditingCommentId(comment.id); setEditingDraft(comment.body); }} aria-label="Edit comment" className="rounded-full p-1.5 text-muted-foreground hover:bg-background/70"><Pencil className="h-3.5 w-3.5" /></button>}
+                  <button type="button" disabled={deleteComment.isPending} onClick={() => { if (window.confirm("Delete this comment? Replies must be deleted first.")) deleteComment.mutate(comment.id); }} aria-label="Delete comment" className="rounded-full p-1.5 text-muted-foreground hover:bg-background/70 hover:text-destructive disabled:opacity-50"><Trash2 className="h-3.5 w-3.5" /></button>
+                </div>}
+              </div>
+              {editing ? (
+                <form onSubmit={(event) => { event.preventDefault(); editComment.mutate({ commentId: comment.id, body: editingDraft }); }} className="mt-2 space-y-2">
+                  <textarea value={editingDraft} onChange={(event) => setEditingDraft(event.target.value)} maxLength={1000} rows={2} autoFocus className="w-full resize-y rounded-lg border border-border bg-background p-2 text-sm outline-none focus:border-primary" aria-label="Edit comment" />
+                  <div className="flex justify-end gap-2">
+                    <button type="button" onClick={() => { setEditingCommentId(null); setEditingDraft(""); }} className="px-3 py-1.5 text-xs text-muted-foreground">Cancel</button>
+                    <button type="submit" disabled={!editingDraft.trim() || editComment.isPending} className="rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground disabled:opacity-50">{editComment.isPending ? "Saving…" : "Save"}</button>
+                  </div>
+                </form>
+              ) : <>
+                {comment.body && <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-6">{comment.body}</p>}
+                {comment.media_url && comment.media_type === "audio" && <audio controls preload="metadata" src={comment.media_url} className="mt-2 h-9 max-w-full" aria-label={"Voice comment by " + displayName(author)} />}
+                <button type="button" onClick={() => { setReplyToId(comment.id); setEditingCommentId(null); composerRef.current?.focus(); }} className="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-background/70 hover:text-foreground"><Reply className="h-3.5 w-3.5" /> Reply</button>
+              </>}
             </div>
-            {editing ? (
-              <form onSubmit={(event) => { event.preventDefault(); editComment.mutate({ commentId: comment.id, body: editingDraft }); }} className="mt-2 space-y-2">
-                <textarea value={editingDraft} onChange={(event) => setEditingDraft(event.target.value)} maxLength={1000} rows={2} autoFocus className="w-full resize-y rounded-lg border border-border bg-background p-2 text-sm outline-none focus:border-primary" aria-label="Edit comment" />
-                <div className="flex justify-end gap-2">
-                  <button type="button" onClick={() => { setEditingCommentId(null); setEditingDraft(""); }} className="px-3 py-1.5 text-xs text-muted-foreground">Cancel</button>
-                  <button type="submit" disabled={!editingDraft.trim() || editComment.isPending} className="rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground disabled:opacity-50">{editComment.isPending ? "Saving…" : "Save"}</button>
-                </div>
-              </form>
-            ) : <>
-              {comment.body && <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-6">{comment.body}</p>}
-              {comment.media_url && comment.media_type === "audio" && <audio controls preload="metadata" src={comment.media_url} className="mt-2 h-9 max-w-full" aria-label={"Voice comment by " + displayName(author)} />}
-              <button type="button" onClick={() => { setReplyToId(comment.id); setEditingCommentId(null); composerRef.current?.focus(); }} className="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"><Reply className="h-3.5 w-3.5" /> Reply</button>
-            </>}
           </div>
         </div>
         {children.map((child) => renderComment(child, depth + 1, nextAncestors))}
