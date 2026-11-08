@@ -29,6 +29,7 @@ import {
 import { toast } from "sonner";
 
 import { AppIcon } from "@/components/ListingCard";
+import logo from "@/assets/logo-mark.png";
 import { ConsoleShell } from "@/components/console/ConsoleShell";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useProfile, useSignedUrl, useUnreadCount } from "@/hooks/useSession";
@@ -695,9 +696,12 @@ function SocialPage() {
       <section className="min-h-[calc(100vh-4rem)] w-full min-w-0 max-w-full overflow-x-clip border-b border-border/70 bg-background">
         {!isComposerOpen && <>
         <div className="flex items-center justify-between gap-2 bg-background px-4 py-3.5 sm:px-6">
-          <div>
-             <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">Social</h1>
-             <p className="mt-0.5 hidden text-xs text-muted-foreground sm:block">Connect, share, and discover the MAS community.</p>
+          <div className="flex min-w-0 items-center gap-3">
+             <img src={logo} alt="Malawian App Store" width={32} height={32} className="h-8 w-8 shrink-0 [filter:brightness(0)_saturate(100%)_invert(24%)_sepia(91%)_saturate(2550%)_hue-rotate(202deg)_brightness(96%)_contrast(102%)]" />
+             <div className="min-w-0">
+               <h1 className="text-xl font-semibold tracking-tight sm:text-2xl">Social</h1>
+               <p className="mt-0.5 hidden text-xs text-muted-foreground sm:block">Connect, share, and discover the MAS community.</p>
+             </div>
           </div>
           <button type="button" onClick={() => setSidebarOpen(true)} aria-label="Open sidebar menu" title="Sidebar menu" className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <Menu className="h-5 w-5" aria-hidden="true" />
