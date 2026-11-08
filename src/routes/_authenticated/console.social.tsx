@@ -764,27 +764,6 @@ function SocialPage() {
                 <Avatar profile={profile as SocialProfile | null} />
                 <span className="min-w-0 flex-1 rounded-full border border-border/70 bg-muted/30 px-4 py-3 text-sm text-muted-foreground">What's on your mind?</span>
               </button>
-                <div className="flex items-start gap-3">
-                  <Avatar profile={profile as SocialProfile | null} />
-                  <div className="min-w-0 flex-1">
-                    <label htmlFor="social-post" className="sr-only">Write a post</label>
-                    <textarea id="social-post" value={postDraft} onChange={(event) => setPostDraft(event.target.value)} maxLength={2000} rows={1} placeholder="What would you like to share?" className="min-h-12 w-full resize-y rounded-full border border-border/70 bg-muted/30 px-4 py-2.5 text-sm leading-5 outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/10" />
-                    <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
-                      <div className="flex min-w-0 flex-wrap items-center gap-3">
-                        <label className="flex cursor-pointer items-center gap-2 border border-border/80 px-3 py-2 text-xs font-medium transition-colors hover:bg-muted focus-within:ring-2 focus-within:ring-ring">
-                          <ImagePlus className="h-4 w-4" /> Add photo/video
-                          <input type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" className="sr-only" onChange={(event) => setPostMedia(event.target.files?.[0] ?? null)} />
-                        </label>
-                        {postMedia && <span className="max-w-[170px] truncate text-xs text-muted-foreground">{postMedia.name}<button type="button" onClick={() => setPostMedia(null)} className="ml-2 underline">Remove</button></span>}
-                        <span className="text-xs text-muted-foreground">{postDraft.length}/2000</span>
-                      </div>
-                      <button type="submit" disabled={!postDraft.trim() || createPost.isPending} className="flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50">
-                        <Send className="h-4 w-4" /> {createPost.isPending ? "Posting…" : "Post"}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
 
               {postsQuery.isLoading ? <p className="px-4 py-8 text-sm text-muted-foreground">Loading feed…</p> : postsQuery.isError ? (
                 <p role="alert" className="px-4 py-8 text-sm text-destructive">The feed could not load. The social database migration may not have been applied yet.</p>
