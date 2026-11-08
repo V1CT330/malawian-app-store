@@ -101,7 +101,7 @@ function SocialPostDiscussionPage() {
   const { postId } = Route.useParams();
   const { userId, profile } = useProfile();
   const navigate = useNavigate();
-  const fromSocialFeed = useRouterState({ select: (state) => (state.location.state as { fromSocialFeed?: boolean }).fromSocialFeed === true });
+  const fromSocialFeed = useRouterState({ select: (state) => (state.location.state as { fromSocialFeed?: boolean } | undefined)?.fromSocialFeed === true });
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState("");
   const [replyToId, setReplyToId] = useState<string | null>(null);
@@ -260,7 +260,7 @@ function SocialPostDiscussionPage() {
     const own = comment.author_id === userId;
     const editing = editingCommentId === comment.id;
     return (
-      <div key={comment.id} className={cn("min-w-0", depth > 0 && "ml-4 border-l border-border pl-3 sm:ml-7 sm:pl-4")}>
+      <div key={comment.id} className={cn("min-w-0", depth > 0 && depth <= 4 && "ml-4 border-l border-border pl-3 sm:ml-7 sm:pl-4")}>
         <div className="flex min-w-0 items-start gap-2.5 py-3">
           <Avatar profile={author} size="sm" />
           <div className="min-w-0 flex-1">
