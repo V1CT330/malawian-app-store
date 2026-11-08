@@ -729,11 +729,16 @@ function SocialPage() {
             isComposerOpen ? (
               <div className="flex min-h-[calc(100dvh-2rem)] flex-col bg-background">
                 <header className="flex h-16 shrink-0 items-center justify-between border-b border-border px-4">
+                  <div className="flex items-center gap-2">
+                    <Link to="/" aria-label="Malawian App Store home" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-background">
+                      <img src={logo} alt="Malawian App Store" width={32} height={32} className="h-8 w-8 object-contain" />
+                    </Link>
                   <div className="flex items-center gap-3">
                     <button type="button" onClick={() => setIsComposerOpen(false)} aria-label="Back to feed" className="flex h-10 w-10 items-center justify-center rounded-full text-foreground hover:bg-muted">
                       <ArrowLeft className="h-6 w-6" />
                     </button>
                     <h1 className="text-xl font-bold">Create post</h1>
+                  </div>
                   </div>
                   <button type="submit" form="social-create-post" disabled={!postDraft.trim() || createPost.isPending} className="rounded-full px-3 py-2 text-base font-bold text-primary disabled:text-muted-foreground disabled:opacity-60">
                     {createPost.isPending ? "Posting…" : "Post"}
