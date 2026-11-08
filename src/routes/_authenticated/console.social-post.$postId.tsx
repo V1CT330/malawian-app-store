@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Loader2, MessageCircle, Mic, Pencil, Reply, Send, StopCircle, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
@@ -100,6 +100,8 @@ function AudioRecorder({ value, onChange }: { value: Blob | null; onChange: (blo
 function SocialPostDiscussionPage() {
   const { postId } = Route.useParams();
   const { userId, profile } = useProfile();
+  const navigate = useNavigate();
+  const fromSocialFeed = useRouterState({ select: (state) => (state.location.state as { fromSocialFeed?: boolean }).fromSocialFeed === true });
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState("");
   const [replyToId, setReplyToId] = useState<string | null>(null);
@@ -172,7 +174,7 @@ function SocialPostDiscussionPage() {
         const mime = voiceClip.type || "audio/webm";
         const ext = mime.includes("mp4") ? "m4a" : mime.includes("ogg") ? "ogg" : mime.includes("mpeg") ? "mp3" : "webm";
         uploadedPath = String(userId) + "/comments/" + postId + "/" + Date.now() + "-" + Math.random().toString(36).slice(2) + "." + ext;
-        const { error: uploadError } = await supabase.storage.from("social-media").upload(uploadedPath, voiceClip, { cacheControl: "3600", contentType: mime, upsert: false });
+        const { error: uploadError } = await supabase.storage.from("social-media").upload(uploadedPath, voiceClip, { cacheControl: "3600", contentType: mime.split(";")[0], upsert: false });
         if (uploadError) throw uploadError;
         mediaUrl = supabase.storage.from("social-media").getPublicUrl(uploadedPath).data.publicUrl;
       }
@@ -294,7 +296,7 @@ function SocialPostDiscussionPage() {
     <ConsoleShell title="Social" description="Post discussion" hideTopBar hideTitleCard fullWidth>
       <div className="mx-auto flex min-h-[calc(100svh-4rem)] w-full max-w-3xl flex-col border-x-0 border-border bg-background sm:border-x">
         <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-border bg-background/95 px-4 py-3 backdrop-blur">
-          <Link to="/console/social" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground" aria-label="Back to Social feed"><ArrowLeft className="h-5 w-5" /></Link>
+          <button type="button" onClick={() => { if (fromSocialFeed && window.history.length > 1) window.history.back(); else void navigate({ to: "/console/social" }); }} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground" aria-label="Back to Social feed"><ArrowLeft className="h-5 w-5" /></button>
           <div className="min-w-0"><h1 className="font-semibold">Post discussion</h1><p className="text-xs text-muted-foreground">{(commentsQuery.data ?? []).length} comments</p></div>
         </header>
 
