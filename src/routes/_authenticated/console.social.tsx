@@ -729,7 +729,6 @@ function SocialPage() {
               <div className="flex min-h-[calc(100dvh-2rem)] flex-col bg-background">
                 <header className="flex h-16 shrink-0 items-center justify-between border-b border-border px-4">
                   <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-3">
                     <button type="button" onClick={() => setIsComposerOpen(false)} aria-label="Back to feed" className="flex h-10 w-10 items-center justify-center rounded-full text-foreground hover:bg-muted">
                       <ArrowLeft className="h-6 w-6" />
                     </button>
