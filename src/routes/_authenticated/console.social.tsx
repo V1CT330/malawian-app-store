@@ -754,7 +754,7 @@ function SocialPage() {
                 const reacted = postReactions.some((reaction) => reaction.user_id === userId);
                 const postComments = commentsByPost.get(post.id) ?? [];
                 return (
-                  <article key={post.id} className="relative w-full min-w-0 overflow-x-clip border-b-4 border-muted bg-background px-4 py-1 sm:px-5">
+                  <article key={post.id} className="relative w-full min-w-0 overflow-x-clip border-b-[3px] border-muted-foreground/30 bg-background px-4 py-0 sm:px-5">
                     <div className="flex items-start gap-3">
                       <Avatar profile={author} />
                       <div className="min-w-0 flex-1">
@@ -778,10 +778,10 @@ function SocialPage() {
                         </div>
                       </details>}
                     </div>
-                    <p className="whitespace-pre-wrap break-words py-2 text-sm leading-6">{post.body}</p>
+                    <p className="whitespace-pre-wrap break-words py-1 text-sm leading-6">{post.body}</p>
                     {post.media_url && post.media_type === "image" && <div className="mb-4 flex w-full min-w-0 justify-center overflow-hidden bg-muted/20"><img src={post.media_url} alt="Post attachment" loading="lazy" className="block h-auto max-h-[70svh] sm:max-h-[min(75vh,720px)] w-full max-w-full object-contain object-center" /></div>}
                     {post.media_url && post.media_type === "video" && <div className="mb-4 flex w-full min-w-0 justify-center overflow-hidden bg-black"><video src={post.media_url} controls preload="metadata" className="block h-auto max-h-[70svh] sm:max-h-[min(75vh,720px)] w-full max-w-full object-contain object-center" aria-label="Post video attachment" /></div>}
-                    <div className="relative flex items-center justify-around gap-2 py-1.5 text-sm text-muted-foreground after:absolute after:bottom-0 after:left-[-1rem] after:right-[-1rem] after:border-b after:border-border sm:after:left-[-1.25rem] sm:after:right-[-1.25rem]">
+                    <div className="flex items-center justify-around gap-2 py-0 text-sm text-muted-foreground">
                       <button type="button" disabled={toggleReaction.isPending} onClick={() => toggleReaction.mutate({ postId: post.id, reacted })} className={cn("flex flex-1 items-center justify-center gap-2 rounded-full bg-muted px-3 py-2 transition-colors hover:bg-muted/80 hover:text-foreground", reacted && "text-destructive")} aria-label={reacted ? "Unlike post" : "Like post"} aria-pressed={reacted}>
                         <Heart className={cn("h-5 w-5", reacted && "fill-current")} /> <span>{postReactions.length}</span>
                       </button>
