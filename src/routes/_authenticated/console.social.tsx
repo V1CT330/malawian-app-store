@@ -716,7 +716,7 @@ function SocialPage() {
           {!userId ? (
             <div className="px-4 py-8 text-sm text-muted-foreground">Sign in to use Social.</div>
           ) : activeSection === "Feed" ? (
-            <div className="w-full space-y-0 pb-6 pt-0">
+            <div className="w-full space-y-0 pb-0 pt-0">
               <form onSubmit={submitPost} className="w-full border-y border-border/80 bg-background px-4 py-3 sm:px-5">
                 <div className="flex items-start gap-3">
                   <Avatar profile={profile as SocialProfile | null} />
@@ -799,7 +799,7 @@ function SocialPage() {
                 );
               })}
               {postsQuery.data?.length > 0 && (
-                <div aria-hidden="true" className="space-y-3 border-b-[3px] border-muted-foreground/30 bg-background px-4 py-5 sm:px-5">
+                <div aria-hidden="true" className="space-y-3 border-b-[3px] border-muted-foreground/30 bg-background px-4 pt-4 pb-0 sm:px-5">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 shrink-0 animate-pulse rounded-full bg-muted" />
                     <div className="min-w-0 flex-1 space-y-2">
