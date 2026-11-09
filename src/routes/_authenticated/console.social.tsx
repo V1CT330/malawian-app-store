@@ -299,6 +299,31 @@ function SocialPage() {
     },
   });
 
+  // Fetch profiles for visible post and comment authors independently of the
+  // 100-profile directory cap. Otherwise older/less recently listed members
+  // can appear in the feed without their name or avatar.
+  const postAuthorIds = useMemo(
+    () => Array.from(new Set([
+      ...(postsQuery.data ?? []).map((post) => post.author_id),
+      ...(commentsQuery.data ?? []).map((comment) => comment.author_id),
+    ])),
+    [postsQuery.data, commentsQuery.data],
+  );
+
+  const postAuthorsQuery = useQuery({
+    queryKey: ["social", "post-authors", postAuthorIds.join(",")],
+    enabled: Boolean(userId && postAuthorIds.length),
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data, error } = await socialDb
+        .from("public_profiles")
+        .select("id, display_name, developer_name, avatar_url, bio, is_developer")
+        .in("id", postAuthorIds);
+      if (error) throw error;
+      return (data ?? []) as SocialProfile[];
+    },
+  });
+
   const messagesQuery = useQuery({
     queryKey: ["social", "messages", userId],
     enabled: Boolean(userId),
@@ -318,8 +343,11 @@ function SocialPage() {
 
 
   const profileMap = useMemo(
-    () => new Map((profilesQuery.data ?? []).map((item) => [item.id, item])),
-    [profilesQuery.data],
+    () => new Map(
+      [...(profilesQuery.data ?? []), ...(postAuthorsQuery.data ?? [])]
+        .map((item) => [item.id, item]),
+    ),
+    [profilesQuery.data, postAuthorsQuery.data],
   );
   const reactionsByPost = useMemo(() => {
     const grouped = new Map<string, { id: string; post_id: string; user_id: string }[]>();
