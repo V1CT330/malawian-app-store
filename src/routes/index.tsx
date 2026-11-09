@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ChevronRight, RefreshCw } from "lucide-react";
+import { ChevronRight, ExternalLink, Megaphone, RefreshCw } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
@@ -103,6 +103,20 @@ function StorePage() {
     refetchOnMount: "always",
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
+  });
+
+  const sponsoredStoreAds = useQuery({
+    queryKey: ["store", "sponsored-ad-creatives"],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("active_ad_creatives")
+        .select("id,headline,body,image_url,destination_url,placements")
+        .contains("placements", ["store"])
+        .limit(4);
+      if (error) throw error;
+      return data ?? [];
+    },
+    staleTime: 60_000,
   });
 
   const normalizedSearch = search.trim().toLowerCase();
@@ -249,6 +263,38 @@ function StorePage() {
             </>
           ) : null}
 
+          {browsing && (sponsoredStoreAds.data ?? []).length > 0 && (
+            <section className="mb-5" aria-label="Sponsored products">
+              <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+                <Megaphone className="h-4 w-4" /> Sponsored
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {(sponsoredStoreAds.data ?? []).map((ad: {
+                  id: string; headline: string; body: string | null; image_url: string | null;
+                  destination_url: string; placements: string[];
+                }) => (
+                  <a key={ad.id} href={ad.destination_url} target="_blank" rel="noreferrer noopener"
+                    onClick={() => {
+                      void supabase.auth.getUser().then(({ data }) => {
+                        if (data.user) {
+                          void (supabase as any).from("ad_events").insert({
+                            campaign_id: ad.id, event_type: "click", viewer_id: data.user.id,
+                          });
+                        }
+                      });
+                    }}
+                    className="overflow-hidden border border-border bg-background transition-colors hover:border-primary/50">
+                    {ad.image_url && <img src={ad.image_url} alt="" loading="lazy" className="h-36 w-full object-cover" />}
+                    <div className="p-3">
+                      <p className="font-semibold">{ad.headline}</p>
+                      {ad.body && <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{ad.body}</p>}
+                      <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary">Learn more <ExternalLink className="h-3 w-3" /></span>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </section>
+          )}
           <section className="mb-2" aria-live="polite" aria-atomic="false">
             <h2 className="mb-2 font-display text-[17px] font-semibold">
               {browsing
