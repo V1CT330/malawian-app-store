@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
@@ -11,301 +11,243 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { useProfile } from "@/hooks/useSession";
-import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 import { supabase } from "@/integrations/supabase/client";
-import { fetchFoundingProgram } from "@/lib/pro";
 import { formatMwk } from "@/lib/store";
 
 export const Route = createFileRoute("/_authenticated/advertise")({
   head: () => ({
     meta: [
-      { title: "Advertise your product · Malawian App Store" },
-      {
-        name: "description",
-        content:
-          "Create promotion campaigns for your apps and websites, set a budget in Kwacha and track impressions, clicks and spend.",
-      },
-      { property: "og:title", content: "Advertise your product · Malawian App Store" },
-      { property: "og:description", content: "Promotion campaigns priced in Malawian Kwacha." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { title: "Ads Manager · Malawian App Store" },
+      { name: "description", content: "Create, submit and monitor advertising campaigns on MAS." },
     ],
   }),
   component: AdvertisePage,
 });
 
-const PLACEMENTS = [
-  { value: "featured", label: "Featured placement", detail: "Shown on the store home shelves" },
-  {
-    value: "search",
-    label: "Search boost",
-    detail: "Higher position in category and search results",
-  },
-  { value: "banner", label: "Store banner", detail: "Wide banner across browse pages" },
-] as const;
-
-const LOCATIONS = ["All Malawi", "Lilongwe", "Blantyre", "Mzuzu", "Zomba"] as const;
+type Campaign = {
+  id: string;
+  advertiser_id: string;
+  name: string;
+  headline: string;
+  body: string | null;
+  image_url: string | null;
+  destination_url: string;
+  placements: string[];
+  duration_days: number;
+  budget_mwk: number;
+  status: string;
+  review_notes: string | null;
+  starts_at: string | null;
+  ends_at: string | null;
+  created_at: string;
+};
 
 function AdvertisePage() {
-  useRequireDeveloper();
   const { userId } = useProfile();
   const queryClient = useQueryClient();
-
-  const [listingId, setListingId] = useState("");
   const [name, setName] = useState("");
-  const [placement, setPlacement] = useState<string>("featured");
-  const [budget, setBudget] = useState("10000");
+  const [headline, setHeadline] = useState("");
+  const [body, setBody] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [destinationUrl, setDestinationUrl] = useState("");
+  const [budget, setBudget] = useState("5000");
   const [days, setDays] = useState("7");
-  const [location, setLocation] = useState<string>("All Malawi");
-
-  const listings = useQuery({
-    queryKey: ["advertise-listings", userId],
-    enabled: Boolean(userId),
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("listings")
-        .select("id,name,status")
-        .eq("developer_id", userId!)
-        .order("updated_at", { ascending: false });
-      if (error) throw error;
-      return data ?? [];
-    },
-  });
+  const [placements, setPlacements] = useState<string[]>(["social_feed"]);
 
   const campaigns = useQuery({
-    queryKey: ["campaigns", userId],
+    queryKey: ["ad-campaigns", userId],
     enabled: Boolean(userId),
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("promotions")
+        .from("ad_campaigns")
         .select("*")
-        .eq("owner_id", userId!)
+        .eq("advertiser_id", userId!)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as Campaign[];
     },
   });
 
-  const founding = useQuery({ queryKey: ["founding-program"], queryFn: fetchFoundingProgram });
+  const eventStats = useQuery({
+    queryKey: ["ad-event-stats", campaigns.data?.map((c) => c.id).join(",")],
+    enabled: Boolean(campaigns.data?.length),
+    queryFn: async () => {
+      const ids = (campaigns.data ?? []).map((c) => c.id);
+      const { data, error } = await supabase
+        .from("ad_events")
+        .select("campaign_id,event_type")
+        .in("campaign_id", ids);
+      if (error) throw error;
+      const totals = new Map<string, { impressions: number; clicks: number }>();
+      for (const row of data ?? []) {
+        const current = totals.get(row.campaign_id) ?? { impressions: 0, clicks: 0 };
+        if (row.event_type === "impression") current.impressions += 1;
+        if (row.event_type === "click") current.clicks += 1;
+        totals.set(row.campaign_id, current);
+      }
+      return totals;
+    },
+  });
 
-  const create = useMutation({
+  const createCampaign = useMutation({
     mutationFn: async () => {
-      if (!listingId) throw new Error("Choose which product to promote.");
+      if (!userId) throw new Error("Sign in to create a campaign.");
+      if (name.trim().length < 3) throw new Error("Campaign name must be at least 3 characters.");
+      if (headline.trim().length < 3) throw new Error("Add an advert headline.");
+      if (!/^https:\/\/.+/.test(destinationUrl.trim())) throw new Error("Destination must be a secure https:// URL.");
+      if (imageUrl.trim() && !/^https:\/\/.+/.test(imageUrl.trim())) throw new Error("Image URL must start with https://.");
       const amount = Number(budget);
-      if (!Number.isFinite(amount) || amount < 1000)
-        throw new Error("Set a budget of at least MK1,000.");
-      const length = Math.max(1, Math.min(90, Number(days) || 7));
-      const ends = new Date(Date.now() + length * 24 * 60 * 60 * 1000);
-      const { error } = await supabase.from("promotions").insert({
-        owner_id: userId!,
-        listing_id: listingId,
-        name: name.trim() || "Promotion campaign",
-        kind: placement,
+      const duration = Number(days);
+      if (!Number.isInteger(amount) || amount < 1000) throw new Error("Minimum proposed budget is MK1,000.");
+      if (!Number.isInteger(duration) || duration < 1 || duration > 90) throw new Error("Campaign duration must be 1–90 days.");
+      if (!placements.length) throw new Error("Choose at least one placement.");
+      const { error } = await supabase.from("ad_campaigns").insert({
+        advertiser_id: userId,
+        name: name.trim(),
+        headline: headline.trim(),
+        body: body.trim() || null,
+        image_url: imageUrl.trim() || null,
+        destination_url: destinationUrl.trim(),
+        placements,
+        duration_days: duration,
         budget_mwk: amount,
-        target_location: location,
-        starts_at: new Date().toISOString(),
-        ends_at: ends.toISOString(),
         status: "pending",
       });
       if (error) throw error;
     },
-    onSuccess: () => {
-      toast.success("Campaign submitted for review");
-      setName("");
-      queryClient.invalidateQueries({ queryKey: ["campaigns", userId] });
+    onSuccess: async () => {
+      toast.success("Campaign submitted for MAS review.");
+      setName(""); setHeadline(""); setBody(""); setImageUrl(""); setDestinationUrl("");
+      await queryClient.invalidateQueries({ queryKey: ["ad-campaigns", userId] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (error: Error) => toast.error(error.message),
   });
 
-  const pause = useMutation({
+  const pauseCampaign = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("promotions").update({ status: "paused" }).eq("id", id);
+      const { error } = await supabase.from("ad_campaigns").update({ status: "paused" }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["campaigns", userId] }),
-    onError: (e: Error) => toast.error(e.message),
+    onSuccess: async () => {
+      toast.success("Campaign paused.");
+      await queryClient.invalidateQueries({ queryKey: ["ad-campaigns", userId] });
+    },
+    onError: (error: Error) => toast.error(error.message),
   });
+
+  const activeCount = useMemo(
+    () => (campaigns.data ?? []).filter((campaign) => campaign.status === "approved").length,
+    [campaigns.data],
+  );
+
+  function togglePlacement(value: string) {
+    setPlacements((current) => current.includes(value)
+      ? current.filter((item) => item !== value)
+      : [...current, value]);
+  }
 
   return (
     <ConsoleShell
-      title="Advertise"
-      description="Promote your products inside the store and reach people browsing for local software."
-      breadcrumbs={[{ label: "Console", to: "/console" }, { label: "Advertise" }]}
+      title="Ads Manager"
+      description="Create campaigns, submit adverts for review and monitor their performance."
+      breadcrumbs={[{ label: "Console", to: "/console" }, { label: "Ads Manager" }]}
     >
-      {founding.data?.enabled && founding.data.promo_credit_mwk > 0 && (
-        <section className="surface-card mb-4 border-l-4 border-l-brand-green p-4">
-          <h2 className="font-display text-base font-semibold">Founding promotional credit</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Founding developers are eligible for {formatMwk(founding.data.promo_credit_mwk)} in
-            promotional credit toward their first campaigns. Credit is applied by the store team
-            after review.
-          </p>
-        </section>
-      )}
+      <section className="mb-4 border border-amber-500/40 bg-amber-500/5 p-4">
+        <p className="text-sm font-semibold">Pilot mode — no payment is collected</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Campaigns are submitted for manual approval. Budgets are proposed amounts, not charges.
+          Checkout, verified delivery and billing are not connected yet.
+        </p>
+      </section>
 
-      <section className="surface-card space-y-3 p-4">
-        <h2 className="font-display text-base font-semibold">Create a campaign</h2>
-
+      <section className="space-y-4 border border-border bg-background p-4">
         <div>
-          <Label htmlFor="campaign-product">Product</Label>
-          <select
-            id="campaign-product"
-            className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-            value={listingId}
-            onChange={(e) => setListingId(e.target.value)}
-          >
-            <option value="">Select a product</option>
-            {(listings.data ?? []).map((l) => (
-              <option key={l.id} value={l.id}>
-                {l.name} ({l.status})
-              </option>
-            ))}
-          </select>
+          <h2 className="font-display text-lg font-semibold">Create an advert</h2>
+          <p className="text-sm text-muted-foreground">All campaigns are reviewed before they can appear on MAS.</p>
         </div>
-
-        <div>
-          <Label htmlFor="campaign-name">Campaign name</Label>
-          <Input
-            id="campaign-name"
-            value={name}
-            maxLength={60}
-            placeholder="Launch week push"
-            onChange={(e) => setName(e.target.value)}
-          />
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="space-y-1">
+            <Label htmlFor="ad-campaign-name">Campaign name</Label>
+            <Input id="ad-campaign-name" maxLength={100} value={name} onChange={(e) => setName(e.target.value)} placeholder="Product launch campaign" />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="ad-headline">Advert headline</Label>
+            <Input id="ad-headline" maxLength={120} value={headline} onChange={(e) => setHeadline(e.target.value)} placeholder="What should people notice?" />
+          </div>
         </div>
-
+        <div className="space-y-1">
+          <Label htmlFor="ad-body">Description</Label>
+          <Textarea id="ad-body" rows={3} maxLength={500} value={body} onChange={(e) => setBody(e.target.value)} placeholder="Explain what you are promoting." />
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="space-y-1">
+            <Label htmlFor="ad-image">Image URL (optional)</Label>
+            <Input id="ad-image" type="url" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://…" />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="ad-destination">Destination URL</Label>
+            <Input id="ad-destination" type="url" value={destinationUrl} onChange={(e) => setDestinationUrl(e.target.value)} placeholder="https://example.com" />
+          </div>
+        </div>
         <div>
-          <Label>Placement</Label>
-          <div className="mt-1 grid gap-2">
-            {PLACEMENTS.map((p) => (
-              <button
-                key={p.value}
-                type="button"
-                onClick={() => setPlacement(p.value)}
-                className={`rounded-xl border p-3 text-left text-sm ${
-                  placement === p.value ? "border-primary bg-accent" : "border-border"
-                }`}
-              >
-                <span className="font-medium">{p.label}</span>
-                <span className="block text-xs text-muted-foreground">{p.detail}</span>
-              </button>
+          <Label>Placements</Label>
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            {[
+              { value: "social_feed", label: "Social feed", detail: "Sponsored content in the Social feed" },
+              { value: "store", label: "Store discovery", detail: "Sponsored listings in store discovery" },
+            ].map((item) => (
+              <label key={item.value} className="flex cursor-pointer items-start gap-3 border border-border p-3">
+                <input type="checkbox" checked={placements.includes(item.value)} onChange={() => togglePlacement(item.value)} className="mt-1" />
+                <span><span className="block text-sm font-medium">{item.label}</span><span className="block text-xs text-muted-foreground">{item.detail}</span></span>
+              </label>
             ))}
           </div>
         </div>
-
-        <div className="grid gap-3 sm:grid-cols-3">
-          <div>
-            <Label htmlFor="campaign-budget">Budget in MWK</Label>
-            <Input
-              id="campaign-budget"
-              inputMode="numeric"
-              value={budget}
-              onChange={(e) => setBudget(e.target.value.replace(/\D/g, ""))}
-            />
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="space-y-1">
+            <Label htmlFor="ad-budget">Proposed budget (MWK)</Label>
+            <Input id="ad-budget" inputMode="numeric" value={budget} onChange={(e) => setBudget(e.target.value.replace(/\D/g, ""))} />
           </div>
-          <div>
-            <Label htmlFor="campaign-days">Duration in days</Label>
-            <Input
-              id="campaign-days"
-              inputMode="numeric"
-              value={days}
-              onChange={(e) => setDays(e.target.value.replace(/\D/g, ""))}
-            />
-          </div>
-          <div>
-            <Label htmlFor="campaign-location">Target location</Label>
-            <select
-              id="campaign-location"
-              className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-            >
-              {LOCATIONS.map((l) => (
-                <option key={l} value={l}>
-                  {l}
-                </option>
-              ))}
-            </select>
+          <div className="space-y-1">
+            <Label htmlFor="ad-days">Duration (days)</Label>
+            <Input id="ad-days" inputMode="numeric" value={days} onChange={(e) => setDays(e.target.value.replace(/\D/g, ""))} />
           </div>
         </div>
-
-        <Button size="sm" disabled={create.isPending} onClick={() => create.mutate()}>
-          Submit campaign
+        <Button disabled={createCampaign.isPending} onClick={() => createCampaign.mutate()}>
+          {createCampaign.isPending ? "Submitting…" : "Submit for approval"}
         </Button>
       </section>
 
-      <section className="surface-card mt-4 p-4">
-        <h2 className="font-display text-base font-semibold">Your campaigns</h2>
-        {campaigns.isLoading ? (
-          <Skeleton className="mt-3 h-20 w-full rounded-xl" />
-        ) : campaigns.data?.length ? (
-          <ul className="mt-3 space-y-3">
-            {campaigns.data.map((c) => (
-              <li key={c.id} className="rounded-xl border border-border p-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="text-sm font-medium">{c.name ?? "Promotion campaign"}</p>
-                    <p className="text-xs capitalize text-muted-foreground">
-                      {c.kind} · {c.target_location ?? "All Malawi"}
-                    </p>
-                  </div>
-                  <Badge variant="secondary" className="capitalize">
-                    {c.status}
-                  </Badge>
+      <section className="mt-5 space-y-3">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="font-display text-lg font-semibold">Your campaigns</h2>
+          <Badge variant="secondary">{activeCount} approved</Badge>
+        </div>
+        {campaigns.isLoading ? <Skeleton className="h-24 w-full" /> : campaigns.isError ? (
+          <p role="alert" className="border border-destructive/30 p-4 text-sm text-destructive">Campaigns could not be loaded. Check your connection and try again.</p>
+        ) : campaigns.data?.length ? campaigns.data.map((campaign) => {
+          const stats = eventStats.data?.get(campaign.id) ?? { impressions: 0, clicks: 0 };
+          return (
+            <article key={campaign.id} className="border border-border bg-background p-4">
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <h3 className="font-semibold">{campaign.name}</h3>
+                  <p className="mt-0.5 text-sm text-muted-foreground">{campaign.headline}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{campaign.placements.join(" · ")} · {campaign.duration_days} days</p>
                 </div>
-                <div className="mt-2 grid grid-cols-4 gap-2 text-center text-xs">
-                  <div>
-                    <p className="font-display text-sm font-bold">{c.impressions}</p>
-                    <p className="text-muted-foreground">views</p>
-                  </div>
-                  <div>
-                    <p className="font-display text-sm font-bold">{c.clicks}</p>
-                    <p className="text-muted-foreground">clicks</p>
-                  </div>
-                  <div>
-                    <p className="font-display text-sm font-bold">
-                      {formatMwk(Number(c.spent_mwk))}
-                    </p>
-                    <p className="text-muted-foreground">spent</p>
-                  </div>
-                  <div>
-                    <p className="font-display text-sm font-bold">
-                      {formatMwk(Number(c.budget_mwk))}
-                    </p>
-                    <p className="text-muted-foreground">budget</p>
-                  </div>
-                </div>
-                {c.status !== "paused" && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="mt-3"
-                    disabled={pause.isPending}
-                    onClick={() => pause.mutate(c.id)}
-                  >
-                    Pause campaign
-                  </Button>
-                )}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="mt-2 text-sm text-muted-foreground">
-            No campaigns yet. Your first campaign can start the day your product goes live.
-          </p>
-        )}
-      </section>
-
-      <section className="surface-card mt-4 p-4">
-        <h2 className="font-display text-base font-semibold">Notes on advertising</h2>
-        <Textarea
-          readOnly
-          rows={4}
-          className="mt-2 resize-none bg-secondary text-sm"
-          value={
-            "Campaigns are reviewed before they go live. Budgets are charged in Malawian Kwacha. Impressions and clicks update as your campaign runs. You can pause a campaign at any time and the remaining budget stays with your account."
-          }
-        />
+                <Badge variant={campaign.status === "approved" ? "default" : campaign.status === "rejected" ? "destructive" : "secondary"} className="capitalize">{campaign.status}</Badge>
+              </div>
+              {campaign.review_notes && <p className="mt-3 border-l-2 border-amber-500 pl-3 text-sm text-muted-foreground">Review note: {campaign.review_notes}</p>}
+              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div><p className="text-lg font-semibold tabular-nums">{stats.impressions.toLocaleString()}</p><p className="text-xs text-muted-foreground">Impressions</p></div>
+                <div><p className="text-lg font-semibold tabular-nums">{stats.clicks.toLocaleString()}</p><p className="text-xs text-muted-foreground">Clicks</p></div>
+                <div><p className="text-lg font-semibold tabular-nums">{formatMwk(campaign.budget_mwk)}</p><p className="text-xs text-muted-foreground">Proposed budget</p></div>
+                <div><p className="text-lg font-semibold tabular-nums">{campaign.duration_days}</p><p className="text-xs text-muted-foreground">Days</p></div>
+              </div>
+              {campaign.status === "approved" && <Button className="mt-3" size="sm" variant="outline" disabled={pauseCampaign.isPending} onClick={() => pauseCampaign.mutate(campaign.id)}>Pause campaign</Button>}
+            </article>
+          );
+        }) : <p className="border border-dashed border-border p-6 text-center text-sm text-muted-foreground">No campaigns yet. Your submitted campaigns will appear here.</p>}
       </section>
     </ConsoleShell>
   );
