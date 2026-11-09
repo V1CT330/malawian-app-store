@@ -111,6 +111,8 @@ function AdvertisePage() {
         placements,
         duration_days: duration,
         budget_mwk: amount,
+        starts_at: new Date().toISOString(),
+        ends_at: new Date(Date.now() + duration * 24 * 60 * 60 * 1000).toISOString(),
         status: "pending",
       });
       if (error) throw error;
