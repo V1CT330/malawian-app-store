@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -259,6 +259,43 @@ function SocialPage() {
       return (data ?? []) as SocialPost[];
     },
   });
+
+  const sponsoredCampaignsQuery = useQuery({
+    queryKey: ["social", "sponsored-campaigns"],
+    enabled: Boolean(userId),
+    refetchInterval: 60_000,
+    queryFn: async () => {
+      const { data, error } = await socialDb
+        .from("ad_campaigns")
+        .select("id,advertiser_id,headline,body,image_url,destination_url,placements,starts_at,ends_at")
+        .eq("status", "approved")
+        .contains("placements", ["social_feed"])
+        .order("created_at", { ascending: false })
+        .limit(10);
+      if (error) throw error;
+      const now = Date.now();
+      return (data ?? []).filter((campaign: {
+        starts_at: string | null; ends_at: string | null;
+      }) => (!campaign.starts_at || new Date(campaign.starts_at).getTime() <= now)
+        && (!campaign.ends_at || new Date(campaign.ends_at).getTime() > now));
+    },
+  });
+
+  const trackedAdImpressions = useRef(new Set<string>());
+  const sponsoredCampaign = sponsoredCampaignsQuery.data?.[0];
+  useEffect(() => {
+    if (!userId || !sponsoredCampaign?.id || trackedAdImpressions.current.has(sponsoredCampaign.id)) return;
+    trackedAdImpressions.current.add(sponsoredCampaign.id);
+    void socialDb.from("ad_events").insert({
+      campaign_id: sponsoredCampaign.id,
+      event_type: "impression",
+      viewer_id: userId,
+    }).then(({ error }: { error: { code?: string } | null }) => {
+      if (error && error.code !== "23505") {
+        trackedAdImpressions.current.delete(sponsoredCampaign.id);
+      }
+    });
+  }, [userId, sponsoredCampaign?.id]);
 
   const connectionsQuery = useQuery({
     queryKey: ["social", "connections", userId],
@@ -799,6 +836,28 @@ function SocialPage() {
                 <span className="min-w-0 flex-1 rounded-full border border-border/70 bg-muted/30 px-4 py-3 text-sm text-muted-foreground">What's on your mind?</span>
               </button>
 
+              {sponsoredCampaign && (
+                <article className="relative w-full border-b-[3px] border-muted-foreground/30 bg-background px-4 py-4 sm:px-5">
+                  <div className="mb-3 flex items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground"><Megaphone className="h-3.5 w-3.5" /> Sponsored</span>
+                    <span className="text-[11px] text-muted-foreground">Advertisement</span>
+                  </div>
+                  <a href={sponsoredCampaign.destination_url} target="_blank" rel="noreferrer noopener"
+                    onClick={() => {
+                      void socialDb.from("ad_events").insert({
+                        campaign_id: sponsoredCampaign.id,
+                        event_type: "click",
+                        viewer_id: userId,
+                      });
+                    }}
+                    className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                    {sponsoredCampaign.image_url && <img src={sponsoredCampaign.image_url} alt="" loading="lazy" className="mb-3 max-h-72 w-full object-contain" />}
+                    <h3 className="text-base font-bold">{sponsoredCampaign.headline}</h3>
+                    {sponsoredCampaign.body && <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">{sponsoredCampaign.body}</p>}
+                    <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary">Learn more <ExternalLink className="h-3.5 w-3.5" /></span>
+                  </a>
+                </article>
+              )}
               {postsQuery.isLoading ? <p className="px-4 py-8 text-sm text-muted-foreground">Loading feed…</p> : postsQuery.isError ? (
                 <p role="alert" className="px-4 py-8 text-sm text-destructive">The feed could not load. The social database migration may not have been applied yet.</p>
               ) : !postsQuery.data?.length ? (
