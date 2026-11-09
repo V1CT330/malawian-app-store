@@ -817,7 +817,7 @@ function SocialPage() {
                     <div className="flex items-start gap-3">
                       <Avatar profile={author} />
                       <div className="min-w-0 flex-1">
-                        <div className="flex min-w-0 items-center gap-1.5"><p className="truncate text-sm font-semibold">{displayName(author)}</p>{author?.kyc_status === "approved" && <BadgeCheck className="h-4 w-4 shrink-0 fill-[#1877F2] text-[#1877F2]" aria-label="Verified" title="Verified" />}</div>
+                        <div className="flex min-w-0 items-center gap-1.5"><p className="truncate text-sm font-semibold">{displayName(author)}</p>{author?.kyc_status === "approved" && <svg viewBox="0 0 24 24" className="h-4 w-4 shrink-0" role="img" aria-label="Verified" title="Verified"><path d="M12 1.5 14.2 3.4 17.1 2.8 18.2 5.5 21 6.5 20.5 9.4 22.5 12 20.5 14.6 21 17.5 18.2 18.5 17.1 21.2 14.2 20.6 12 22.5 9.8 20.6 6.9 21.2 5.8 18.5 3 17.5 3.5 14.6 1.5 12 3.5 9.4 3 6.5 5.8 5.5 6.9 2.8 9.8 3.4Z" fill="#1877F2"/><path d="m7.8 12.2 2.7 2.7 5.8-6" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>}</div>
                         <time className="mt-0.5 block text-xs text-muted-foreground" dateTime={post.created_at}>{new Date(post.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</time>
                       </div>
                       {post.author_id === userId && <details className="relative">
