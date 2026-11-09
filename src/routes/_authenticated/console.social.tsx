@@ -64,6 +64,7 @@ type SocialProfile = {
   avatar_url: string | null;
   bio?: string | null;
   is_developer?: boolean;
+  kyc_status?: "none" | "pending" | "approved" | "rejected" | null;
 };
 type SocialPost = {
   id: string;
@@ -151,7 +152,7 @@ function SocialPage() {
     queryFn: async () => {
       const { data, error } = await socialDb
         .from("public_profiles")
-        .select("id, display_name, developer_name, avatar_url, bio, is_developer")
+        .select("id, display_name, developer_name, avatar_url, bio, is_developer, kyc_status")
         .order("display_name", { ascending: true })
         .limit(100);
       if (error) throw error;
@@ -317,7 +318,7 @@ function SocialPage() {
     queryFn: async () => {
       const { data, error } = await socialDb
         .from("public_profiles")
-        .select("id, display_name, developer_name, avatar_url, bio, is_developer")
+        .select("id, display_name, developer_name, avatar_url, bio, is_developer, kyc_status")
         .in("id", postAuthorIds);
       if (error) throw error;
       return (data ?? []) as SocialProfile[];
@@ -816,7 +817,7 @@ function SocialPage() {
                     <div className="flex items-start gap-3">
                       <Avatar profile={author} />
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-semibold">{displayName(author)}</p>
+                        <div className="flex min-w-0 items-center gap-1.5"><p className="truncate text-sm font-semibold">{displayName(author)}</p>{author?.kyc_status === "approved" && <BadgeCheck className="h-4 w-4 shrink-0 fill-[#1877F2] text-[#1877F2]" aria-label="Verified" title="Verified" />}</div>
                         <time className="mt-0.5 block text-xs text-muted-foreground" dateTime={post.created_at}>{new Date(post.created_at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</time>
                       </div>
                       {post.author_id === userId && <details className="relative">
