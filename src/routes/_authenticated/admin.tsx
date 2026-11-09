@@ -75,6 +75,48 @@ function AdminPage() {
     },
   });
 
+  const adCampaigns = useQuery({
+    queryKey: ["admin-ad-campaigns"],
+    enabled: isAdmin,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("ad_campaigns")
+        .select("id,advertiser_id,name,headline,body,image_url,destination_url,placements,duration_days,budget_mwk,status,created_at")
+        .in("status", ["pending", "approved", "rejected", "paused", "suspended"])
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const decideAdCampaign = useMutation({
+    mutationFn: async ({ id, advertiserId, status, note }: {
+      id: string;
+      advertiserId: string;
+      status: "approved" | "rejected" | "suspended";
+      note?: string;
+    }) => {
+      const { error } = await supabase.from("ad_campaigns").update({
+        status,
+        review_notes: note?.trim() || null,
+        reviewed_by: userId,
+        reviewed_at: new Date().toISOString(),
+      }).eq("id", id);
+      if (error) throw error;
+      const { error: notificationError } = await supabase.from("notifications").insert({
+        user_id: advertiserId,
+        title: `Ad campaign ${status}`,
+        body: note?.trim() || `Your advertising campaign was ${status} by MAS.`,
+      });
+      if (notificationError) console.warn("Campaign decision saved, but notification failed.");
+    },
+    onSuccess: () => {
+      toast.success("Advertising review decision saved.");
+      void queryClient.invalidateQueries({ queryKey: ["admin-ad-campaigns"] });
+    },
+    onError: (error: Error) => toast.error(error.message),
+  });
+
   const reports = useQuery({
     queryKey: ["admin-reports"],
     enabled: isAdmin,
@@ -313,6 +355,7 @@ function AdminPage() {
       <Tabs defaultValue="review" className="mt-4">
         <TabsList className="flex-wrap">
           <TabsTrigger value="review">Review</TabsTrigger>
+          <TabsTrigger value="ads">Ads</TabsTrigger>
           <TabsTrigger value="releases">Releases</TabsTrigger>
           <TabsTrigger value="reports">Reports</TabsTrigger>
           <TabsTrigger value="kyc">KYC</TabsTrigger>
@@ -376,6 +419,49 @@ function AdminPage() {
               ))}
             </>
           )}
+        </TabsContent>
+
+        <TabsContent value="ads" className="mt-4 space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="font-display text-base font-semibold">Advertising campaigns</h2>
+            <Badge variant="secondary">{(adCampaigns.data ?? []).filter((campaign) => campaign.status === "pending").length} pending</Badge>
+          </div>
+          {adCampaigns.isLoading ? (
+            <Skeleton className="h-24 w-full rounded-2xl" />
+          ) : adCampaigns.isError ? (
+            <p role="alert" className="surface-card p-4 text-sm text-destructive">Could not load advertising campaigns.</p>
+          ) : (adCampaigns.data ?? []).length === 0 ? (
+            <p className="surface-card p-6 text-center text-sm text-muted-foreground">No advertising campaigns have been submitted.</p>
+          ) : (adCampaigns.data ?? []).map((campaign) => (
+            <article key={campaign.id} className="surface-card space-y-3 p-4">
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <h3 className="font-semibold">{campaign.name}</h3>
+                  <p className="text-sm text-muted-foreground">{campaign.headline}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">Advertiser {campaign.advertiser_id} · {campaign.placements.join(", ")} · {campaign.duration_days} days · {Number(campaign.budget_mwk).toLocaleString("en")} MWK proposed</p>
+                </div>
+                <Badge variant="secondary" className="capitalize">{campaign.status}</Badge>
+              </div>
+              {campaign.body && <p className="text-sm">{campaign.body}</p>}
+              <a href={campaign.destination_url} target="_blank" rel="noreferrer noopener" className="break-all text-sm text-primary underline">Review destination: {campaign.destination_url}</a>
+              {campaign.image_url && <img src={campaign.image_url} alt="Advert creative preview" loading="lazy" className="max-h-48 max-w-full object-contain" />}
+              {campaign.status === "pending" && (
+                <div className="flex flex-wrap gap-2">
+                  <Button size="sm" disabled={decideAdCampaign.isPending} onClick={() => decideAdCampaign.mutate({ id: campaign.id, advertiserId: campaign.advertiser_id, status: "approved" })}>Approve campaign</Button>
+                  <Button size="sm" variant="outline" disabled={decideAdCampaign.isPending} onClick={() => {
+                    const note = window.prompt("Reason for rejecting this advert (shown to advertiser)") ?? "";
+                    if (note.trim()) decideAdCampaign.mutate({ id: campaign.id, advertiserId: campaign.advertiser_id, status: "rejected", note });
+                  }}>Reject</Button>
+                </div>
+              )}
+              {campaign.status === "approved" && (
+                <Button size="sm" variant="destructive" disabled={decideAdCampaign.isPending} onClick={() => {
+                  const note = window.prompt("Reason for suspending this advert") ?? "";
+                  if (note.trim()) decideAdCampaign.mutate({ id: campaign.id, advertiserId: campaign.advertiser_id, status: "suspended", note });
+                }}>Suspend campaign</Button>
+              )}
+            </article>
+          ))}
         </TabsContent>
 
         <TabsContent value="releases" className="mt-4 space-y-3">
