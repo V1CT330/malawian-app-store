@@ -90,17 +90,24 @@ function AdminPage() {
   });
 
   const decideAdCampaign = useMutation({
-    mutationFn: async ({ id, advertiserId, status, note }: {
+    mutationFn: async ({ id, advertiserId, status, note, durationDays }: {
       id: string;
       advertiserId: string;
       status: "approved" | "rejected" | "suspended";
       note?: string;
+      durationDays?: number;
     }) => {
+      const reviewedAt = new Date();
+      const schedule = status === "approved" ? {
+        starts_at: reviewedAt.toISOString(),
+        ends_at: new Date(reviewedAt.getTime() + (durationDays ?? 7) * 24 * 60 * 60 * 1000).toISOString(),
+      } : {};
       const { error } = await supabase.from("ad_campaigns").update({
         status,
         review_notes: note?.trim() || null,
         reviewed_by: userId,
-        reviewed_at: new Date().toISOString(),
+        reviewed_at: reviewedAt.toISOString(),
+        ...schedule,
       }).eq("id", id);
       if (error) throw error;
       const { error: notificationError } = await supabase.from("notifications").insert({
@@ -447,7 +454,7 @@ function AdminPage() {
               {campaign.image_url && <img src={campaign.image_url} alt="Advert creative preview" loading="lazy" className="max-h-48 max-w-full object-contain" />}
               {campaign.status === "pending" && (
                 <div className="flex flex-wrap gap-2">
-                  <Button size="sm" disabled={decideAdCampaign.isPending} onClick={() => decideAdCampaign.mutate({ id: campaign.id, advertiserId: campaign.advertiser_id, status: "approved" })}>Approve campaign</Button>
+                  <Button size="sm" disabled={decideAdCampaign.isPending} onClick={() => decideAdCampaign.mutate({ id: campaign.id, advertiserId: campaign.advertiser_id, status: "approved", durationDays: campaign.duration_days })}>Approve campaign</Button>
                   <Button size="sm" variant="outline" disabled={decideAdCampaign.isPending} onClick={() => {
                     const note = window.prompt("Reason for rejecting this advert (shown to advertiser)") ?? "";
                     if (note.trim()) decideAdCampaign.mutate({ id: campaign.id, advertiserId: campaign.advertiser_id, status: "rejected", note });
