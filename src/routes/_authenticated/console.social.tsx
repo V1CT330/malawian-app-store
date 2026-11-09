@@ -900,7 +900,7 @@ function SocialPage() {
                     <p className="whitespace-pre-wrap break-words py-1 text-sm leading-6">{post.body}</p>
                     {post.media_url && post.media_type === "image" && <div className="mb-4 flex w-full min-w-0 justify-center overflow-hidden bg-muted/20"><img src={post.media_url} alt="Post attachment" loading="lazy" className="block h-auto max-h-[70svh] sm:max-h-[min(75vh,720px)] w-full max-w-full object-contain object-center" /></div>}
                     {post.media_url && post.media_type === "video" && <div className="mb-4 flex w-full min-w-0 justify-center overflow-hidden bg-black"><video src={post.media_url} controls preload="metadata" className="block h-auto max-h-[70svh] sm:max-h-[min(75vh,720px)] w-full max-w-full object-contain object-center" aria-label="Post video attachment" /></div>}
-                    <div className="mt-4 flex items-center justify-around gap-2 border-t border-border pt-3 pb-1 text-sm text-muted-foreground">
+                    <div className="mt-4 flex items-center justify-around gap-2 pt-3 pb-1 text-sm text-muted-foreground">
                       <button type="button" disabled={toggleReaction.isPending} onClick={() => toggleReaction.mutate({ postId: post.id, reacted })} className={cn("flex flex-1 items-center justify-center gap-2 rounded-full bg-muted px-3 py-2 transition-colors hover:bg-muted/80 hover:text-foreground", reacted && "text-destructive")} aria-label={reacted ? "Unlike post" : "Like post"} aria-pressed={reacted}>
                         <ThumbsUp className={cn("h-5 w-5", reacted && "fill-current")} /> <span>{postReactions.length}</span>
                       </button>
