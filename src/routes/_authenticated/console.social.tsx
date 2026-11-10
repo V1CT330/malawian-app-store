@@ -828,8 +828,8 @@ function SocialPage() {
                       <span className="mt-1 inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1.5 text-xs font-semibold"><Globe className="h-4 w-4" /> Public <span aria-hidden="true">▾</span></span>
                     </div>
                   </div>
-                  <label htmlFor="social-post" className="sr-only">What's on your mind?</label>
-                  <textarea id="social-post" autoFocus value={postDraft} onChange={(event) => setPostDraft(event.target.value)} maxLength={2000} placeholder="What's on your mind?" className="min-h-[38vh] w-full flex-1 resize-none border-0 bg-muted/70 px-5 py-5 text-2xl leading-relaxed outline-none placeholder:text-muted-foreground focus:ring-0 sm:text-3xl" />
+                  <label htmlFor="social-post" className="sr-only">Share something</label>
+                  <textarea id="social-post" autoFocus value={postDraft} onChange={(event) => setPostDraft(event.target.value)} maxLength={2000} placeholder="Share something" className="min-h-[38vh] w-full flex-1 resize-none border-0 bg-muted/70 px-5 py-5 text-2xl leading-relaxed outline-none placeholder:text-muted-foreground focus:ring-0 sm:text-3xl" />
                   <div className="shrink-0 space-y-3 border-t border-border bg-background px-4 py-4">
                     <div className="flex items-center justify-between gap-3">
                       <label className="flex min-h-12 flex-1 cursor-pointer items-center gap-3 rounded-xl px-2 text-base font-medium transition-colors hover:bg-muted">
@@ -849,7 +849,7 @@ function SocialPage() {
             <div className="w-full space-y-0 pb-0 pt-0">
               <button type="button" onClick={() => setIsComposerOpen(true)} className="flex w-full items-center gap-3 border-y border-border/80 bg-background px-4 py-3 text-left sm:px-5">
                 <Avatar profile={profile as SocialProfile | null} />
-                <span className="min-w-0 flex-1 rounded-full border border-border/70 bg-muted/30 px-4 py-3 text-sm text-muted-foreground">What's on your mind?</span>
+                <span className="min-w-0 flex-1 rounded-full border border-border/70 bg-muted/30 px-4 py-3 text-sm text-muted-foreground">Share something</span>
               </button>
 
               {sponsoredCampaign && (
