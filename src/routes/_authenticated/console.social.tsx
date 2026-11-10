@@ -760,7 +760,7 @@ function SocialPage() {
         </SheetContent>
       </Sheet>
 
-      <section className="min-h-[calc(100vh-4rem)] w-full min-w-0 max-w-full overflow-x-clip border-b border-border/70 bg-background">
+      <section className="social-feed-screen min-h-[calc(100vh-4rem)] w-full min-w-0 max-w-full overflow-x-clip border-b border-border/70 bg-background">
         {!isComposerOpen && <>
         <div className="flex items-center justify-between gap-2 bg-background px-4 py-3.5 sm:px-6">
           <div className="flex min-w-0 items-center gap-3">
