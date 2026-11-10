@@ -7,6 +7,7 @@ import { ListingCard } from "@/components/ListingCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { SOCIAL_FIELDS, type Listing } from "@/lib/store";
+import { useSignedUrl } from "@/hooks/useSession";
 
 export const Route = createFileRoute("/developers/$id")({
   head: () => ({
@@ -30,7 +31,7 @@ function DeveloperPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("public_profiles")
-        .select("id,display_name,developer_name,kyc_status,bio,website_url,github_url,portfolio_url,facebook_url,x_url,linkedin_url,instagram_url,youtube_url")
+        .select("id,display_name,developer_name,kyc_status,bio,cover_image_url,website_url,github_url,portfolio_url,facebook_url,x_url,linkedin_url,instagram_url,youtube_url")
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
@@ -67,13 +68,16 @@ function DeveloperPage() {
   });
 
   const p = profile.data as Record<string, string | boolean | null> | null | undefined;
+  const cover = useSignedUrl(typeof p?.cover_image_url === "string" ? p.cover_image_url : null);
 
   return (
     <AppShell>
       {profile.isLoading ? (
         <Skeleton className="h-24 w-full rounded-2xl" />
       ) : (
-        <header className="surface-card p-5">
+        <header className="surface-card overflow-hidden">
+          {cover && <div className="h-32 w-full bg-muted sm:h-44"><img src={cover} alt="Profile cover" className="h-full w-full object-cover" /></div>}
+          <div className="p-5">
           <h1 className="flex items-center gap-2 font-display text-2xl font-bold">
             {(p?.developer_name as string) || (p?.display_name as string) || "Developer"}
             {p?.kyc_status === "approved" && <BadgeCheck className="h-5 w-5 text-primary" />}
@@ -93,6 +97,7 @@ function DeveloperPage() {
                 </a>
               ) : null,
             )}
+          </div>
           </div>
         </header>
       )}
