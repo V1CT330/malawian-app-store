@@ -731,7 +731,7 @@ function SocialPage() {
               { label: "App Store", to: "/" },
               { label: "Developer Dashboard", to: "/console" },
             ].map((item) => (
-              <Link key={item.to} to={item.to} onClick={() => setSidebarOpen(false)} className="block border-b border-border px-3 py-3 text-sm text-foreground transition-colors hover:bg-secondary">
+              <Link key={item.to} to={item.to} onClick={() => setSidebarOpen(false)} className="block px-3 py-3 text-sm text-foreground transition-colors hover:bg-secondary">
                 {item.label}
               </Link>
             ))}
@@ -744,7 +744,7 @@ function SocialPage() {
                   if (label === "Find Investors") setActiveSection("Find Investors");
                   else toast.info(`${label} opportunities are not yet available.`);
                 }}
-                className="block w-full border-b border-border px-3 py-3 text-left text-sm text-foreground transition-colors hover:bg-secondary"
+                className="block w-full px-3 py-3 text-left text-sm text-foreground transition-colors hover:bg-secondary"
               >
                 {label}
               </button>
@@ -755,7 +755,7 @@ function SocialPage() {
                 setSidebarOpen(false);
                 setActiveSection("Monetization");
               }}
-              className="block w-full border-b border-border px-3 py-3 text-left text-sm text-foreground transition-colors hover:bg-secondary"
+              className="block w-full px-3 py-3 text-left text-sm text-foreground transition-colors hover:bg-secondary"
             >
               Monetise
             </button>
@@ -766,7 +766,7 @@ function SocialPage() {
                   setSidebarOpen(false);
                   setActiveSection("My Profile");
                 }}
-                className="block w-full border-b border-border px-3 py-3 text-left text-sm text-foreground transition-colors hover:bg-secondary"
+                className="block w-full px-3 py-3 text-left text-sm text-foreground transition-colors hover:bg-secondary"
               >
                 My Profile
               </button>
@@ -803,7 +803,7 @@ function SocialPage() {
         </nav>
         </>}
 
-        <main className="min-h-[220px] w-full min-w-0 max-w-full overflow-x-clip">
+        <main className={cn("min-h-[220px] w-full min-w-0 max-w-full overflow-x-clip", activeSection !== "Feed" && "social-no-horizontal-lines")}>
           {!userId ? (
             <div className="px-4 py-8 text-sm text-muted-foreground">Sign in to use Social.</div>
           ) : activeSection === "Feed" ? (
