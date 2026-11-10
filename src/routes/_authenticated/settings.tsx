@@ -49,6 +49,8 @@ function SettingsPage() {
   const { dark, setTheme, accent, setAccent } = useTheme();
   const avatar = useSignedUrl(profile?.avatar_url);
   const avatarInput = useRef<HTMLInputElement>(null);
+  const coverInput = useRef<HTMLInputElement>(null);
+  const cover = useSignedUrl(profile?.cover_image_url);
   const [termsOpen, setTermsOpen] = useState(false);
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [bio, setBio] = useState<string | null>(null);
@@ -128,6 +130,26 @@ function SettingsPage() {
       await queryClient.invalidateQueries({ queryKey: ["signed-url"] });
     },
     onError: (error: Error) => toast.error(error.message || "Could not upload profile photo"),
+  });
+
+  const uploadCover = useMutation({
+    mutationFn: async (file: File) => {
+      if (!userId) throw new Error("Sign in required");
+      if (!file.type.startsWith("image/")) throw new Error("Choose an image file");
+      if (file.size > 8 * 1024 * 1024) throw new Error("Cover images must be 8 MB or smaller");
+      const path = await uploadAsset(userId, file, "profile-covers");
+      const { error } = await supabase.from("profiles").update({ cover_image_url: path }).eq("id", userId);
+      if (error) throw error;
+    },
+    onSuccess: async () => {
+      toast.success("Cover picture updated");
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["profile", userId] }),
+        queryClient.invalidateQueries({ queryKey: ["social", "profiles"] }),
+        queryClient.invalidateQueries({ queryKey: ["signed-url"] }),
+      ]);
+    },
+    onError: (error: Error) => toast.error(error.message || "Could not upload cover picture"),
   });
 
   const setMode = useMutation({
@@ -261,6 +283,20 @@ function SettingsPage() {
                     </>
                   )}
                 </div>
+              </div>
+
+              <div className="mt-5 space-y-3 border-b border-border pb-5">
+                <div>
+                  <p className="text-sm font-medium">Cover picture</p>
+                  <p className="mt-1 text-xs text-muted-foreground">Choose a wide image for the top of your public profile. Images up to 8 MB.</p>
+                </div>
+                <div className="relative h-28 w-full overflow-hidden bg-muted sm:h-36">
+                  {cover ? <img src={cover} alt="Your profile cover" className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-sm text-muted-foreground">No cover picture selected</div>}
+                </div>
+                <button type="button" onClick={() => coverInput.current?.click()} disabled={uploadCover.isPending} className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline disabled:opacity-50">
+                  <Camera className="h-4 w-4" /> {uploadCover.isPending ? "Uploading cover…" : cover ? "Change cover picture" : "Add cover picture"}
+                </button>
+                <input ref={coverInput} type="file" accept="image/*" className="sr-only" aria-label="Choose profile cover picture" onChange={(event) => { const file = event.target.files?.[0]; if (file) uploadCover.mutate(file); event.currentTarget.value = ""; }} />
               </div>
 
               <div className="grid gap-5 py-5">
