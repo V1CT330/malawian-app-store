@@ -8,6 +8,7 @@ export type Profile = {
   id: string;
   display_name: string | null;
   avatar_url: string | null;
+  cover_image_url: string | null;
   bio: string | null;
   phone: string | null;
   phone_verified: boolean;
