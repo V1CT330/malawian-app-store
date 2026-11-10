@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { ConsoleShell } from "@/components/console/ConsoleShell";
@@ -36,6 +36,8 @@ function DeveloperProfilePage() {
   const { userId, profile } = useProfile();
   const queryClient = useQueryClient();
   const avatar = useSignedUrl(profile?.avatar_url);
+  const cover = useSignedUrl(profile?.cover_image_url);
+  const coverInput = useRef<HTMLInputElement>(null);
 
   const [fields, setFields] = useState<Record<string, string>>({});
   const [socials, setSocials] = useState<Record<string, string>>({});
@@ -146,6 +148,27 @@ function DeveloperProfilePage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  const uploadCover = useMutation({
+    mutationFn: async (file: File) => {
+      if (!userId) throw new Error("Sign in required");
+      if (!file.type.startsWith("image/")) throw new Error("Choose an image file");
+      if (file.size > 8 * 1024 * 1024) throw new Error("Cover images must be 8 MB or smaller");
+      const path = await uploadAsset(userId, file, "profile-covers");
+      const { error } = await supabase.from("profiles").update({ cover_image_url: path }).eq("id", userId);
+      if (error) throw error;
+    },
+    onSuccess: async () => {
+      toast.success("Cover picture updated");
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["profile", userId] }),
+        queryClient.invalidateQueries({ queryKey: ["social", "profiles"] }),
+        queryClient.invalidateQueries({ queryKey: ["developer", userId] }),
+        queryClient.invalidateQueries({ queryKey: ["signed-url"] }),
+      ]);
+    },
+    onError: (e: Error) => toast.error(e.message || "Could not upload cover picture"),
+  });
+
   const text = (
     key: string,
     label: string,
@@ -169,6 +192,20 @@ function DeveloperProfilePage() {
       <p className="text-sm text-muted-foreground">
         This is what users see when they open your developer page.
       </p>
+
+      <section className="surface-card mt-4 space-y-3 p-4">
+        <div>
+          <p className="text-sm font-semibold">Profile cover picture</p>
+          <p className="mt-1 text-xs text-muted-foreground">This wide image appears at the top of your public developer profile. Maximum size: 8 MB.</p>
+        </div>
+        <div className="h-28 w-full overflow-hidden bg-muted sm:h-36">
+          {cover ? <img src={cover} alt="Your profile cover" className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-sm text-muted-foreground">No cover picture selected</div>}
+        </div>
+        <Input ref={coverInput} type="file" accept="image/*" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; if (file) uploadCover.mutate(file); e.currentTarget.value = ""; }} />
+        <Button size="sm" variant="outline" disabled={uploadCover.isPending} onClick={() => coverInput.current?.click()}>
+          {uploadCover.isPending ? "Uploading cover…" : cover ? "Change cover picture" : "Add cover picture"}
+        </Button>
+      </section>
 
       <section className="surface-card flex items-center gap-4 p-4">
         <div className="h-16 w-16 overflow-hidden rounded-full bg-secondary">
