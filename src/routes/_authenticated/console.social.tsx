@@ -721,6 +721,8 @@ function SocialPage() {
     });
   }
 
+  const unreadMessages = (messagesQuery.data ?? []).filter((message) => message.recipient_id === userId && message.sender_id !== userId && !message.read_at).length;
+
   return (
     <ConsoleShell title="Social" hideTopBar hideTitleCard fullWidth>
       <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
@@ -795,8 +797,14 @@ function SocialPage() {
             return (
               <button key={id} type="button" onClick={() => setActiveSection(id)} aria-label={id} title={id} aria-current={selected ? "page" : undefined}
                 className={cn("flex min-h-12 min-w-0 flex-1 flex-col items-center justify-center border-b-2 px-1 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring", selected ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:border-border hover:text-foreground")}>
-                <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
-                {id === "Notifications" && unread > 0 && <span className="text-[10px] font-semibold">{unread > 9 ? "9+" : unread}</span>}
+                <span className="relative flex h-6 w-6 shrink-0 items-center justify-center">
+                  <Icon className="h-5 w-5" aria-hidden="true" />
+                  {((id === "Notifications" && unread > 0) || (id === "Messages" && unreadMessages > 0)) && (
+                    <span className="absolute -right-2 -top-2 flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-[#1877F2] px-1 text-[10px] font-bold leading-none text-white shadow-sm">
+                      {id === "Notifications" ? (unread > 99 ? "99+" : unread) : (unreadMessages > 99 ? "99+" : unreadMessages)}
+                    </span>
+                  )}
+                </span>
               </button>
             );
           })}
