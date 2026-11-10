@@ -258,3 +258,11 @@ html:has(.social-feed-screen) {
 html:has(.social-feed-screen)::-webkit-scrollbar {
   display: none;
 }
+
+
+/* Remove decorative horizontal dividers from Social sections other than Feed. */
+.social-no-horizontal-lines,
+.social-no-horizontal-lines * {
+  border-top-color: transparent !important;
+  border-bottom-color: transparent !important;
+}
