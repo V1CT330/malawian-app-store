@@ -145,6 +145,7 @@ function SocialPage() {
   const [projectType, setProjectType] = useState<"app" | "website" | "game" | "tool" | "other">("website");
   const [projectDescription, setProjectDescription] = useState("");
   const [projectImageUrl, setProjectImageUrl] = useState("");
+  const [optimisticReactions, setOptimisticReactions] = useState<Record<string, boolean>>({});
 
   const profilesQuery = useQuery({
     queryKey: ["social", "profiles"],
@@ -530,8 +531,22 @@ function SocialPage() {
         if (error) throw error;
       }
     },
-    onSuccess: () => invalidateSocial(["social", "reactions"]),
-    onError: (error: Error) => toast.error(error.message || "Could not update reaction"),
+    onSuccess: async (_result, variables) => {
+      await invalidateSocial(["social", "reactions"]);
+      setOptimisticReactions((current) => {
+        const next = { ...current };
+        delete next[variables.postId];
+        return next;
+      });
+    },
+    onError: (error: Error, variables) => {
+      setOptimisticReactions((current) => {
+        const next = { ...current };
+        delete next[variables.postId];
+        return next;
+      });
+      toast.error(error.message || "Could not update reaction");
+    },
   });
 
   const sendConnection = useMutation({
@@ -870,7 +885,7 @@ function SocialPage() {
               ) : postsQuery.data.map((post) => {
                 const author = profileMap.get(post.author_id) ?? (post.author_id === userId ? profile as SocialProfile : null);
                 const postReactions = reactionsByPost.get(post.id) ?? [];
-                const reacted = postReactions.some((reaction) => reaction.user_id === userId);
+                const reacted = optimisticReactions[post.id] ?? postReactions.some((reaction) => reaction.user_id === userId);
                 const postComments = commentsByPost.get(post.id) ?? [];
                 return (
                   <article key={post.id} className="relative w-full min-w-0 overflow-x-clip border-b-[3px] border-muted-foreground/30 bg-background px-4 pt-3 pb-4 sm:px-5">
@@ -901,7 +916,11 @@ function SocialPage() {
                     {post.media_url && post.media_type === "image" && <div className="-mx-4 mb-4 flex w-[calc(100%+2rem)] min-w-0 justify-center overflow-hidden bg-muted/20 sm:-mx-5 sm:w-[calc(100%+2.5rem)]"><img src={post.media_url} alt="Post attachment" loading="lazy" className="block h-auto max-h-[70svh] sm:max-h-[min(75vh,720px)] w-full max-w-full object-contain object-center" /></div>}
                     {post.media_url && post.media_type === "video" && <div className="-mx-4 mb-4 flex w-[calc(100%+2rem)] min-w-0 justify-center overflow-hidden bg-black sm:-mx-5 sm:w-[calc(100%+2.5rem)]"><video src={post.media_url} controls preload="metadata" className="block h-auto max-h-[70svh] sm:max-h-[min(75vh,720px)] w-full max-w-full object-contain object-center" aria-label="Post video attachment" /></div>}
                     <div className="mt-4 flex items-center justify-around gap-2 pt-3 pb-1 text-sm text-muted-foreground">
-                      <button type="button" disabled={toggleReaction.isPending} onClick={() => toggleReaction.mutate({ postId: post.id, reacted })} className={cn("flex flex-1 items-center justify-center gap-2 rounded-full bg-muted px-3 py-2 transition-colors hover:bg-muted/80 hover:text-foreground", reacted && "text-[#1877F2]")} aria-label={reacted ? "Unlike post" : "Like post"} aria-pressed={reacted}>
+                      <button type="button" disabled={toggleReaction.isPending} onClick={() => {
+                        const nextReacted = !reacted;
+                        setOptimisticReactions((current) => ({ ...current, [post.id]: nextReacted }));
+                        toggleReaction.mutate({ postId: post.id, reacted });
+                      }} className={cn("flex flex-1 items-center justify-center gap-2 rounded-full bg-muted px-3 py-2 transition-colors hover:bg-muted/80 hover:text-foreground", reacted && "!text-[#1877F2]")} aria-label={reacted ? "Unlike post" : "Like post"} aria-pressed={reacted}>
                         <ThumbsUp className={cn("h-5 w-5", reacted && "fill-current")} /> <span>{postReactions.length}</span>
                       </button>
                       <Link to="/console/social-post/$postId" params={{ postId: post.id }} state={{ fromSocialFeed: true }} aria-label={postComments.length + " comments. Open discussion"} title={postComments.length + " comments"} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-muted px-3 py-2 transition-colors hover:bg-muted/80 hover:text-foreground"><MessageCircle className="h-5 w-5" /></Link>
