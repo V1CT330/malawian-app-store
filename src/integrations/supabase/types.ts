@@ -1791,6 +1791,7 @@ export type Database = {
       public_profiles: {
         Row: {
           avatar_url: string | null
+          cover_image_url: string | null
           bio: string | null
           company_name: string | null
           created_at: string | null
@@ -1814,6 +1815,7 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          cover_image_url?: string | null
           bio?: string | null
           company_name?: string | null
           created_at?: string | null
@@ -1837,6 +1839,7 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          cover_image_url?: string | null
           bio?: string | null
           company_name?: string | null
           created_at?: string | null
