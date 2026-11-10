@@ -249,3 +249,12 @@
     padding-bottom: calc(7rem + env(safe-area-inset-bottom));
   }
 }
+
+/* Hide the browser's vertical scroll thumb on the Social screen without disabling scrolling. */
+html:has(.social-feed-screen) {
+  scrollbar-width: none;
+}
+
+html:has(.social-feed-screen)::-webkit-scrollbar {
+  display: none;
+}
