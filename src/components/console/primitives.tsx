@@ -93,11 +93,11 @@ export function SectionCard({
   className?: string;
 }) {
   return (
-    <section className={cn("min-w-0 border-b border-border py-5 last:border-b-0", className)}>
+    <section className={cn("min-w-0 border-b border-border/80 py-6 last:border-b-0", className)}>
       {(title || action) && (
-        <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           {title && (
-            <h2 className="font-display text-base font-semibold tracking-tight">{title}</h2>
+            <h2 className="text-base font-semibold tracking-tight">{title}</h2>
           )}
           {action}
         </div>
@@ -119,7 +119,7 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-border px-6 py-10 text-center">
+    <div className="flex flex-col items-center gap-2 border border-dashed border-border/80 bg-muted/10 px-5 py-9 text-center">
       {Icon && <Icon className="h-6 w-6 text-muted-foreground" />}
       <p className="font-display text-base font-semibold">{title}</p>
       {description && <p className="max-w-sm text-sm text-muted-foreground">{description}</p>}
@@ -132,7 +132,7 @@ export function RowSkeletons({ count = 3 }: { count?: number }) {
   return (
     <div className="space-y-3">
       {Array.from({ length: count }).map((_, i) => (
-        <Skeleton key={i} className="h-16 w-full rounded-2xl" />
+        <Skeleton key={i} className="h-14 w-full rounded-md" />
       ))}
     </div>
   );
@@ -142,7 +142,7 @@ export function TileSkeletons({ count = 4 }: { count?: number }) {
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       {Array.from({ length: count }).map((_, i) => (
-        <Skeleton key={i} className="h-24 w-full rounded-2xl" />
+        <Skeleton key={i} className="h-24 w-full rounded-md" />
       ))}
     </div>
   );
