@@ -22,6 +22,7 @@ import { ACCENT_PRESETS, useTheme } from "@/hooks/useTheme";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMwk, uploadAsset } from "@/lib/store";
 import { PRO_NAME, PRO_PRICE_MWK } from "@/lib/pro";
+import { hasProAccess } from "@/lib/pro-access";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -72,7 +73,7 @@ function SettingsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("subscriptions")
-        .select("status")
+        .select("plan,status,current_period_end")
         .eq("user_id", userId!)
         .maybeSingle();
       if (error) throw error;
@@ -462,7 +463,7 @@ function SettingsPage() {
                     { to: "/console", label: "Developer console", detail: "Products and publishing" },
                     { to: "/console/store", label: "Public developer profile", detail: "Your public presence" },
                     { to: "/console/verification", label: "Identity verification", detail: "Verification status" },
-                    { to: "/console/subscription", label: PRO_NAME, detail: subscription.data?.status === "active" ? `Active · ${formatMwk(PRO_PRICE_MWK)} monthly` : "Manage your plan" },
+                    { to: "/console/subscription", label: PRO_NAME, detail: hasProAccess(subscription.data) ? `Active · ${formatMwk(PRO_PRICE_MWK)} monthly` : "Manage your plan" },
                   ].map((item) => (
                     <Link key={item.to} to={item.to} className="group flex items-center gap-3 py-4 hover:text-primary">
                       <div className="min-w-0 flex-1"><p className="text-sm font-medium">{item.label}</p><p className="mt-1 text-xs text-muted-foreground">{item.detail}</p></div>
