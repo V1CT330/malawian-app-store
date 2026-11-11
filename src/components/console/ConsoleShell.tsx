@@ -159,7 +159,7 @@ export function ConsoleShell({
   }
 
   return (
-    <div className="console-square flex min-h-screen bg-muted/40">
+    <div className="console-square flex min-h-screen bg-background">
       <aside className="sticky top-0 hidden h-screen w-[264px] shrink-0 flex-col border-r border-sidebar-border bg-sidebar px-4 py-5 lg:flex">
         <Link to="/console" className="mb-6 flex items-center gap-2.5 rounded-2xl px-2 py-1.5">
           <img src={logo} alt="" width={32} height={32} className="h-8 w-8" />
@@ -330,9 +330,9 @@ export function ConsoleShell({
             </ol>
           )}
           {!hideTitleCard && (
-            <div className="console-hero mb-6 flex flex-wrap items-start justify-between gap-4 p-5 sm:p-6">
+            <div className="mb-6 flex flex-wrap items-start justify-between gap-4 border-b border-border pb-5">
               <div className="min-w-0">
-                <h1 className="font-display text-2xl font-bold leading-tight sm:text-3xl">{title}</h1>
+                <h1 className="font-display text-2xl font-bold leading-tight sm:text-[28px]">{title}</h1>
                 {description && (
                   <p className="mt-1.5 max-w-xl text-sm text-muted-foreground">{description}</p>
                 )}

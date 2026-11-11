@@ -94,7 +94,7 @@ function ProPage() {
       <h1 className="font-display text-2xl font-bold">{PRO_NAME}</h1>
       <p className="text-sm text-muted-foreground">{PRO_TAGLINE}</p>
 
-      <section className="surface-card p-5 text-center">
+      <section className="surface-card console-feature-card p-5 text-center">
         <p className="font-display text-3xl font-bold">{formatMwk(PRO_PRICE_MWK)}</p>
         <p className="text-sm text-muted-foreground">per month</p>
         {hasAccess ? (
