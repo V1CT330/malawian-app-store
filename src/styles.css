@@ -193,8 +193,8 @@
   box-shadow: var(--shadow-card);
 }
 
-/* Google Cloud-inspired palette, scoped only to Developer Mode. */
-.console-square {
+/* Google Cloud-inspired palette, scoped to Developer Mode and excluded from Social screens. */
+.console-square:not(:has(.social-feed-screen)) {
   --background: oklch(0.97 0.012 258);
   --foreground: oklch(0.29 0.045 258);
   --card: oklch(1 0 0);
@@ -223,7 +223,7 @@
   --sidebar-ring: oklch(0.61 0.16 255);
 }
 
-.dark .console-square {
+.dark .console-square:not(:has(.social-feed-screen)) {
   --background: oklch(0.19 0.018 258);
   --foreground: oklch(0.94 0.012 258);
   --card: oklch(0.225 0.02 258);
