@@ -254,15 +254,15 @@
 
 /* Developer console: preserve intentional rounded geometry in content.
    Scope shape corrections to the content area; the side navigation is untouched. */
-.console-square main .rounded-none {
+.console-square:not(:has(.social-feed-screen)) main .rounded-none {
   border-radius: 0.75rem !important;
 }
-.console-square main .surface-card,
-.console-square main .console-hero,
-.console-square main .inset-tile {
+.console-square:not(:has(.social-feed-screen)) main .surface-card,
+.console-square:not(:has(.social-feed-screen)) main .console-hero,
+.console-square:not(:has(.social-feed-screen)) main .inset-tile {
   border-radius: 1.25rem;
 }
-.console-square main .rounded-full {
+.console-square:not(:has(.social-feed-screen)) main .rounded-full {
   border-radius: 9999px !important;
 }
 .console-square .social-comment-bubble {
@@ -292,21 +292,21 @@
 }
 
 /* Flat developer-console design: panels become open sections, not nested cards. Keep only intentional feature, chat, and error surfaces boxed. */
-.console-square [class*="shadow-"],
-.console-square .surface-card,
-.console-square .surface-card:hover,
-.console-square .console-hero,
-.console-square .inset-tile {
+.console-square:not(:has(.social-feed-screen)) [class*="shadow-"],
+.console-square:not(:has(.social-feed-screen)) .surface-card,
+.console-square:not(:has(.social-feed-screen)) .surface-card:hover,
+.console-square:not(:has(.social-feed-screen)) .console-hero,
+.console-square:not(:has(.social-feed-screen)) .inset-tile {
   box-shadow: none !important;
 }
 
-.console-square .surface-card:not(.console-feature-card):not(.console-chat-bubble):not([class*="border-destructive"]) {
+.console-square:not(:has(.social-feed-screen)) .surface-card:not(.console-feature-card):not(.console-chat-bubble):not([class*="border-destructive"]) {
   background: transparent !important;
   border-color: transparent !important;
   box-shadow: none !important;
 }
 
-.console-square .console-hero {
+.console-square:not(:has(.social-feed-screen)) .console-hero {
   background-image: none !important;
   background-color: var(--card) !important;
 }
@@ -456,11 +456,11 @@ html:has(.social-feed-screen)::-webkit-scrollbar {
 
 /* Developer Mode surfaces: pale blue canvas behind a rounded white content plane.
    Keep component corner radii intact; only remove decorative section separators. */
-body:has(.console-square) {
+body:has(.console-square:not(:has(.social-feed-screen))) {
   background: oklch(1 0 0);
 }
 
-.console-square {
+.console-square:not(:has(.social-feed-screen)) {
   background: var(--background);
   border-radius: 28px;
   margin: 10px;
@@ -468,18 +468,18 @@ body:has(.console-square) {
 }
 
 @media (max-width: 639px) {
-  .console-square {
+  .console-square:not(:has(.social-feed-screen)) {
     border-radius: 22px;
     margin: 6px;
     min-height: calc(100vh - 12px);
   }
 }
 
-.console-square > div {
+.console-square:not(:has(.social-feed-screen)) > div {
   min-width: 0;
 }
 
-.console-square header {
+.console-square:not(:has(.social-feed-screen)) header {
   position: sticky;
   top: 0;
   z-index: 50;
@@ -487,7 +487,7 @@ body:has(.console-square) {
   background: var(--card);
 }
 
-.console-square main {
+.console-square:not(:has(.social-feed-screen)) main {
   background: var(--card);
   border-radius: 26px;
   margin: 12px 16px 20px;
@@ -496,36 +496,36 @@ body:has(.console-square) {
 }
 
 @media (max-width: 639px) {
-  .console-square main {
+  .console-square:not(:has(.social-feed-screen)) main {
     border-radius: 22px;
     margin: 10px 10px 16px;
     padding: 18px 16px;
   }
 }
 
-.console-square main :where(section, .dashboard-content-flat > section) {
+.console-square:not(:has(.social-feed-screen)) main :where(section, .dashboard-content-flat > section) {
   border-top-color: transparent !important;
   border-bottom-color: transparent !important;
 }
 
-.console-square main :where(.surface-card, .console-hero, .inset-tile) {
+.console-square:not(:has(.social-feed-screen)) main :where(.surface-card, .console-hero, .inset-tile) {
   box-shadow: none !important;
 }
 
 /* Keep useful input outlines and table structure visible. */
-.console-square main :where(input, select, textarea, [role="combobox"]) {
+.console-square:not(:has(.social-feed-screen)) main :where(input, select, textarea, [role="combobox"]) {
   border-color: var(--input);
 }
 
 
 /* Soft, Google Sans-inspired typography, limited to Developer Mode. */
-.console-square {
+.console-square:not(:has(.social-feed-screen)) {
   font-family: "Nunito Sans", "DM Sans", ui-sans-serif, system-ui, sans-serif;
   font-optical-sizing: auto;
   font-synthesis: none;
 }
 
-.console-square :where(h1, h2, h3, h4, .font-display) {
+.console-square:not(:has(.social-feed-screen)) :where(h1, h2, h3, h4, .font-display) {
   font-family: "Nunito Sans", "DM Sans", ui-sans-serif, system-ui, sans-serif;
   letter-spacing: -0.015em;
 }
