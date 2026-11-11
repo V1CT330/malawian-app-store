@@ -161,17 +161,7 @@ function ConsoleDashboard() {
   ].filter((item) => item.value > 0);
 
   return (
-    <ConsoleShell
-      title={`Welcome back, ${profile?.developer_name || profile?.display_name || "developer"}`}
-      description="Your publishing command centre. Check performance, fix blockers and manage releases."
-      actions={
-        <Button asChild variant="outline" className="rounded-none">
-          <Link to="/console/products">
-            <LayoutList className="mr-2 h-4 w-4" /> All products
-          </Link>
-        </Button>
-      }
-    >
+    <ConsoleShell hideTitleCard>
       <div className="dashboard-content-flat space-y-7">
         <section className="grid overflow-hidden rounded-3xl border border-border/70 bg-gradient-to-br from-primary/[0.055] via-background to-google-red/[0.035] shadow-sm md:grid-cols-[1.4fr_1fr]">
           <div className="flex flex-col justify-between gap-5 border-b border-border/70 p-5 sm:p-7 md:border-b-0 md:border-r">
