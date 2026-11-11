@@ -59,7 +59,7 @@ export function MetricTile({
   hint?: string;
 }) {
   return (
-    <div className="surface-card p-5 transition-shadow hover:shadow-soft">
+    <div className="min-w-0 py-3 sm:py-4">
       <p className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
         {label}
       </p>
@@ -93,11 +93,11 @@ export function SectionCard({
   className?: string;
 }) {
   return (
-    <section className={cn("surface-card p-5 sm:p-6", className)}>
+    <section className={cn("min-w-0 border-b border-border py-5 last:border-b-0", className)}>
       {(title || action) && (
-        <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="mb-3 flex items-center justify-between gap-3">
           {title && (
-            <h2 className="font-display text-[17px] font-semibold tracking-tight">{title}</h2>
+            <h2 className="font-display text-base font-semibold tracking-tight">{title}</h2>
           )}
           {action}
         </div>
