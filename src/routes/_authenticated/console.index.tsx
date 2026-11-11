@@ -27,6 +27,7 @@ import { Progress } from "@/components/ui/progress";
 import { useProfile } from "@/hooks/useSession";
 import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 import { supabase } from "@/integrations/supabase/client";
+import { hasProAccess } from "@/lib/pro-access";
 import { conversion, sum, useDeveloperStats, useMyListings } from "@/lib/console.queries";
 import { metricLabel, readinessScore } from "@/lib/console";
 import { reputationTier } from "@/lib/portal";
@@ -73,7 +74,7 @@ function ConsoleDashboard() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("subscriptions")
-        .select("status,current_period_end")
+        .select("plan,status,current_period_end")
         .eq("user_id", userId!)
         .maybeSingle();
       if (error) throw error;
@@ -85,7 +86,7 @@ function ConsoleDashboard() {
   const rating = ratedListings.reduce((total, listing) => total + Number(listing.rating_avg), 0) /
     Math.max(1, ratedListings.length);
   const reputation = reputationQuery.data ?? 0;
-  const subscribed = subscriptionQuery.data?.status === "active";
+  const subscribed = hasProAccess(subscriptionQuery.data);
   const published = listings.filter((listing) => listing.status === "published");
   const drafts = listings.filter((listing) => listing.status === "draft");
   const pending = listings.filter((listing) => listing.status === "pending");

@@ -6,10 +6,12 @@ import { AppIcon } from "@/components/ListingCard";
 import { ConsoleShell } from "@/components/console/ConsoleShell";
 import { EmptyState, RowSkeletons, SectionCard, StatusPill } from "@/components/console/primitives";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useProfile } from "@/hooks/useSession";
 import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyListings } from "@/lib/console.queries";
+import { hasProAccess } from "@/lib/pro-access";
 
 export const Route = createFileRoute("/_authenticated/console/testing")({
   head: () => ({
@@ -35,9 +37,24 @@ function TestingPage() {
   const listingsQuery = useMyListings(userId);
   const listings = listingsQuery.data ?? [];
 
+  const subscription = useQuery({
+    queryKey: ["subscription", userId],
+    enabled: Boolean(userId),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("subscriptions")
+        .select("plan,status,current_period_end")
+        .eq("user_id", userId!)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+  const hasPro = hasProAccess(subscription.data);
+
   const testersQuery = useQuery({
     queryKey: ["console-testers", userId],
-    enabled: Boolean(userId),
+    enabled: Boolean(userId && hasPro),
     queryFn: async () => {
       const { data, error } = await supabase
         .from("beta_testers")
@@ -50,6 +67,34 @@ function TestingPage() {
   });
 
   const testers = testersQuery.data ?? [];
+
+  if (subscription.isLoading) {
+    return <ConsoleShell title="Testing"><p className="text-sm text-muted-foreground">Checking Developer Pro access…</p></ConsoleShell>;
+  }
+
+  if (subscription.isError) {
+    return (
+      <ConsoleShell title="Testing">
+        <SectionCard title="Unable to verify subscription">
+          <p className="text-sm text-muted-foreground">We could not confirm your Developer Pro status. Retry before opening beta testing tools.</p>
+          <Button className="mt-3" variant="outline" onClick={() => void subscription.refetch()}>Retry</Button>
+        </SectionCard>
+      </ConsoleShell>
+    );
+  }
+
+  if (!hasPro) {
+    return (
+      <ConsoleShell title="Testing">
+        <SectionCard title="Beta testing requires Developer Pro">
+          <Badge variant="outline">Developer Pro feature</Badge>
+          <p className="mt-2 text-sm text-muted-foreground">Upgrade to an active paid subscription to invite beta testers and manage testing channels.</p>
+          <Button asChild className="mt-3"><Link to="/console/subscription">Upgrade to Developer Pro</Link></Button>
+        </SectionCard>
+      </ConsoleShell>
+    );
+  }
+
   const nameOf = (id: string) => listings.find((l) => l.id === id)?.name ?? "Product";
 
   return (

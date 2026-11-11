@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Send } from "lucide-react";
 import { useState } from "react";
@@ -7,6 +8,10 @@ import { toast } from "sonner";
 import { ConsoleShell } from "@/components/console/ConsoleShell";
 import { GeminiIcon } from "@/components/GeminiIcon";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useProfile } from "@/hooks/useSession";
+import { supabase } from "@/integrations/supabase/client";
+import { hasProAccess } from "@/lib/pro-access";
 import { Textarea } from "@/components/ui/textarea";
 import { askAssistant } from "@/lib/assistant.functions";
 import { cn } from "@/lib/utils";
@@ -40,6 +45,21 @@ const SUGGESTIONS = [
 
 function AssistantPage() {
   useRequireDeveloper();
+  const { userId } = useProfile();
+  const subscription = useQuery({
+    queryKey: ["subscription", userId],
+    enabled: Boolean(userId),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("subscriptions")
+        .select("plan,status,current_period_end")
+        .eq("user_id", userId!)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+  const hasPro = hasProAccess(subscription.data);
   const ask = useServerFn(askAssistant);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -60,6 +80,35 @@ function AssistantPage() {
     } finally {
       setBusy(false);
     }
+  }
+
+  if (subscription.isLoading) {
+    return <ConsoleShell title="AI assistant"><p className="text-sm text-muted-foreground">Checking Developer Pro access…</p></ConsoleShell>;
+  }
+
+  if (subscription.isError) {
+    return (
+      <ConsoleShell title="AI assistant">
+        <section className="surface-card space-y-3 p-5">
+          <h1 className="font-display text-xl font-semibold">Unable to verify subscription</h1>
+          <p className="text-sm text-muted-foreground">We could not confirm your Developer Pro status. Retry before using the AI assistant.</p>
+          <Button variant="outline" onClick={() => void subscription.refetch()}>Retry</Button>
+        </section>
+      </ConsoleShell>
+    );
+  }
+
+  if (!hasPro) {
+    return (
+      <ConsoleShell title="AI assistant">
+        <section className="surface-card space-y-3 p-5">
+          <Badge variant="outline">Developer Pro feature</Badge>
+          <h1 className="font-display text-xl font-semibold">AI assistant requires Developer Pro</h1>
+          <p className="text-sm text-muted-foreground">Upgrade to an active paid subscription to use the MAS AI publishing assistant.</p>
+          <Button asChild><Link to="/console/subscription">Upgrade to Developer Pro</Link></Button>
+        </section>
+      </ConsoleShell>
+    );
   }
 
   return (

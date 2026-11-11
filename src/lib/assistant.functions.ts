@@ -1,4 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
+
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { assertProSubscription } from "@/lib/pro.server";
 import { z } from "zod";
 
 const Input = z.object({
@@ -26,8 +29,10 @@ function toPlainText(text: string) {
 }
 
 export const askAssistant = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => Input.parse(data))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    await assertProSubscription(context.userId);
     const { completeNvidiaChat } = await import("@/lib/nvidia-ai.server");
     const raw = await completeNvidiaChat([
       {

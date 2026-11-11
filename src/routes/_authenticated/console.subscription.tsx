@@ -21,6 +21,7 @@ import {
   WHY_PRO_CLOSING,
 } from "@/lib/pro";
 import { formatMwk } from "@/lib/store";
+import { hasProAccess } from "@/lib/pro-access";
 import { cancelProSubscription, startProCheckout } from "@/lib/payments.functions";
 import { useServerFn } from "@tanstack/react-start";
 
@@ -65,12 +66,7 @@ function ProPage() {
   });
 
   const status = subscription.data?.status;
-  const periodEnd = subscription.data?.current_period_end
-    ? Date.parse(subscription.data.current_period_end)
-    : null;
-  const hasAccess =
-    (status === "active" || status === "cancelled") &&
-    (status === "active" && periodEnd === null ? true : periodEnd !== null && periodEnd > Date.now());
+  const hasAccess = hasProAccess(subscription.data);
   const cancelled = status === "cancelled";
   const startCheckout = useServerFn(startProCheckout);
   const cancelSubscription = useServerFn(cancelProSubscription);

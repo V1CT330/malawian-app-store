@@ -1,4 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { assertProSubscription } from "@/lib/pro.server";
 import { z } from "zod";
 
 export const AI_TASKS = [
@@ -57,8 +59,19 @@ function toPlainText(text: string) {
 }
 
 export const publishingAssist = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => Input.parse(data))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context: authContext }) => {
+    await assertProSubscription(authContext.userId);
+    const context = [
+      `Product: ${data.name || "Not provided"}`,
+      `Tagline: ${data.tagline || "Not provided"}`,
+      `Description: ${data.description || "Not provided"}`,
+      `Category: ${data.category || "Not provided"}`,
+      `Type: ${data.kind || "app"}`,
+      `Language: ${data.language}`,
+      `Additional notes: ${data.extra || "None"}`,
+    ].join("\n");
     const { completeNvidiaChat } = await import("@/lib/nvidia-ai.server");
     const text = await completeNvidiaChat(
       [
