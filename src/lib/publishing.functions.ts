@@ -71,7 +71,7 @@ export const publishingAssist = createServerFn({ method: "POST" })
       `Type: ${data.kind || "app"}`,
       `Language: ${data.language}`,
       `Additional notes: ${data.extra || "None"}`,
-    ].join("\\n");
+    ].join("\n");
     const { completeNvidiaChat } = await import("@/lib/nvidia-ai.server");
     const text = await completeNvidiaChat(
       [
