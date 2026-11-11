@@ -38,6 +38,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
+import { hasProAccess } from "@/lib/pro-access";
 import { kindLabel, type PortalListing } from "@/lib/portal";
 import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 
@@ -255,20 +256,14 @@ function AnalyticsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("subscriptions")
-        .select("status,current_period_end")
+        .select("plan,status,current_period_end")
         .eq("user_id", userId!)
         .maybeSingle();
       if (error) throw error;
       return data;
     },
   });
-  const subscriptionStatus = subscription.data?.status;
-  const periodEnd = subscription.data?.current_period_end
-    ? Date.parse(subscription.data.current_period_end)
-    : null;
-  const hasPro =
-    (subscriptionStatus === "active" && (periodEnd === null || periodEnd > Date.now())) ||
-    (subscriptionStatus === "cancelled" && periodEnd !== null && periodEnd > Date.now());
+  const hasPro = hasProAccess(subscription.data);
 
   const listings = useQuery({
     queryKey: ["my-listings", userId],
