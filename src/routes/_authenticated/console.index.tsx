@@ -284,8 +284,6 @@ function ConsoleDashboard() {
                     </div>
                   ))}
                 </div>
-                  ))}
-                </div>
               </>
             )}
           </SectionCard>
