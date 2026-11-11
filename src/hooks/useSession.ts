@@ -52,6 +52,19 @@ export function useSession() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!userId) return;
+    let active = true;
+    void supabase.rpc("accept_team_invitation").then(({ error }) => {
+      if (active && error) {
+        console.error("Could not accept workspace invitation:", error.message);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, [userId]);
+
   return { userId, ready };
 }
 
