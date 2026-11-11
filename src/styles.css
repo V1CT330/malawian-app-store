@@ -229,12 +229,18 @@
   border-radius: var(--radius);
 }
 
-/* Flat developer-console design: no floating cards, hover shadows, or gradient hero panels. */
+/* Flat developer-console design: panels become open sections, not nested cards. Keep only intentional feature, chat, and error surfaces boxed. */
 .console-square [class*="shadow-"],
 .console-square .surface-card,
 .console-square .surface-card:hover,
 .console-square .console-hero,
 .console-square .inset-tile {
+  box-shadow: none !important;
+}
+
+.console-square .surface-card:not(.console-feature-card):not(.console-chat-bubble):not([class*="border-destructive"]) {
+  background: transparent !important;
+  border-color: transparent !important;
   box-shadow: none !important;
 }
 
