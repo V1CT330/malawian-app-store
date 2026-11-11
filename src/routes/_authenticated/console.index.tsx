@@ -50,6 +50,35 @@ export const Route = createFileRoute("/_authenticated/console/")({
   component: ConsoleDashboard,
 });
 
+function CircularGauge({ value, size = 88, label }: { value: number; size?: number; label: string }) {
+  const safeValue = Math.max(0, Math.min(100, Number.isFinite(value) ? value : 0));
+  const radius = 36;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference * (1 - safeValue / 100);
+
+  return (
+    <div
+      role="img"
+      aria-label={`${label}: ${Math.round(safeValue)} percent`}
+      className="relative shrink-0"
+      style={{ width: size, height: size }}
+    >
+      <svg viewBox="0 0 80 80" className="h-full w-full -rotate-90">
+        <circle cx="40" cy="40" r={radius} fill="none" stroke="currentColor" strokeOpacity="0.10" strokeWidth="7" />
+        <circle
+          cx="40" cy="40" r={radius} fill="none" stroke="var(--google-green)"
+          strokeWidth="7" strokeLinecap="round" strokeDasharray={circumference}
+          strokeDashoffset={offset} className="transition-[stroke-dashoffset] duration-700"
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="font-display text-lg font-bold tabular-nums">{Math.round(safeValue)}%</span>
+        <span className="text-[9px] font-medium uppercase tracking-wide text-muted-foreground">{label}</span>
+      </div>
+    </div>
+  );
+}
+
 function ConsoleDashboard() {
   useRequireDeveloper();
   const { userId, profile } = useProfile();
@@ -148,8 +177,8 @@ function ConsoleDashboard() {
       }
     >
       <div className="dashboard-content-flat space-y-7">
-        <section className="grid gap-0 border-b border-border md:grid-cols-[1.4fr_1fr]">
-          <div className="flex flex-col justify-between gap-5 border-b border-border p-5 sm:p-6 md:border-b-0 md:border-r">
+        <section className="grid overflow-hidden rounded-3xl border border-border/70 bg-gradient-to-br from-primary/[0.055] via-background to-google-red/[0.035] shadow-sm md:grid-cols-[1.4fr_1fr]">
+          <div className="flex flex-col justify-between gap-5 border-b border-border/70 p-5 sm:p-7 md:border-b-0 md:border-r">
             <div>
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <Badge variant="outline" className="rounded-none">DEVELOPER OVERVIEW</Badge>
@@ -169,14 +198,14 @@ function ConsoleDashboard() {
               </Button>
             </div>
           </div>
-          <div className="grid grid-cols-2">
+          <div className="grid grid-cols-2 bg-muted/20">
             {[
               { label: "Published", value: published.length, note: "Live listings" },
               { label: "In review", value: pending.length, note: "Awaiting review" },
               { label: "Drafts", value: drafts.length, note: "Not published" },
               { label: "Action needed", value: rejected.length + tasks.filter((task) => task.tone === "info").length, note: "Fix or complete" },
             ].map((item, index) => (
-              <div key={item.label} className={`p-4 sm:p-5 ${index % 2 === 0 ? "border-r" : ""} ${index < 2 ? "border-b" : ""} border-border`}>
+              <div key={item.label} className={`p-4 sm:p-5 ${index % 2 === 0 ? "border-r" : ""} ${index < 2 ? "border-b" : ""} border-border/70`}>
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{item.label}</p>
                 <p className={`mt-2 font-display text-3xl font-bold tabular-nums ${item.label === "Published" ? "text-brand-green" : item.label === "In review" ? "text-amber-600 dark:text-amber-400" : item.label === "Action needed" ? (item.value > 0 ? "text-brand-red" : "text-brand-green") : "text-foreground"}`}>{listingsQuery.isLoading ? "—" : item.value}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{item.note}</p>
@@ -272,14 +301,14 @@ function ConsoleDashboard() {
               <EmptyState icon={Rocket} title="Start publishing" description="Create your first product listing to begin building your store presence." action={<Button asChild className="rounded-none"><Link to="/upload">Create listing</Link></Button>} />
             ) : (
               <div className="space-y-4">
-                <div className="flex items-end justify-between gap-3">
-                  <div>
-                    <p className={`text-3xl font-bold tabular-nums ${published.length > 0 && liveReady === published.length ? "text-brand-green" : published.length > 0 && liveReady / published.length < 0.5 ? "text-brand-red" : "text-amber-600 dark:text-amber-400"}`}>{Math.round((liveReady / Math.max(1, published.length)) * 100)}%</p>
-                    <p className="text-xs text-muted-foreground">Published listings at full readiness</p>
+                <div className="flex items-center gap-4 rounded-2xl bg-muted/35 p-4">
+                  <CircularGauge value={published.length ? (liveReady / published.length) * 100 : 0} label="Ready" />
+                  <div className="min-w-0">
+                    <p className="font-display text-base font-semibold">Publishing readiness</p>
+                    <p className="mt-1 text-xs text-muted-foreground">Share of published listings that meet every readiness check.</p>
+                    <p className="mt-2 text-sm font-medium tabular-nums">{liveReady} of {published.length} live listings ready</p>
                   </div>
-                  <span className="text-sm text-muted-foreground">{liveReady}/{published.length} live</span>
                 </div>
-                <Progress value={published.length ? (liveReady / published.length) * 100 : 0} />
                 <div className="divide-y divide-border border-y border-border">
                   <div className="flex items-center justify-between py-3 text-sm"><span className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-brand-green" /> Published</span><strong>{published.length}</strong></div>
                   <div className="flex items-center justify-between py-3 text-sm"><span className="flex items-center gap-2"><Rocket className="h-4 w-4 text-muted-foreground" /> In review</span><strong>{pending.length}</strong></div>
@@ -339,11 +368,13 @@ function ConsoleDashboard() {
             </SectionCard>
 
             <SectionCard title="Developer reputation" action={<Badge variant="secondary" className="rounded-none">{reputationTier(reputation)}</Badge>}>
-              <div className="flex items-end justify-between gap-3">
-                <p className="font-display text-3xl font-bold tabular-nums">{reputation}<span className="ml-1 text-sm font-normal text-muted-foreground">/100</span></p>
-                <p className="text-xs text-muted-foreground">Quality · ratings · updates</p>
+              <div className="flex items-center gap-4 rounded-2xl bg-muted/35 p-3">
+                <CircularGauge value={reputation} size={76} label="Score" />
+                <div className="min-w-0">
+                  <p className="font-display text-lg font-semibold tabular-nums">{reputation}<span className="ml-1 text-xs font-normal text-muted-foreground">/100</span></p>
+                  <p className="mt-1 text-xs text-muted-foreground">Quality · ratings · updates</p>
+                </div>
               </div>
-              <Progress value={reputation} className="mt-3" />
             </SectionCard>
 
             <SectionCard title="Developer Pro" action={subscribed ? <Badge className="rounded-none">Active</Badge> : <Badge variant="outline" className="rounded-none">Optional</Badge>}>
