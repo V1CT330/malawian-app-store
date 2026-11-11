@@ -454,44 +454,38 @@ html:has(.social-feed-screen)::-webkit-scrollbar {
   }
 }
 
-/* Developer Mode cleanup: keep geometry square and remove decorative separators.
-   Form controls retain a clear, usable outline. */
-.console-square :where(*[class*="rounded-"]) {
-  border-radius: 3px !important;
+/* Developer Mode surfaces: pale blue canvas behind a rounded white content plane.
+   Keep component corner radii intact; only remove decorative section separators. */
+.console-square {
+  background: var(--background);
 }
 
-.console-square :where(button, input, select, textarea, [role="button"]) {
-  border-radius: 3px !important;
+.console-square main {
+  background: var(--card);
+  border-radius: 26px;
+  margin: 12px 16px 20px;
+  min-height: calc(100vh - 32px);
+  padding: 24px;
 }
 
-.console-square aside :where(a, button, [role="button"]) {
-  border-radius: 3px !important;
+@media (max-width: 639px) {
+  .console-square main {
+    border-radius: 22px;
+    margin: 10px 10px 16px;
+    padding: 18px 16px;
+  }
 }
 
-.console-square main :where(section, .surface-card, .console-hero, .inset-tile) {
-  border-color: transparent !important;
-  box-shadow: none !important;
-}
-
-.console-square main section {
+.console-square main :where(section, .dashboard-content-flat > section) {
   border-top-color: transparent !important;
   border-bottom-color: transparent !important;
 }
 
-.console-square main .dashboard-content-flat > section {
-  border-color: transparent !important;
-}
-
-.console-square main .surface-card,
-.console-square main .console-hero,
-.console-square main .inset-tile {
-  background-image: none !important;
+.console-square main :where(.surface-card, .console-hero, .inset-tile) {
   box-shadow: none !important;
 }
 
-/* Preserve input outlines and data-table structure; remove decorative card outlines only. */
+/* Keep useful input outlines and table structure visible. */
 .console-square main :where(input, select, textarea, [role="combobox"]) {
-  border: 1px solid var(--input) !important;
-  border-radius: 3px !important;
+  border-color: var(--input);
 }
-
