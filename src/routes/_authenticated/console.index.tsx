@@ -152,12 +152,6 @@ function ConsoleDashboard() {
     if (previous === 0) return current === 0 ? null : 100;
     return Math.round(((current - previous) / previous) * 100);
   };
-  const listingStatusData = [
-    { name: "Published", value: published.length, color: "var(--google-green)" },
-    { name: "In review", value: pending.length, color: "var(--google-blue)" },
-    { name: "Drafts", value: drafts.length, color: "var(--google-yellow)" },
-    { name: "Rejected", value: rejected.length, color: "var(--google-red)" },
-  ].filter((item) => item.value > 0);
 
   return (
     <ConsoleShell hideTitleCard>
