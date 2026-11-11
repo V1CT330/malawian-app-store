@@ -275,3 +275,9 @@ html:has(.social-feed-screen)::-webkit-scrollbar {
   border-top-color: transparent !important;
   border-bottom-color: transparent !important;
 }
+
+/* The Social layout suppresses decorative dividers, never form-control outlines. */
+.social-no-horizontal-lines :is(input, textarea, select, [role="combobox"]) {
+  border-top-color: var(--border) !important;
+  border-bottom-color: var(--border) !important;
+}
