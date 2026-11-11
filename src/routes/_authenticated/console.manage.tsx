@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -18,6 +18,7 @@ import {
 import { useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 import { logActivity, TEAM_ROLES } from "@/lib/portal";
+import { hasProAccess } from "@/lib/pro-access";
 import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 
 export const Route = createFileRoute("/_authenticated/console/manage")({
@@ -55,9 +56,24 @@ function TeamPage() {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<string>("editor");
 
+  const subscription = useQuery({
+    queryKey: ["subscription", userId],
+    enabled: Boolean(userId),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("subscriptions")
+        .select("plan,status,current_period_end")
+        .eq("user_id", userId!)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+  const hasPro = hasProAccess(subscription.data);
+
   const members = useQuery({
     queryKey: ["team", userId],
-    enabled: Boolean(userId),
+    enabled: Boolean(userId && hasPro),
     queryFn: async () => {
       const { data, error } = await supabase
         .from("team_members")
@@ -71,7 +87,7 @@ function TeamPage() {
 
   const activity = useQuery({
     queryKey: ["activity", userId],
-    enabled: Boolean(userId),
+    enabled: Boolean(userId && hasPro),
     queryFn: async () => {
       const { data, error } = await supabase
         .from("activity_logs")
@@ -134,6 +150,35 @@ function TeamPage() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  if (subscription.isLoading) {
+    return <ConsoleShell title="Manage workspace"><p className="text-sm text-muted-foreground">Checking Developer Pro access…</p></ConsoleShell>;
+  }
+
+  if (subscription.isError) {
+    return (
+      <ConsoleShell title="Manage workspace">
+        <section className="surface-card space-y-3 p-5">
+          <h1 className="font-display text-xl font-semibold">Unable to verify subscription</h1>
+          <p className="text-sm text-muted-foreground">We could not confirm your Developer Pro status. Retry before opening team collaboration.</p>
+          <Button variant="outline" onClick={() => void subscription.refetch()}>Retry</Button>
+        </section>
+      </ConsoleShell>
+    );
+  }
+
+  if (!hasPro) {
+    return (
+      <ConsoleShell title="Manage workspace">
+        <section className="surface-card space-y-3 p-5">
+          <Badge variant="outline">Developer Pro feature</Badge>
+          <h1 className="font-display text-xl font-semibold">Team collaboration requires Developer Pro</h1>
+          <p className="text-sm text-muted-foreground">Upgrade to an active paid subscription to invite collaborators and manage workspace activity.</p>
+          <Button asChild><Link to="/console/subscription">Upgrade to Developer Pro</Link></Button>
+        </section>
+      </ConsoleShell>
+    );
+  }
 
   return (
     <ConsoleShell title="Manage workspace">
