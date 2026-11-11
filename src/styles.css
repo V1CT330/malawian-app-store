@@ -516,3 +516,16 @@ body:has(.console-square) {
 .console-square main :where(input, select, textarea, [role="combobox"]) {
   border-color: var(--input);
 }
+
+
+/* Soft, Google Sans-inspired typography, limited to Developer Mode. */
+.console-square {
+  font-family: "Nunito Sans", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  font-optical-sizing: auto;
+  font-synthesis: none;
+}
+
+.console-square :where(h1, h2, h3, h4, .font-display) {
+  font-family: "Nunito Sans", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.015em;
+}
