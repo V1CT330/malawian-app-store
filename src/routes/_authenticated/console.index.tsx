@@ -5,7 +5,6 @@ import {
   ArrowRight,
   BarChart3,
   CheckCircle2,
-  LayoutList,
   Rocket,
   TrendingUp,
 } from "lucide-react";
@@ -162,8 +161,8 @@ function ConsoleDashboard() {
 
   return (
     <ConsoleShell hideTitleCard>
-      <div className="dashboard-content-flat space-y-7">
-        <section className="grid overflow-hidden rounded-3xl border border-border/70 bg-gradient-to-br from-primary/[0.055] via-background to-google-red/[0.035] shadow-sm md:grid-cols-[1.4fr_1fr]">
+      <div className="dashboard-content-flat space-y-5">
+        <section className="grid overflow-hidden rounded-xl border border-border/70 bg-gradient-to-br from-primary/[0.055] via-background to-google-red/[0.035] shadow-sm md:grid-cols-[1.4fr_1fr]">
           <div className="flex flex-col justify-between gap-5 border-b border-border/70 p-5 sm:p-7 md:border-b-0 md:border-r">
             <div>
               <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -200,7 +199,14 @@ function ConsoleDashboard() {
           </div>
         </section>
 
-        <div className="grid grid-cols-2 gap-x-5 gap-y-2 xl:grid-cols-4">
+        {(listingsQuery.isError || statsQuery.isError || reputationQuery.isError || subscriptionQuery.isError) && (
+          <div role="alert" className="flex flex-wrap items-center justify-between gap-2 border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm">
+            <span className="font-medium">Some dashboard information could not be loaded.</span>
+            <span className="text-xs text-muted-foreground">Displayed figures may be incomplete. Refresh the page or try again shortly.</span>
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
           {statsQuery.isLoading ? <TileSkeletons /> : (
             <>
               <MetricTile label="Installs (30d)" value={installs.toLocaleString("en")} delta={percentDelta(currentInstalls, previousInstalls)} hint="Recorded installs" />
@@ -211,7 +217,7 @@ function ConsoleDashboard() {
           )}
         </div>
 
-        <div className="grid gap-5 xl:grid-cols-[1.6fr_1fr]">
+        <div className="grid gap-4 xl:grid-cols-[1.6fr_1fr]">
           <SectionCard
             title="Performance over the last 30 days"
             action={<Button asChild size="sm" variant="ghost" className="rounded-none"><Link to="/console/analytics">Detailed analytics <ArrowRight className="ml-1 h-4 w-4" /></Link></Button>}
@@ -247,37 +253,6 @@ function ConsoleDashboard() {
             )}
           </SectionCard>
 
-          <SectionCard title="Listing breakdown">
-            <p className="mb-3 text-xs text-muted-foreground">Actual listings grouped by their current publishing status.</p>
-            {listingsQuery.isLoading ? (
-              <div className="h-48 animate-pulse bg-muted" />
-            ) : listingStatusData.length === 0 ? (
-              <div className="flex min-h-40 items-center justify-center text-center text-sm text-muted-foreground">Your listing breakdown will appear after you create a product.</div>
-            ) : (
-              <>
-                <div className="space-y-4">
-                  {listingStatusData.map((item) => (
-                    <div key={item.name} className="space-y-1.5">
-                      <div className="flex items-center justify-between gap-3 text-xs">
-                        <span className="text-muted-foreground">{item.name}</span>
-                        <strong className="tabular-nums">{item.value}</strong>
-                      </div>
-                      <div className="h-2 w-full bg-muted">
-                        <div
-                          className="h-full"
-                          style={{
-                            width: `${(item.value / Math.max(1, listings.length)) * 100}%`,
-                            backgroundColor: item.color,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-          </SectionCard>
-
           <SectionCard title="Publishing health">
             {listingsQuery.isLoading ? <RowSkeletons count={2} /> : listings.length === 0 ? (
               <EmptyState icon={Rocket} title="Start publishing" description="Create your first product listing to begin building your store presence." action={<Button asChild className="rounded-none"><Link to="/upload">Create listing</Link></Button>} />
@@ -303,10 +278,10 @@ function ConsoleDashboard() {
           </SectionCard>
         </div>
 
-        <div className="grid gap-5 xl:grid-cols-[1.35fr_1fr]">
+        <div className="grid gap-4 xl:grid-cols-[1.35fr_1fr]">
           <SectionCard title="Products" action={<Button asChild size="sm" variant="ghost" className="rounded-none"><Link to="/console/products">Manage all <ArrowRight className="ml-1 h-4 w-4" /></Link></Button>}>
             {listingsQuery.isLoading ? <RowSkeletons /> : listings.length === 0 ? (
-              <EmptyState icon={LayoutList} title="Publish your first product" description="Apps, websites, AI agents and browser extensions are all welcome." action={<Button asChild className="rounded-none"><Link to="/upload">Start a listing</Link></Button>} />
+              <div className="flex flex-wrap items-center justify-between gap-3 py-2"><div><p className="text-sm font-medium">No products yet</p><p className="mt-1 text-xs text-muted-foreground">Publish an app, website, AI agent or browser extension to start building your store.</p></div><Button asChild size="sm" className="rounded-none"><Link to="/upload">Create product <ArrowRight className="ml-2 h-4 w-4" /></Link></Button></div>
             ) : (
               <ul className="divide-y divide-border">
                 {listings.slice(0, 5).map((listing) => (
