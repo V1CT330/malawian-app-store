@@ -361,7 +361,8 @@ html:has(.social-feed-screen)::-webkit-scrollbar {
     max-width: 100%;
   }
 
-  table {
+  /* Keep wide data tables scrollable inside their own wrapper, not across the page. */
+  .relative.w-full.overflow-auto > table {
     min-width: 36rem;
   }
 
