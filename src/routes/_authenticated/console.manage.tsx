@@ -104,11 +104,55 @@ function TeamPage() {
     mutationFn: async () => {
       if (!userId) throw new Error("Sign in required");
       const clean = email.trim().toLowerCase();
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean)) throw new Error("Enter a valid email address");
-      const { error } = await supabase
+      if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(clean)) throw new Error("Enter a valid email address");
+
+      const { data: authData, error: authError } = await supabase.auth.getUser();
+      if (authError) throw authError;
+      if (!authData.user) throw new Error("Sign in required");
+      if (authData.user.email?.toLowerCase() === clean) {
+        throw new Error("You cannot invite your own account");
+      }
+
+      const { data: existing, error: lookupError } = await supabase
         .from("team_members")
-        .insert({ owner_id: userId, email: clean, role, status: "invited" });
-      if (error) throw error;
+        .select("id,status")
+        .eq("owner_id", userId)
+        .eq("email", clean)
+        .maybeSingle();
+      if (lookupError) throw lookupError;
+      if (existing?.status === "active") {
+        throw new Error("This person is already a workspace member");
+      }
+
+      let invitationId = existing?.id;
+      if (existing) {
+        const { error } = await supabase
+          .from("team_members")
+          .update({ role, status: "invited", member_id: null })
+          .eq("id", existing.id);
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase
+          .from("team_members")
+          .insert({ owner_id: userId, email: clean, role, status: "invited" })
+          .select("id")
+          .single();
+        if (error) throw error;
+        invitationId = data.id;
+      }
+
+      const redirectTo = `${window.location.origin}/auth?redirect=%2Fconsole%2Fmanage`;
+      const { error: emailError } = await supabase.auth.signInWithOtp({
+        email: clean,
+        options: { emailRedirectTo: redirectTo, shouldCreateUser: true },
+      });
+      if (emailError) {
+        if (invitationId) {
+          await supabase.from("team_members").delete().eq("id", invitationId);
+        }
+        throw emailError;
+      }
+
       await logActivity({
         ownerId: userId,
         actorId: userId,
@@ -116,7 +160,7 @@ function TeamPage() {
       });
     },
     onSuccess: () => {
-      toast.success("Invitation recorded");
+      toast.success("Invitation email sent. The recipient must open the email link to join.");
       setEmail("");
       queryClient.invalidateQueries({ queryKey: ["team", userId] });
       queryClient.invalidateQueries({ queryKey: ["activity", userId] });
