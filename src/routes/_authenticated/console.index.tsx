@@ -147,8 +147,8 @@ function ConsoleDashboard() {
         </Button>
       }
     >
-      <div className="dashboard-content-flat space-y-5 [&_.surface-card]:rounded-none">
-        <section className="grid gap-0 border border-border bg-background md:grid-cols-[1.4fr_1fr]">
+      <div className="dashboard-content-flat space-y-7">
+        <section className="grid gap-0 border-b border-border md:grid-cols-[1.4fr_1fr]">
           <div className="flex flex-col justify-between gap-5 border-b border-border p-5 sm:p-6 md:border-b-0 md:border-r">
             <div>
               <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -185,7 +185,7 @@ function ConsoleDashboard() {
           </div>
         </section>
 
-        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-x-5 gap-y-2 xl:grid-cols-4">
           {statsQuery.isLoading ? <TileSkeletons /> : (
             <>
               <MetricTile label="Installs (30d)" value={installs.toLocaleString("en")} delta={percentDelta(currentInstalls, previousInstalls)} hint="Recorded installs" />
