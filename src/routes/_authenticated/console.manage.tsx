@@ -125,6 +125,7 @@ function TeamPage() {
       }
 
       let invitationId = existing?.id;
+      const createdNewInvitation = !existing;
       if (existing) {
         const { error } = await supabase
           .from("team_members")
@@ -141,13 +142,13 @@ function TeamPage() {
         invitationId = data.id;
       }
 
-      const redirectTo = `${window.location.origin}/auth?redirect=%2Fconsole%2Fmanage`;
+      const redirectTo = window.location.origin;
       const { error: emailError } = await supabase.auth.signInWithOtp({
         email: clean,
         options: { emailRedirectTo: redirectTo, shouldCreateUser: true },
       });
       if (emailError) {
-        if (invitationId) {
+        if (createdNewInvitation && invitationId) {
           await supabase.from("team_members").delete().eq("id", invitationId);
         }
         throw emailError;
