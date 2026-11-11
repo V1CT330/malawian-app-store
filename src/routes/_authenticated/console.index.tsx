@@ -9,7 +9,7 @@ import {
   Rocket,
   TrendingUp,
 } from "lucide-react";
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip, Line, LineChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { ResponsiveContainer, Tooltip, Line, LineChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 import { AppIcon } from "@/components/ListingCard";
 import { ConsoleShell } from "@/components/console/ConsoleShell";
@@ -49,30 +49,27 @@ export const Route = createFileRoute("/_authenticated/console/")({
   component: ConsoleDashboard,
 });
 
-function CircularGauge({ value, size = 88, label }: { value: number; size?: number; label: string }) {
+function LinearGauge({ value, label }: { value: number; label: string }) {
   const safeValue = Math.max(0, Math.min(100, Number.isFinite(value) ? value : 0));
-  const radius = 36;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference * (1 - safeValue / 100);
 
   return (
-    <div
-      role="img"
-      aria-label={`${label}: ${Math.round(safeValue)} percent`}
-      className="relative shrink-0"
-      style={{ width: size, height: size }}
-    >
-      <svg viewBox="0 0 80 80" className="h-full w-full -rotate-90">
-        <circle cx="40" cy="40" r={radius} fill="none" stroke="currentColor" strokeOpacity="0.10" strokeWidth="7" />
-        <circle
-          cx="40" cy="40" r={radius} fill="none" stroke="var(--google-green)"
-          strokeWidth="7" strokeLinecap="round" strokeDasharray={circumference}
-          strokeDashoffset={offset} className="transition-[stroke-dashoffset] duration-700"
+    <div className="w-full min-w-0">
+      <div className="mb-1 flex items-center justify-between gap-3 text-xs">
+        <span className="font-medium text-muted-foreground">{label}</span>
+        <span className="font-semibold tabular-nums">{Math.round(safeValue)}%</span>
+      </div>
+      <div
+        role="progressbar"
+        aria-label={label}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(safeValue)}
+        className="h-2 w-full overflow-hidden bg-muted"
+      >
+        <div
+          className="h-full bg-brand-green transition-[width] duration-500"
+          style={{ width: `${safeValue}%` }}
         />
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="font-display text-lg font-bold tabular-nums">{Math.round(safeValue)}%</span>
-        <span className="text-[9px] font-medium uppercase tracking-wide text-muted-foreground">{label}</span>
       </div>
     </div>
   );
@@ -268,27 +265,25 @@ function ConsoleDashboard() {
               <div className="flex min-h-40 items-center justify-center text-center text-sm text-muted-foreground">Your listing breakdown will appear after you create a product.</div>
             ) : (
               <>
-                <div className="relative h-48 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie data={listingStatusData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={52} outerRadius={76} paddingAngle={3} stroke="none">
-                        {listingStatusData.map((entry) => <Cell key={entry.name} fill={entry.color} />)}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="font-display text-2xl font-bold tabular-nums">{listings.length}</span>
-                    <span className="text-xs text-muted-foreground">Products</span>
-                  </div>
-                </div>
-                <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                <div className="space-y-4">
                   {listingStatusData.map((item) => (
-                    <div key={item.name} className="flex min-w-0 items-center gap-2">
-                      <span className="h-2.5 w-2.5 shrink-0" style={{ backgroundColor: item.color }} />
-                      <span className="min-w-0 flex-1 text-muted-foreground">{item.name}</span>
-                      <strong className="tabular-nums">{item.value}</strong>
+                    <div key={item.name} className="space-y-1.5">
+                      <div className="flex items-center justify-between gap-3 text-xs">
+                        <span className="text-muted-foreground">{item.name}</span>
+                        <strong className="tabular-nums">{item.value}</strong>
+                      </div>
+                      <div className="h-2 w-full bg-muted">
+                        <div
+                          className="h-full"
+                          style={{
+                            width: `${(item.value / Math.max(1, listings.length)) * 100}%`,
+                            backgroundColor: item.color,
+                          }}
+                        />
+                      </div>
                     </div>
+                  ))}
+                </div>
                   ))}
                 </div>
               </>
@@ -300,13 +295,14 @@ function ConsoleDashboard() {
               <EmptyState icon={Rocket} title="Start publishing" description="Create your first product listing to begin building your store presence." action={<Button asChild className="rounded-none"><Link to="/upload">Create listing</Link></Button>} />
             ) : (
               <div className="space-y-4">
-                <div className="flex items-center gap-4 rounded-2xl bg-muted/35 p-4">
-                  <CircularGauge value={published.length ? (liveReady / published.length) * 100 : 0} label="Ready" />
-                  <div className="min-w-0">
-                    <p className="font-display text-base font-semibold">Publishing readiness</p>
-                    <p className="mt-1 text-xs text-muted-foreground">Share of published listings that meet every readiness check.</p>
-                    <p className="mt-2 text-sm font-medium tabular-nums">{liveReady} of {published.length} live listings ready</p>
-                  </div>
+                <div className="space-y-2">
+                  <LinearGauge
+                    value={published.length ? (liveReady / published.length) * 100 : 0}
+                    label="Publishing readiness"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {liveReady} of {published.length} live listings meet every readiness check.
+                  </p>
                 </div>
                 <div className="divide-y divide-border border-y border-border">
                   <div className="flex items-center justify-between py-3 text-sm"><span className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-brand-green" /> Published</span><strong>{published.length}</strong></div>
@@ -367,12 +363,12 @@ function ConsoleDashboard() {
             </SectionCard>
 
             <SectionCard title="Developer reputation" action={<Badge variant="secondary" className="rounded-none">{reputationTier(reputation)}</Badge>}>
-              <div className="flex items-center gap-4 rounded-2xl bg-muted/35 p-3">
-                <CircularGauge value={reputation} size={76} label="Score" />
-                <div className="min-w-0">
-                  <p className="font-display text-lg font-semibold tabular-nums">{reputation}<span className="ml-1 text-xs font-normal text-muted-foreground">/100</span></p>
-                  <p className="mt-1 text-xs text-muted-foreground">Quality · ratings · updates</p>
-                </div>
+              <div className="space-y-2">
+                <p className="font-display text-lg font-semibold tabular-nums">
+                  {reputation}<span className="ml-1 text-xs font-normal text-muted-foreground">/100</span>
+                </p>
+                <LinearGauge value={reputation} label="Developer reputation" />
+                <p className="text-xs text-muted-foreground">Quality · ratings · updates</p>
               </div>
             </SectionCard>
 
