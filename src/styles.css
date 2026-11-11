@@ -193,14 +193,17 @@
   box-shadow: var(--shadow-card);
 }
 
-/* Developer console surfaces stay square, while avatars and chat bubbles retain their shape. */
-.console-square [class*="rounded-"],
-.console-square .surface-card,
-.console-square .console-hero,
-.console-square .inset-tile {
-  border-radius: 0 !important;
+/* Developer console: preserve intentional rounded geometry in content.
+   Scope shape corrections to the content area; the side navigation is untouched. */
+.console-square main .rounded-none {
+  border-radius: 0.75rem !important;
 }
-.console-square .rounded-full {
+.console-square main .surface-card,
+.console-square main .console-hero,
+.console-square main .inset-tile {
+  border-radius: 1.25rem;
+}
+.console-square main .rounded-full {
   border-radius: 9999px !important;
 }
 .console-square .social-comment-bubble {
