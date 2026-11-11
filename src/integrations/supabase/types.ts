@@ -1873,6 +1873,7 @@ export type Database = {
       }
     }
     Functions: {
+      accept_team_invitation: { Args: never; Returns: boolean }
       claim_first_admin: { Args: never; Returns: boolean }
       compute_reputation: { Args: { _developer: string }; Returns: number }
       confirm_phone: { Args: { _phone: string }; Returns: undefined }
