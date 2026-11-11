@@ -142,7 +142,7 @@ function AssistantPage() {
               "max-w-[85%] whitespace-pre-wrap rounded-2xl px-3.5 py-2.5 text-sm",
               m.role === "user"
                 ? "ml-auto bg-primary text-primary-foreground"
-                : "surface-card text-foreground",
+                : "surface-card console-chat-bubble text-foreground",
             )}
           >
             {m.content}
