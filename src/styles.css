@@ -456,8 +456,35 @@ html:has(.social-feed-screen)::-webkit-scrollbar {
 
 /* Developer Mode surfaces: pale blue canvas behind a rounded white content plane.
    Keep component corner radii intact; only remove decorative section separators. */
+body:has(.console-square) {
+  background: oklch(1 0 0);
+}
+
 .console-square {
   background: var(--background);
+  border-radius: 28px;
+  margin: 10px;
+  min-height: calc(100vh - 20px);
+}
+
+@media (max-width: 639px) {
+  .console-square {
+    border-radius: 22px;
+    margin: 6px;
+    min-height: calc(100vh - 12px);
+  }
+}
+
+.console-square > div {
+  min-width: 0;
+}
+
+.console-square header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  flex-shrink: 0;
+  background: var(--card);
 }
 
 .console-square main {
