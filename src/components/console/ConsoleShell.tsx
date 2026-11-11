@@ -188,7 +188,7 @@ export function ConsoleShell({
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        {!hideTopBar && <header className="sticky top-0 z-30 border-b border-border bg-background">
+        {!hideTopBar && <header className="sticky top-0 z-50 shrink-0 bg-background">
           <div className="mx-auto flex w-full max-w-6xl items-center gap-2 px-3 py-3 sm:px-6">
             <Sheet open={drawer} onOpenChange={setDrawer}>
               <SheetTrigger asChild>
