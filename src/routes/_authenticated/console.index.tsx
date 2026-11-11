@@ -155,18 +155,15 @@ function ConsoleDashboard() {
 
   return (
     <ConsoleShell hideTitleCard>
-      <div className="dashboard-content-flat space-y-5">
-        <section className="grid overflow-hidden rounded-xl border border-border/70 bg-gradient-to-br from-primary/[0.055] via-background to-google-red/[0.035] shadow-sm md:grid-cols-[1.4fr_1fr]">
-          <div className="flex flex-col justify-between gap-5 border-b border-border/70 p-5 sm:p-7 md:border-b-0 md:border-r">
+      <div className="dashboard-content-flat space-y-2">
+        <section className="grid border-b border-border/80 bg-background md:grid-cols-[1.35fr_1fr]">
+          <div className="flex flex-col justify-between gap-5 border-b border-border/80 px-1 py-5 sm:py-6 md:border-b-0 md:border-r md:pr-7">
             <div>
               <div className="mb-3 flex flex-wrap items-center gap-2">
-                <Badge variant="outline" className="rounded-none">DEVELOPER OVERVIEW</Badge>
+                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Developer console</span>
                 {subscribed && <Badge className="rounded-none">PRO ACTIVE</Badge>}
               </div>
-              <h2 className="font-display text-xl font-semibold tracking-tight sm:text-2xl">Your store, at a glance</h2>
-              <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-                A clear view of what is live, what needs work, and how people are finding your products.
-              </p>
+              <h2 className="text-2xl font-semibold tracking-tight sm:text-[28px]">Overview</h2>
             </div>
             <div className="flex flex-wrap gap-2">
               <Button asChild className="rounded-none">
@@ -177,14 +174,14 @@ function ConsoleDashboard() {
               </Button>
             </div>
           </div>
-          <div className="grid grid-cols-2 bg-muted/20">
+          <div className="grid grid-cols-2 bg-background md:pl-2">
             {[
               { label: "Published", value: published.length, note: "Live listings" },
               { label: "In review", value: pending.length, note: "Awaiting review" },
               { label: "Drafts", value: drafts.length, note: "Not published" },
               { label: "Action needed", value: rejected.length + tasks.filter((task) => task.tone === "info").length, note: "Fix or complete" },
             ].map((item, index) => (
-              <div key={item.label} className={`p-4 sm:p-5 ${index % 2 === 0 ? "border-r" : ""} ${index < 2 ? "border-b" : ""} border-border/70`}>
+              <div key={item.label} className={`px-4 py-4 sm:px-5 sm:py-5 ${index % 2 === 0 ? "border-r" : ""} ${index < 2 ? "border-b" : ""} border-border/80`}>
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{item.label}</p>
                 <p className={`mt-2 font-display text-3xl font-bold tabular-nums ${item.label === "Published" ? "text-brand-green" : item.label === "In review" ? "text-amber-600 dark:text-amber-400" : item.label === "Action needed" ? (item.value > 0 ? "text-brand-red" : "text-brand-green") : "text-foreground"}`}>{listingsQuery.isLoading ? "—" : item.value}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{item.note}</p>
@@ -200,7 +197,7 @@ function ConsoleDashboard() {
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-x-5 gap-y-2 border-b border-border/80 py-2 sm:grid-cols-4 sm:gap-6">
           {statsQuery.isLoading ? <TileSkeletons /> : (
             <>
               <MetricTile label="Installs (30d)" value={installs.toLocaleString("en")} delta={percentDelta(currentInstalls, previousInstalls)} hint="Recorded installs" />
@@ -211,7 +208,7 @@ function ConsoleDashboard() {
           )}
         </div>
 
-        <div className="grid gap-4 xl:grid-cols-[1.6fr_1fr]">
+        <div className="grid gap-x-8 xl:grid-cols-[1.6fr_1fr]">
           <SectionCard
             title="Performance over the last 30 days"
             action={<Button asChild size="sm" variant="ghost" className="rounded-none"><Link to="/console/analytics">Detailed analytics <ArrowRight className="ml-1 h-4 w-4" /></Link></Button>}
@@ -272,7 +269,7 @@ function ConsoleDashboard() {
           </SectionCard>
         </div>
 
-        <div className="grid gap-4 xl:grid-cols-[1.35fr_1fr]">
+        <div className="grid gap-x-8 xl:grid-cols-[1.35fr_1fr]">
           <SectionCard title="Products" action={<Button asChild size="sm" variant="ghost" className="rounded-none"><Link to="/console/products">Manage all <ArrowRight className="ml-1 h-4 w-4" /></Link></Button>}>
             {listingsQuery.isLoading ? <RowSkeletons /> : listings.length === 0 ? (
               <div className="flex flex-wrap items-center justify-between gap-3 py-2"><div><p className="text-sm font-medium">No products yet</p><p className="mt-1 text-xs text-muted-foreground">Publish an app, website, AI agent or browser extension to start building your store.</p></div><Button asChild size="sm" className="rounded-none"><Link to="/upload">Create product <ArrowRight className="ml-2 h-4 w-4" /></Link></Button></div>
@@ -280,7 +277,7 @@ function ConsoleDashboard() {
               <ul className="divide-y divide-border">
                 {listings.slice(0, 5).map((listing) => (
                   <li key={listing.id}>
-                    <Link to="/console/products/$id" params={{ id: listing.id }} className="flex items-center gap-3 py-3 hover:bg-muted/40">
+                    <Link to="/console/products/$id" params={{ id: listing.id }} className="flex items-center gap-3 py-3.5 hover:bg-muted/30">
                       <AppIcon path={listing.icon_url} name={listing.name} className="h-11 w-11 rounded-xl" />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium">{listing.name}</p>
@@ -294,7 +291,7 @@ function ConsoleDashboard() {
             )}
           </SectionCard>
 
-          <div className="space-y-5">
+          <div className="space-y-1">
             <SectionCard title="Needs your attention" action={<Badge variant="outline" className={`rounded-none ${tasks.length > 0 ? "border-brand-red/40 bg-brand-red/10 text-brand-red" : "border-brand-green/40 bg-brand-green/10 text-brand-green"}`}>{tasks.length} {tasks.length === 1 ? "item" : "items"}</Badge>}>
               {listingsQuery.isLoading ? <RowSkeletons count={2} /> : tasks.length === 0 ? (
                 <div className="flex items-start gap-3">
