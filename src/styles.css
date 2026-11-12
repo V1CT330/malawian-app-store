@@ -503,7 +503,7 @@ body:has(.console-square:not(:has(.social-feed-screen))) {
   }
 }
 
-.console-square:not(:has(.social-feed-screen)) main :where(section, .dashboard-content-flat > section) {
+.console-square:has(.console-dashboard-only):not(:has(.social-feed-screen)) main :where(section, .dashboard-content-flat > section) {
   border-top-color: transparent !important;
   border-bottom-color: transparent !important;
 }
@@ -518,21 +518,21 @@ body:has(.console-square:not(:has(.social-feed-screen))) {
 }
 
 
-/* Remove decorative separators across Developer Mode content only.
-   Keep form outlines, table grids, intentional feature/error surfaces, and Social intact. */
-.console-square:not(:has(.social-feed-screen)) main
-  :where([class*="divide-y"]) > * + *:not(tr) {
+/* Dashboard-only separator cleanup.
+   Buttons, button-like links, form controls, cards, tables, and Social keep their borders. */
+.console-square:has(.console-dashboard-only):not(:has(.social-feed-screen)) main
+  :where([class*="divide-y"]) > * + *:not(tr):not(button):not(a):not([role="button"]) {
   border-top-color: transparent !important;
 }
-.console-square:not(:has(.social-feed-screen)) main
-  :where([class*="border-y"], [class*="border-b"], [class*="border-t"]):not(input):not(textarea):not(select):not([role="combobox"]):not(table):not(thead):not(tbody):not(tfoot):not(tr):not(th):not(td):not(.console-feature-card):not(.console-chat-bubble):not([class*="border-destructive"]) {
+.console-square:has(.console-dashboard-only):not(:has(.social-feed-screen)) main
+  :where([class*="border-y"], [class*="border-b"], [class*="border-t"]):not(button):not(a):not([role="button"]):not(input):not(textarea):not(select):not([role="combobox"]):not(table):not(thead):not(tbody):not(tfoot):not(tr):not(th):not(td):not(.console-feature-card):not(.console-chat-bubble):not([class*="border-destructive"]) {
   border-top-color: transparent !important;
   border-bottom-color: transparent !important;
 }
-.console-square:not(:has(.social-feed-screen)) main :where(input, select, textarea, [role="combobox"]) {
+.console-square:has(.console-dashboard-only):not(:has(.social-feed-screen)) main :where(input, select, textarea, [role="combobox"]) {
   border-color: var(--input) !important;
 }
-.console-square:not(:has(.social-feed-screen)) main :where(table, thead, tbody, tfoot, tr, th, td) {
+.console-square:has(.console-dashboard-only):not(:has(.social-feed-screen)) main :where(table, thead, tbody, tfoot, tr, th, td) {
   border-color: var(--border);
 }
 
