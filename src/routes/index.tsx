@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ChevronRight, ExternalLink, Megaphone, RefreshCw } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { AppShell } from "@/components/AppShell";
-import { ListingCard, ListingTile } from "@/components/ListingCard";
+import { AppIcon, ListingCard, ListingTile } from "@/components/ListingCard";
+import { useSignedUrl } from "@/hooks/useSession";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { CATEGORIES, type Listing } from "@/lib/store";
@@ -61,6 +62,13 @@ function Shelf({ title, subtitle, items }: { title: string; subtitle?: string; i
   );
 }
 
+function SponsoredBannerImage({ path, className }: { path: string | null; className: string }) {
+  const signedUrl = useSignedUrl(path && !/^https?:\\/\\//i.test(path) ? path : null);
+  const src = path && /^https?:\\/\\//i.test(path) ? path : signedUrl;
+  if (!src) return null;
+  return <img src={src} alt="" loading="lazy" className={className} />;
+}
+
 function StorePage() {
   const routeSearch = Route.useSearch();
   const navigate = useNavigate();
@@ -110,7 +118,7 @@ function StorePage() {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("active_ad_creatives")
-        .select("id,headline,body,image_url,destination_url,placements")
+        .select("id,headline,body,image_url,destination_url,placements,creative_type,listing_id,listing_name,listing_slug,listing_icon_url,listing_banner_url,listing_website_url,listing_kind,listing_status")
         .contains("placements", ["store"])
         .limit(4);
       if (error) throw error;
@@ -118,6 +126,22 @@ function StorePage() {
     },
     staleTime: 60_000,
   });
+
+  const storeAds = (sponsoredStoreAds.data ?? []) as Array<{
+    id: string; headline: string; body: string | null; image_url: string | null;
+    destination_url: string; placements: string[]; creative_type: string;
+    listing_id: string | null; listing_name: string | null; listing_slug: string | null;
+    listing_icon_url: string | null; listing_banner_url: string | null;
+    listing_website_url: string | null; listing_kind: string | null; listing_status: string | null;
+  }>;
+  const sponsoredApps = storeAds.filter((ad) => ad.creative_type === "app_listing" && ad.listing_kind === "app");
+  const sponsoredWebsites = storeAds.filter((ad) => ad.creative_type === "website_banner" && (!ad.listing_kind || ad.listing_kind === "website"));
+  const trackedStoreImpressions = useRef(new Set<string>());
+  const recordStoreAdClick = (campaignId: string) => {
+    void supabase.auth.getUser().then(({ data }) => {
+      if (data.user) void (supabase as any).from("ad_events").insert({ campaign_id: campaignId, event_type: "click", viewer_id: data.user.id });
+    });
+  };
 
   const normalizedSearch = search.trim().toLowerCase();
   const listings = useMemo(
@@ -134,6 +158,20 @@ function StorePage() {
 
   const hasFilters = normalizedSearch !== "" || kind !== "all" || category !== "All";
   const browsing = !hasFilters;
+  useEffect(() => {
+    if (!browsing) return;
+    void supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) return;
+      for (const ad of storeAds) {
+        if (trackedStoreImpressions.current.has(ad.id)) continue;
+        trackedStoreImpressions.current.add(ad.id);
+        void (supabase as any).from("ad_events").insert({ campaign_id: ad.id, event_type: "impression", viewer_id: data.user.id })
+          .then(({ error }: { error: { code?: string } | null }) => {
+            if (error && error.code !== "23505") trackedStoreImpressions.current.delete(ad.id);
+          });
+      }
+    });
+  }, [browsing, storeAds.map((ad) => ad.id).join(",")]);
   const topCharts = useMemo(
     () => topByNumber(listings, (listing) => listing.downloads),
     [listings],
@@ -229,7 +267,7 @@ function StorePage() {
             {isFetching ? "Retrying…" : "Try again"}
           </button>
         </div>
-      ) : listings.length === 0 ? (
+      ) : listings.length === 0 && sponsoredApps.length === 0 && sponsoredWebsites.length === 0 && !sponsoredStoreAds.isLoading ? (
         <div className="rounded-2xl border border-border p-8 text-center">
           <h2 className="font-display text-lg font-semibold">
             {hasFilters ? "No matching products" : "Nothing here yet"}
@@ -251,62 +289,37 @@ function StorePage() {
         </div>
       ) : (
         <div>
-          {browsing ? (
-            <>
-              <Shelf
-                title="Recommended for you"
-                subtitle="Fresh from Malawian developers"
-                items={fresh}
-              />
-              <Shelf title="Top charts" subtitle="Most popular this week" items={topCharts} />
-              <Shelf title="Top rated" subtitle="Loved by reviewers" items={topRated} />
-            </>
-          ) : null}
-
-          {browsing && (sponsoredStoreAds.data ?? []).length > 0 && (
-            <section className="mb-5" aria-label="Sponsored products">
-              <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-muted-foreground">
-                <Megaphone className="h-4 w-4" /> Sponsored
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {(sponsoredStoreAds.data ?? []).map((ad: {
-                  id: string; headline: string; body: string | null; image_url: string | null;
-                  destination_url: string; placements: string[];
-                }) => (
-                  <a key={ad.id} href={ad.destination_url} target="_blank" rel="noreferrer noopener"
-                    onClick={() => {
-                      void supabase.auth.getUser().then(({ data }) => {
-                        if (data.user) {
-                          void (supabase as any).from("ad_events").insert({
-                            campaign_id: ad.id, event_type: "click", viewer_id: data.user.id,
-                          });
-                        }
-                      });
-                    }}
-                    className="overflow-hidden border border-border bg-background transition-colors hover:border-primary/50">
-                    {ad.image_url && <img src={ad.image_url} alt="" loading="lazy" className="h-36 w-full object-cover" />}
-                    <div className="p-3">
-                      <p className="font-semibold">{ad.headline}</p>
-                      {ad.body && <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{ad.body}</p>}
-                      <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary">Learn more <ExternalLink className="h-3 w-3" /></span>
+          {browsing && sponsoredApps.length > 0 && (
+            <section className="mb-5" aria-label="Sponsored apps">
+              <div className="mb-3 flex items-center gap-2 text-xs font-semibold text-muted-foreground"><Megaphone className="h-4 w-4" /> Sponsored apps</div>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {sponsoredApps.map((ad) => {
+                  const content = <div className="flex min-w-0 items-center gap-3 border border-border bg-background p-3 transition-colors hover:border-primary/50">
+                    <AppIcon path={ad.listing_icon_url} name={ad.listing_name || ad.headline} className="h-14 w-14 rounded-2xl" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold">{ad.listing_name || ad.headline}</p>
+                      {ad.body && <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{ad.body}</p>}
+                      <div className="mt-1 flex items-center gap-2"><span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Sponsored</span>{ad.listing_status !== "published" && <span className="text-[10px] font-semibold text-primary">Coming Soon</span>}</div>
                     </div>
-                  </a>
-                ))}
+                  </div>;
+                  return ad.listing_status === "published" && ad.listing_slug
+                    ? <Link key={ad.id} to="/apps/$slug" params={{ slug: ad.listing_slug }} onClick={() => recordStoreAdClick(ad.id)}>{content}</Link>
+                    : <div key={ad.id}>{content}</div>;
+                })}
               </div>
             </section>
           )}
-          <section className="mb-2" aria-live="polite" aria-atomic="false">
-            <h2 className="mb-2 font-display text-[17px] font-semibold">
-              {browsing
-                ? "All listings"
-                : `${listings.length} result${listings.length === 1 ? "" : "s"}`}
-            </h2>
-            <div className="space-y-1">
-              {listings.map((l) => (
-                <ListingCard key={l.id} listing={l} />
-              ))}
-            </div>
-          </section>
+          {browsing && sponsoredWebsites.length > 0 && <section className="mb-5 space-y-3" aria-label="Sponsored websites">
+            {sponsoredWebsites.map((ad) => <a key={ad.id} href={ad.destination_url} target="_blank" rel="noreferrer noopener" onClick={() => recordStoreAdClick(ad.id)} className="block overflow-hidden border border-border bg-background transition-colors hover:border-primary/50">
+              <SponsoredBannerImage path={ad.image_url || ad.listing_banner_url || ad.listing_icon_url} className="max-h-52 w-full object-cover" />
+              <div className="flex items-center justify-between gap-3 p-3"><div className="min-w-0"><p className="font-semibold">{ad.listing_name || ad.headline}</p>{ad.body && <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{ad.body}</p>}<span className="mt-1 inline-block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Sponsored website</span></div><ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground" /></div>
+            </a>)}
+          </section>}
+          {browsing ? <><Shelf title="Recommended for you" subtitle="Fresh from Malawian developers" items={fresh} /><Shelf title="Top charts" subtitle="Most popular this week" items={topCharts} /><Shelf title="Top rated" subtitle="Loved by reviewers" items={topRated} /></> : null}
+          {listings.length > 0 && <section className="mb-2" aria-live="polite" aria-atomic="false">
+            <h2 className="mb-2 font-display text-[17px] font-semibold">{browsing ? "All listings" : `${listings.length} result${listings.length === 1 ? "" : "s"}`}</h2>
+            <div className="space-y-1">{listings.map((l) => <ListingCard key={l.id} listing={l} />)}</div>
+          </section>}
         </div>
       )}
     </AppShell>

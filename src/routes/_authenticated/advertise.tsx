@@ -40,6 +40,9 @@ type Campaign = {
   starts_at: string | null;
   ends_at: string | null;
   created_at: string;
+  creative_type: "app_listing" | "website_banner" | "custom";
+  listing_id: string | null;
+  listing_name: string | null;
 };
 
 function AdvertisePage() {
@@ -52,7 +55,24 @@ function AdvertisePage() {
   const [destinationUrl, setDestinationUrl] = useState("");
   const [budget, setBudget] = useState("5000");
   const [days, setDays] = useState("7");
-  const [placements, setPlacements] = useState<string[]>(["social_feed"]);
+  const [placements, setPlacements] = useState<string[]>(["store", "social_feed"]);
+  const [creativeType, setCreativeType] = useState<"app_listing" | "website_banner" | "custom">("app_listing");
+  const [listingId, setListingId] = useState("");
+  const developerListings = useQuery({
+    queryKey: ["ad-eligible-listings", userId],
+    enabled: Boolean(userId),
+    queryFn: async () => {
+      const { data, error } = await supabase.from("listings")
+        .select("id,name,slug,tagline,kind,status,icon_url,banner_url,website_url")
+        .eq("developer_id", userId!)
+        .in("status", ["draft", "pending", "published"])
+        .in("kind", ["app", "website"])
+        .order("updated_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+  const selectedListing = developerListings.data?.find((listing) => listing.id === listingId) ?? null;
 
   const campaigns = useQuery({
     queryKey: ["ad-campaigns", userId],
@@ -93,21 +113,33 @@ function AdvertisePage() {
     mutationFn: async () => {
       if (!userId) throw new Error("Sign in to create a campaign.");
       if (name.trim().length < 3) throw new Error("Campaign name must be at least 3 characters.");
-      if (headline.trim().length < 3) throw new Error("Add an advert headline.");
-      if (!/^https:\/\/.+/.test(destinationUrl.trim())) throw new Error("Destination must be a secure https:// URL.");
-      if (imageUrl.trim() && !/^https:\/\/.+/.test(imageUrl.trim())) throw new Error("Image URL must start with https://.");
+      if (creativeType === "app_listing" && (!selectedListing || selectedListing.kind !== "app")) throw new Error("Select one of your app listings.");
+      if (creativeType === "website_banner" && listingId && (!selectedListing || selectedListing.kind !== "website")) throw new Error("Select one of your website listings.");
+      if (creativeType === "custom" && placements.includes("store")) throw new Error("Custom adverts can only appear in Social Mode.");
+      const destination = selectedListing
+        ? creativeType === "app_listing" ? `${window.location.origin}/apps/${selectedListing.slug}` : selectedListing.website_url || destinationUrl.trim()
+        : destinationUrl.trim();
+      const image = imageUrl.trim() || (creativeType === "website_banner" ? selectedListing?.banner_url || selectedListing?.icon_url : "") || "";
+      if (!/^https:\/\/.+/.test(destination)) throw new Error("Destination must be a secure https:// URL.");
+      if (imageUrl.trim() && !/^https:\/\/.+/.test(imageUrl.trim())) throw new Error("Custom image URL must start with https://.");
+      if (creativeType === "website_banner" && !image) throw new Error("Add a banner image for the website advert.");
+      if (creativeType === "website_banner" && selectedListing && !selectedListing.website_url && !destinationUrl.trim()) throw new Error("Add a website URL to the selected website listing first.");
+      if (creativeType === "custom" && !headline.trim()) throw new Error("Add an advert headline.");
+      if (creativeType === "website_banner" && !headline.trim() && !selectedListing) throw new Error("Add an advert headline.");
       const amount = Number(budget);
       const duration = Number(days);
       if (!Number.isInteger(amount) || amount < 1000) throw new Error("Minimum proposed budget is MK1,000.");
       if (!Number.isInteger(duration) || duration < 1 || duration > 90) throw new Error("Campaign duration must be 1–90 days.");
       if (!placements.length) throw new Error("Choose at least one placement.");
-      const { error } = await supabase.from("ad_campaigns").insert({
+      const { error } = await (supabase as any).from("ad_campaigns").insert({
         advertiser_id: userId,
         name: name.trim(),
-        headline: headline.trim(),
-        body: body.trim() || null,
-        image_url: imageUrl.trim() || null,
-        destination_url: destinationUrl.trim(),
+        creative_type: creativeType,
+        listing_id: selectedListing?.id ?? null,
+        headline: headline.trim() || selectedListing?.name || name.trim(),
+        body: body.trim() || selectedListing?.tagline || null,
+        image_url: image || null,
+        destination_url: destination,
         placements,
         duration_days: duration,
         budget_mwk: amount,
@@ -119,7 +151,8 @@ function AdvertisePage() {
     },
     onSuccess: async () => {
       toast.success("Campaign submitted for MAS review.");
-      setName(""); setHeadline(""); setBody(""); setImageUrl(""); setDestinationUrl("");
+      setName(""); setHeadline(""); setBody(""); setImageUrl(""); setDestinationUrl(""); setListingId("");
+      setCreativeType("app_listing"); setPlacements(["store", "social_feed"]);
       await queryClient.invalidateQueries({ queryKey: ["ad-campaigns", userId] });
     },
     onError: (error: Error) => toast.error(error.message),
@@ -169,6 +202,33 @@ function AdvertisePage() {
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="space-y-1">
+            <Label htmlFor="ad-creative-type">What are you promoting?</Label>
+            <select id="ad-creative-type" value={creativeType} onChange={(e) => {
+              const next = e.target.value as "app_listing" | "website_banner" | "custom";
+              setCreativeType(next); setListingId("");
+              setPlacements(next === "custom" ? ["social_feed"] : ["store", "social_feed"]);
+            }} className="h-10 w-full border border-input bg-background px-3 text-sm">
+              <option value="app_listing">One of my apps</option>
+              <option value="website_banner">A website banner</option>
+              <option value="custom">Other advert (Social Mode only)</option>
+            </select>
+          </div>
+          {creativeType !== "custom" && (
+            <div className="space-y-1">
+              <Label htmlFor="ad-listing">Select your listing</Label>
+              <select id="ad-listing" value={listingId} onChange={(e) => setListingId(e.target.value)}
+                className="h-10 w-full border border-input bg-background px-3 text-sm">
+                <option value="">{creativeType === "app_listing" ? "Choose an app" : "External website banner (no listing)"}</option>
+                {(developerListings.data ?? []).filter((listing) => creativeType === "app_listing" ? listing.kind === "app" : listing.kind === "website").map((listing) => (
+                  <option key={listing.id} value={listing.id}>{listing.name} · {listing.status === "published" ? "Published" : "Coming soon"}</option>
+                ))}
+              </select>
+              {developerListings.isLoading && <p className="text-xs text-muted-foreground">Loading your listings…</p>}
+              {!developerListings.isLoading && creativeType === "app_listing" && !(developerListings.data ?? []).some((listing) => listing.kind === "app") &&
+                <p className="text-xs text-muted-foreground">You have no eligible app listings yet. Create a listing first.</p>}
+            </div>
+          )}
+          <div className="space-y-1">
             <Label htmlFor="ad-campaign-name">Campaign name</Label>
             <Input id="ad-campaign-name" maxLength={100} value={name} onChange={(e) => setName(e.target.value)} placeholder="Product launch campaign" />
           </div>
@@ -195,8 +255,8 @@ function AdvertisePage() {
           <Label>Placements</Label>
           <div className="mt-2 grid gap-2 sm:grid-cols-2">
             {[
-              { value: "social_feed", label: "Social feed", detail: "Sponsored content in the Social feed" },
-              { value: "store", label: "Store discovery", detail: "Sponsored listings in store discovery" },
+              ...(creativeType === "custom" ? [] : [{ value: "store", label: "App Store", detail: creativeType === "app_listing" ? "Sponsored app placement above regular listings" : "Website banner placement in the App Store" }]),
+              { value: "social_feed", label: "Social Mode", detail: "Sponsored advert in the Social feed" },
             ].map((item) => (
               <label key={item.value} className="flex cursor-pointer items-start gap-3 border border-border p-3">
                 <input type="checkbox" checked={placements.includes(item.value)} onChange={() => togglePlacement(item.value)} className="mt-1" />

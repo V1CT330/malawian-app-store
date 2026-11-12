@@ -127,6 +127,13 @@ function FacebookShareIcon({ className }: { className?: string }) {
   );
 }
 
+function SponsoredSocialImage({ path }: { path: string | null }) {
+  const signedUrl = useSignedUrl(path && !/^https?:\\/\\//i.test(path) ? path : null);
+  const src = path && /^https?:\\/\\//i.test(path) ? path : signedUrl;
+  if (!src) return null;
+  return <img src={src} alt="" loading="lazy" className="mb-3 max-h-72 w-full object-contain" />;
+}
+
 function SocialPage() {
   const { userId, profile } = useProfile();
   const ownAvatar = useSignedUrl(profile?.avatar_url);
@@ -269,7 +276,7 @@ function SocialPage() {
     queryFn: async () => {
       const { data, error } = await socialDb
         .from("ad_campaigns")
-        .select("id,advertiser_id,headline,body,image_url,destination_url,placements,starts_at,ends_at")
+        .select("id,advertiser_id,headline,body,image_url,destination_url,placements,starts_at,ends_at,creative_type,listing_id,listing_name,listing_slug,listing_icon_url,listing_banner_url,listing_website_url,listing_kind,listing_status")
         .eq("status", "approved")
         .contains("placements", ["social_feed"])
         .order("created_at", { ascending: false })
@@ -284,20 +291,18 @@ function SocialPage() {
   });
 
   const trackedAdImpressions = useRef(new Set<string>());
-  const sponsoredCampaign = sponsoredCampaignsQuery.data?.[0];
+  const sponsoredCampaigns = sponsoredCampaignsQuery.data ?? [];
   useEffect(() => {
-    if (!userId || !sponsoredCampaign?.id || trackedAdImpressions.current.has(sponsoredCampaign.id)) return;
-    trackedAdImpressions.current.add(sponsoredCampaign.id);
-    void socialDb.from("ad_events").insert({
-      campaign_id: sponsoredCampaign.id,
-      event_type: "impression",
-      viewer_id: userId,
-    }).then(({ error }: { error: { code?: string } | null }) => {
-      if (error && error.code !== "23505") {
-        trackedAdImpressions.current.delete(sponsoredCampaign.id);
-      }
-    });
-  }, [userId, sponsoredCampaign?.id]);
+    if (!userId) return;
+    for (const campaign of sponsoredCampaigns) {
+      if (trackedAdImpressions.current.has(campaign.id)) continue;
+      trackedAdImpressions.current.add(campaign.id);
+      void socialDb.from("ad_events").insert({ campaign_id: campaign.id, event_type: "impression", viewer_id: userId })
+        .then(({ error }: { error: { code?: string } | null }) => {
+          if (error && error.code !== "23505") trackedAdImpressions.current.delete(campaign.id);
+        });
+    }
+  }, [userId, sponsoredCampaigns.map((campaign: { id: string }) => campaign.id).join(",")]);
 
   const connectionsQuery = useQuery({
     queryKey: ["social", "connections", userId],
@@ -860,28 +865,22 @@ function SocialPage() {
                 <span className="min-w-0 flex-1 rounded-full border border-border/70 bg-muted/30 px-4 py-3 text-sm text-muted-foreground">Share something</span>
               </button>
 
-              {sponsoredCampaign && (
-                <article className="relative w-full border-b-[3px] border-muted-foreground/30 bg-background px-4 py-4 sm:px-5">
-                  <div className="mb-3 flex items-center justify-between gap-2">
-                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground"><Megaphone className="h-3.5 w-3.5" /> Sponsored</span>
-                    <span className="text-[11px] text-muted-foreground">Advertisement</span>
-                  </div>
-                  <a href={sponsoredCampaign.destination_url} target="_blank" rel="noreferrer noopener"
-                    onClick={() => {
-                      void socialDb.from("ad_events").insert({
-                        campaign_id: sponsoredCampaign.id,
-                        event_type: "click",
-                        viewer_id: userId,
-                      });
-                    }}
-                    className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
-                    {sponsoredCampaign.image_url && <img src={sponsoredCampaign.image_url} alt="" loading="lazy" className="mb-3 max-h-72 w-full object-contain" />}
-                    <h3 className="text-base font-bold">{sponsoredCampaign.headline}</h3>
-                    {sponsoredCampaign.body && <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">{sponsoredCampaign.body}</p>}
-                    <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary">Learn more <ExternalLink className="h-3.5 w-3.5" /></span>
-                  </a>
-                </article>
-              )}
+              {sponsoredCampaigns.map((campaign: {
+                id: string; headline: string; body: string | null; image_url: string | null; destination_url: string;
+                creative_type: string; listing_name: string | null; listing_slug: string | null;
+                listing_icon_url: string | null; listing_banner_url: string | null; listing_status: string | null;
+              }) => {
+                const appContent = <div className="flex items-center gap-3"><AppIcon path={campaign.listing_icon_url} name={campaign.listing_name || campaign.headline} className="h-14 w-14 rounded-2xl" /><div className="min-w-0 flex-1"><h3 className="text-base font-bold">{campaign.listing_name || campaign.headline}</h3>{campaign.body && <p className="mt-1 text-sm leading-6 text-muted-foreground">{campaign.body}</p>}<span className="mt-2 inline-block text-xs font-semibold text-primary">{campaign.listing_status === "published" ? "View app" : "Coming Soon"}</span></div></div>;
+                return <article key={campaign.id} className="relative w-full border-b-[3px] border-muted-foreground/30 bg-background px-4 py-4 sm:px-5">
+                  <div className="mb-3 flex items-center justify-between gap-2"><span className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground"><Megaphone className="h-3.5 w-3.5" /> Sponsored</span><span className="text-[11px] text-muted-foreground">Advertisement</span></div>
+                  {campaign.creative_type === "app_listing" ? (campaign.listing_status === "published" && campaign.listing_slug
+                    ? <Link to="/apps/$slug" params={{ slug: campaign.listing_slug }} onClick={() => { void socialDb.from("ad_events").insert({ campaign_id: campaign.id, event_type: "click", viewer_id: userId }); }} className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">{appContent}</Link>
+                    : <div>{appContent}</div>) : <a href={campaign.destination_url} target="_blank" rel="noreferrer noopener" onClick={() => { void socialDb.from("ad_events").insert({ campaign_id: campaign.id, event_type: "click", viewer_id: userId }); }} className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                    {(campaign.image_url || campaign.listing_banner_url) && <SponsoredSocialImage path={campaign.image_url || campaign.listing_banner_url} />}
+                    <h3 className="text-base font-bold">{campaign.listing_name || campaign.headline}</h3>{campaign.body && <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">{campaign.body}</p>}<span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary">Learn more <ExternalLink className="h-3.5 w-3.5" /></span>
+                  </a>}
+                </article>;
+              })}
               {postsQuery.isLoading ? <p className="px-4 py-8 text-sm text-muted-foreground">Loading feed…</p> : postsQuery.isError ? (
                 <p role="alert" className="px-4 py-8 text-sm text-destructive">The feed could not load. The social database migration may not have been applied yet.</p>
               ) : !postsQuery.data?.length ? (
