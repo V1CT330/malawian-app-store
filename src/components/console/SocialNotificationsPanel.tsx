@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Bell } from "lucide-react";
 import { toast } from "sonner";
-import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -41,7 +40,6 @@ export function SocialNotificationsPanel({ userId }: { userId: string }) {
   return <div className="w-full bg-background px-4 py-5 sm:px-6 lg:px-8">
     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
       <div><h2 className="text-xl font-semibold">Social notifications</h2><p className="mt-1 text-sm text-muted-foreground">Connection requests, reactions, comments and messages.</p></div>
-      <Link to="/notifications" className="text-sm font-medium text-primary hover:underline">Store notifications</Link>
     </div>
     {list.isLoading ? <p className="py-8 text-sm text-muted-foreground">Loading social notifications…</p> : list.isError ? <div role="alert" className="border border-border p-4 text-sm"><p className="font-medium">Social notifications are not available yet.</p><p className="mt-1 text-muted-foreground">Apply the MAS Social database migration to the production Supabase project to enable this inbox.</p></div> : list.data?.length ? <div className="divide-y divide-border border-y border-border">
       {list.data.map((item) => <article key={item.id} className={cn("flex items-start gap-3 py-4", !item.read && "bg-primary/[0.04]")}>
