@@ -11,7 +11,7 @@ BEGIN
       AND conrelid = 'public.notifications'::regclass
   ) THEN
     ALTER TABLE public.notifications
-      ADD CONSTRAINT notifications_scope_check CHECK (scope IN ('user', 'developer'));
+      ADD CONSTRAINT notifications_scope_check CHECK (scope IN ('user', 'developer', 'social'));
   END IF;
 END $$;
 
@@ -32,20 +32,20 @@ WHERE title = 'Identity verification update'
 
 -- Earlier Social releases briefly wrote these events to public.notifications.
 -- Move those historical alerts to the existing Social-only table without changing IDs.
-INSERT INTO public.social_notifications (id, user_id, title, body, read, created_at)
-SELECT id, user_id, title, coalesce(body, ''), read, created_at
-FROM public.notifications
-WHERE title IN ('New friend request', 'Friend request accepted',
-                'New reaction on your post')
-   OR title LIKE 'New comment on your post'
-   OR title LIKE 'New message from %'
-ON CONFLICT (id) DO NOTHING;
-
-DELETE FROM public.notifications
+UPDATE public.notifications
+SET scope = 'social'
 WHERE title IN ('New friend request', 'Friend request accepted',
                 'New reaction on your post')
    OR title LIKE 'New comment on your post'
    OR title LIKE 'New message from %';
+
+-- Copy the historical Social alerts into the Social inbox, retaining the originals
+-- in the shared table as scope='social' for a reversible migration.
+INSERT INTO public.social_notifications (id, user_id, title, body, read, created_at)
+SELECT id, user_id, title, coalesce(nullif(body, ''), 'Social activity update'), read, created_at
+FROM public.notifications
+WHERE scope = 'social'
+ON CONFLICT (id) DO NOTHING;
 
 -- Keep future known developer lifecycle events out of the User Mode inbox.
 CREATE OR REPLACE FUNCTION public.assign_notification_scope()
