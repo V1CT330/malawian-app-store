@@ -9,7 +9,7 @@ import { useSignedUrl } from "@/hooks/useSession";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { CATEGORIES, type Listing } from "@/lib/store";
-import { matchesSearch, matchesListingFilters, topByNumber } from "@/shared/mas-core";
+import { matchesSearch, matchesListingFilters, rankListings, topByNumber } from "@/shared/mas-core";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
@@ -156,13 +156,15 @@ function StorePage() {
     || (showSponsoredWebsites && sponsoredWebsites.length > 0);
   const listings = useMemo(
     () =>
-      (data ?? []).filter((l) => {
-        const matchesText = matchesSearch(
-          [l.name, l.tagline, l.description, l.category, l.kind, l.developer?.developer_name, l.developer?.display_name],
-          normalizedSearch,
-        );
-        return matchesText && matchesListingFilters(l, { kind, category });
-      }),
+      rankListings(
+        (data ?? []).filter((l) =>
+          matchesSearch(
+            [l.name, l.tagline, l.description, l.category, l.kind, l.developer?.developer_name, l.developer?.display_name],
+            normalizedSearch,
+          ) && matchesListingFilters(l, { kind, category }),
+        ),
+        { query: normalizedSearch, limit: 200 },
+      ),
     [data, normalizedSearch, kind, category],
   );
 
@@ -190,7 +192,7 @@ function StorePage() {
     () => topByNumber(listings, (listing) => listing.rating_avg * listing.rating_count),
     [listings],
   );
-  const fresh = useMemo(() => listings.slice(0, 8), [listings]);
+  const fresh = useMemo(() => rankListings(listings, { limit: 8, maxPerCategory: 2 }), [listings]);
 
   const updateSearch = (value: string) => {
     const next = value.slice(0, 120);
