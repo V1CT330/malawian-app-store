@@ -116,13 +116,15 @@ function StorePage() {
   const sponsoredStoreAds = useQuery({
     queryKey: ["store", "sponsored-ad-creatives"],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from("active_ad_creatives")
-        .select("id,headline,body,image_url,destination_url,placements,creative_type,listing_id,listing_name,listing_slug,listing_icon_url,listing_banner_url,listing_website_url,listing_kind,listing_status")
-        .contains("placements", ["store"])
-        .limit(4);
-      if (error) throw error;
-      return data ?? [];
+      const adsDb = supabase as any;
+      const columns = "id,headline,body,image_url,destination_url,placements,creative_type,listing_id,listing_name,listing_slug,listing_icon_url,listing_banner_url,listing_website_url,listing_kind,listing_status";
+      const [apps, websites] = await Promise.all([
+        adsDb.from("active_ad_creatives").select(columns).eq("creative_type", "app_listing").contains("placements", ["store"]).limit(4),
+        adsDb.from("active_ad_creatives").select(columns).eq("creative_type", "website_banner").contains("placements", ["store"]).limit(4),
+      ]);
+      if (apps.error) throw apps.error;
+      if (websites.error) throw websites.error;
+      return [...(apps.data ?? []), ...(websites.data ?? [])];
     },
     staleTime: 60_000,
   });
@@ -145,6 +147,14 @@ function StorePage() {
   };
 
   const normalizedSearch = search.trim().toLowerCase();
+  const showSponsoredApps = normalizedSearch === "" && kind !== "website";
+  const showSponsoredWebsites = normalizedSearch === "" && kind !== "app";
+  const visibleStoreAdIds = storeAds
+    .filter((ad) => ad.creative_type === "app_listing" ? showSponsoredApps : showSponsoredWebsites)
+    .map((ad) => ad.id)
+    .join(",");
+  const hasVisibleSponsored = (showSponsoredApps && sponsoredApps.length > 0)
+    || (showSponsoredWebsites && sponsoredWebsites.length > 0);
   const listings = useMemo(
     () =>
       (data ?? []).filter((l) => {
@@ -163,7 +173,7 @@ function StorePage() {
     if (!browsing) return;
     void supabase.auth.getUser().then(({ data }) => {
       if (!data.user) return;
-      for (const campaignId of storeAdIds.split(",").filter(Boolean)) {
+      for (const campaignId of visibleStoreAdIds.split(",").filter(Boolean)) {
         if (trackedStoreImpressions.current.has(campaignId)) continue;
         trackedStoreImpressions.current.add(campaignId);
         void (supabase as any).from("ad_events").insert({ campaign_id: campaignId, event_type: "impression", viewer_id: data.user.id })
@@ -172,7 +182,7 @@ function StorePage() {
           });
       }
     });
-  }, [browsing, storeAdIds]);
+  }, [browsing, visibleStoreAdIds]);
   const topCharts = useMemo(
     () => topByNumber(listings, (listing) => listing.downloads),
     [listings],
@@ -268,7 +278,7 @@ function StorePage() {
             {isFetching ? "Retrying…" : "Try again"}
           </button>
         </div>
-      ) : listings.length === 0 && sponsoredApps.length === 0 && sponsoredWebsites.length === 0 && !sponsoredStoreAds.isLoading ? (
+      ) : listings.length === 0 && !hasVisibleSponsored && !sponsoredStoreAds.isLoading ? (
         <div className="rounded-2xl border border-border p-8 text-center">
           <h2 className="font-display text-lg font-semibold">
             {hasFilters ? "No matching products" : "Nothing here yet"}
@@ -290,7 +300,7 @@ function StorePage() {
         </div>
       ) : (
         <div>
-          {browsing && sponsoredApps.length > 0 && (
+          {showSponsoredApps && sponsoredApps.length > 0 && (
             <section className="mb-5" aria-label="Sponsored apps">
               <div className="mb-3 flex items-center gap-2 text-xs font-semibold text-muted-foreground"><Megaphone className="h-4 w-4" /> Sponsored apps</div>
               <div className="grid gap-2 sm:grid-cols-2">
@@ -310,7 +320,7 @@ function StorePage() {
               </div>
             </section>
           )}
-          {browsing && sponsoredWebsites.length > 0 && <section className="mb-5 space-y-3" aria-label="Sponsored websites">
+          {showSponsoredWebsites && sponsoredWebsites.length > 0 && <section className="mb-5 space-y-3" aria-label="Sponsored websites">
             {sponsoredWebsites.map((ad) => <a key={ad.id} href={ad.destination_url} target="_blank" rel="noreferrer noopener" onClick={() => recordStoreAdClick(ad.id)} className="block overflow-hidden border border-border bg-background transition-colors hover:border-primary/50">
               <SponsoredBannerImage path={ad.image_url || ad.listing_banner_url || ad.listing_icon_url} className="max-h-52 w-full object-cover" />
               <div className="flex items-center justify-between gap-3 p-3"><div className="min-w-0"><p className="font-semibold">{ad.listing_name || ad.headline}</p>{ad.body && <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{ad.body}</p>}<span className="mt-1 inline-block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Sponsored website</span></div><ExternalLink className="h-4 w-4 shrink-0 text-muted-foreground" /></div>
