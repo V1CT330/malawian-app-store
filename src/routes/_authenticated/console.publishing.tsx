@@ -48,7 +48,7 @@ function PublishingPage() {
       description="Every product, grouped by where it sits in the review pipeline."
       breadcrumbs={[{ label: "Console", to: "/console" }, { label: "Publishing" }]}
       actions={
-        <Button asChild>
+        <Button asChild className="rounded-xl">
           <Link to="/upload">New product</Link>
         </Button>
       }
@@ -61,7 +61,7 @@ function PublishingPage() {
           title="Nothing in the pipeline yet"
           description="Start a listing and it will appear here as it moves through review."
           action={
-            <Button asChild>
+            <Button asChild className="rounded-xl">
               <Link to="/upload">Start a listing</Link>
             </Button>
           }
