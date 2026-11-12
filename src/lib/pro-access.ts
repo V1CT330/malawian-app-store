@@ -14,7 +14,7 @@ export function hasProAccess(
   now = Date.now(),
 ): boolean {
   if (!subscription || subscription.plan !== "pro") return false;
-  if (subscription.status !== "active" && subscription.status !== "cancelled") return false;
+  if (subscription.status !== "active" && subscription.status !== "cancelled" && subscription.status !== "trialing") return false;
 
   const periodEnd = subscription.current_period_end
     ? Date.parse(subscription.current_period_end)
