@@ -171,7 +171,7 @@ function UploadPage() {
       <div className="mt-5 space-y-4">
         <div>
           <Label>Type</Label>
-          <div className="mt-1.5 grid grid-cols-2 gap-2 sm:grid-cols-3">
+          <div className="mt-1.5 grid grid-cols-3 gap-3">
             {PRODUCT_KINDS.map((k) => (
               <Button
                 key={k.value}
@@ -181,7 +181,7 @@ function UploadPage() {
                   setKind(k.value);
                   setFile(null);
                 }}
-                className="h-10 w-full min-w-0 whitespace-nowrap px-3 text-center"
+                className={`h-16 w-full min-w-0 whitespace-nowrap px-3 text-center ${k.value === "extension" ? "col-span-3" : ""}`}
               >
                 {k.label}
               </Button>
