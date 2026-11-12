@@ -9,6 +9,7 @@ import {
   Store,
 } from "lucide-react";
 import { useRef, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
