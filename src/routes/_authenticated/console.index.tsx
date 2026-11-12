@@ -234,8 +234,8 @@ function ConsoleDashboard() {
             </div>
 
             <div className="dashboard-panel">
-              <div className="flex items-center justify-between gap-2"><div><p className="dashboard-eyebrow">OPTIONAL PLAN</p><h3 className="mt-1 text-lg font-semibold tracking-tight">Developer Pro</h3></div><Badge variant={subscribed ? "default" : "outline"} className="rounded-full">{subscribed ? "Active" : "Optional"}</Badge></div>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">{subscribed ? `Your subscription is active. Renews ${subscriptionQuery.data?.current_period_end?.slice(0, 10) ?? "monthly"}.` : "MK5,000 per month unlocks priority review, advanced analytics and the AI assistant."}</p>
+              <div className="flex items-center justify-between gap-2"><div><p className="dashboard-eyebrow">OPTIONAL PLAN</p><h3 className="mt-1 text-lg font-semibold tracking-tight">Developer Mode</h3></div><Badge variant={subscribed ? "default" : "outline"} className="rounded-full">{subscribed ? "Active" : "Optional"}</Badge></div>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">{subscribed ? `Your subscription is active. Renews ${subscriptionQuery.data?.current_period_end?.slice(0, 10) ?? "monthly"}.` : "Free for 3 months, then MK12,000/year for the full Developer Mode toolkit."}</p>
               <Button asChild size="sm" variant={subscribed ? "outline" : "default"} className="mt-4 w-full rounded-full"><Link to="/console/subscription">{subscribed ? "Manage subscription" : "Explore Developer Pro"}</Link></Button>
             </div>
           </div>
