@@ -155,7 +155,7 @@ function ConsoleDashboard() {
 
   return (
     <ConsoleShell hideTitleCard>
-      <div className="dashboard-content-flat space-y-2">
+      <div className="console-dashboard-only dashboard-content-flat space-y-2">
         <section className="grid border-b border-border/80 bg-background md:grid-cols-[1.35fr_1fr]">
           <div className="flex flex-col justify-between gap-5 border-b border-border/80 px-1 py-5 sm:py-6 md:border-b-0 md:border-r md:pr-7">
             <div>
