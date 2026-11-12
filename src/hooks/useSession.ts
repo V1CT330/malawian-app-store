@@ -123,15 +123,40 @@ export function useMode() {
   return profile?.mode === "developer" ? "developer" : "user";
 }
 
-export function useUnreadCount() {
+export type NotificationScope = "user" | "developer";
+
+export function useUnreadCount(scope: NotificationScope = "user") {
   const { userId } = useSession();
   const query = useQuery({
-    queryKey: ["unread", userId],
+    queryKey: ["unread", scope, userId],
     enabled: Boolean(userId),
     refetchInterval: 60_000,
     queryFn: async () => {
       const { count, error } = await supabase
         .from("notifications")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId!)
+        .eq("scope", scope)
+        .eq("read", false);
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
+  return query.data ?? 0;
+}
+
+export function useSocialUnreadCount() {
+  const { userId } = useSession();
+  const query = useQuery({
+    queryKey: ["social", "notifications", userId, "unread"],
+    enabled: Boolean(userId),
+    refetchInterval: 30_000,
+    queryFn: async () => {
+      // social_notifications is introduced by the additive Social migration.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const socialDb = supabase as any;
+      const { count, error } = await socialDb
+        .from("social_notifications")
         .select("id", { count: "exact", head: true })
         .eq("user_id", userId!)
         .eq("read", false);
