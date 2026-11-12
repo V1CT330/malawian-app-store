@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { PRO_PRICE_MWK } from "@/lib/pro";
+import { PRO_ANNUAL_PRICE_MWK } from "@/lib/pro";
 
 /** Creates a server-side PayChangu hosted checkout for Developer Pro. */
 export const startProCheckout = createServerFn({ method: "POST" })
@@ -18,7 +18,7 @@ export const startProCheckout = createServerFn({ method: "POST" })
     const { error: insertError } = await supabaseAdmin.from("payment_sessions").insert({
       user_id: context.userId,
       tx_ref: txRef,
-      amount_mwk: PRO_PRICE_MWK,
+      amount_mwk: PRO_ANNUAL_PRICE_MWK,
       status: "pending",
     });
     if (insertError) throw new Error("Could not start payment.");
@@ -26,7 +26,7 @@ export const startProCheckout = createServerFn({ method: "POST" })
     try {
       const checkoutUrl = await createPaychanguCheckout({
         txRef,
-        amount: PRO_PRICE_MWK,
+        amount: PRO_ANNUAL_PRICE_MWK,
         email,
         name: "Developer",
         // PayChangu redirects the customer to callback_url after success.
