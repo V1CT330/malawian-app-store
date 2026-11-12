@@ -139,7 +139,6 @@ function StorePage() {
   const sponsoredApps = storeAds.filter((ad) => ad.creative_type === "app_listing" && ad.listing_kind === "app");
   const sponsoredWebsites = storeAds.filter((ad) => ad.creative_type === "website_banner" && (!ad.listing_kind || ad.listing_kind === "website"));
   const trackedStoreImpressions = useRef(new Set<string>());
-  const storeAdIds = storeAds.map((ad) => ad.id).join(",");
   const recordStoreAdClick = (campaignId: string) => {
     void supabase.auth.getUser().then(({ data }) => {
       if (data.user) void (supabase as any).from("ad_events").insert({ campaign_id: campaignId, event_type: "click", viewer_id: data.user.id });
@@ -170,7 +169,7 @@ function StorePage() {
   const hasFilters = normalizedSearch !== "" || kind !== "all" || category !== "All";
   const browsing = !hasFilters;
   useEffect(() => {
-    if (!browsing) return;
+    if (!visibleStoreAdIds) return;
     void supabase.auth.getUser().then(({ data }) => {
       if (!data.user) return;
       for (const campaignId of visibleStoreAdIds.split(",").filter(Boolean)) {
@@ -182,7 +181,7 @@ function StorePage() {
           });
       }
     });
-  }, [browsing, visibleStoreAdIds]);
+  }, [visibleStoreAdIds]);
   const topCharts = useMemo(
     () => topByNumber(listings, (listing) => listing.downloads),
     [listings],
