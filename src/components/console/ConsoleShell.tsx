@@ -121,6 +121,8 @@ export function ConsoleShell({
   hideTitleCard?: boolean;
   fullWidth?: boolean;
 }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isSocialRoute = pathname === "/console/social" || pathname.startsWith("/console/social-post");
   const { userId, profile } = useProfile();
   const isAdmin = useIsAdmin();
   const unread = useUnreadCount("developer");
@@ -159,7 +161,7 @@ export function ConsoleShell({
   }
 
   return (
-    <div className="console-square flex min-h-screen bg-muted/20">
+    <div className={cn("console-square flex min-h-screen bg-muted/20", !isSocialRoute && "developer-mode-shell")}>
       <aside className="sticky top-0 hidden h-screen w-[264px] shrink-0 flex-col border-r border-sidebar-border bg-background px-4 py-5 lg:flex">
         <Link to="/console" className="mb-6 flex items-center gap-2.5 rounded-2xl px-2 py-1.5">
           <img src={logo} alt="" width={32} height={32} className="h-8 w-8" />
