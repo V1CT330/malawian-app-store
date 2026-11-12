@@ -171,7 +171,7 @@ function UploadPage() {
       <div className="mt-5 space-y-4">
         <div>
           <Label>Type</Label>
-          <div className="mt-1.5 flex flex-wrap gap-2">
+          <div className="mt-1.5 grid grid-cols-1 gap-2 sm:grid-cols-3">
             {PRODUCT_KINDS.map((k) => (
               <Button
                 key={k.value}
@@ -181,7 +181,7 @@ function UploadPage() {
                   setKind(k.value);
                   setFile(null);
                 }}
-                className="flex-1"
+                className="h-auto min-h-10 w-full min-w-0 whitespace-normal px-3 py-2 text-center"
               >
                 {k.label}
               </Button>
