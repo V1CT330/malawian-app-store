@@ -176,12 +176,13 @@ function UploadPage() {
               <Button
                 key={k.value}
                 type="button"
+                aria-pressed={kind === k.value}
                 variant={kind === k.value ? "default" : "outline"}
                 onClick={() => {
                   setKind(k.value);
                   setFile(null);
                 }}
-                className={`h-16 w-full min-w-0 whitespace-nowrap px-3 text-center ${k.value === "extension" ? "col-span-3" : ""}`}
+                className={`h-[68px] w-full min-w-0 rounded-full whitespace-nowrap px-3 text-center text-base font-medium shadow-sm ${k.value === "extension" ? "col-span-3" : ""}`}
               >
                 {k.label}
               </Button>
@@ -191,7 +192,7 @@ function UploadPage() {
 
         <div>
           <Label htmlFor="name">Name</Label>
-          <Input id="name" value={name} maxLength={60} onChange={(e) => setName(e.target.value)} />
+          <Input id="name" className="h-[60px] rounded-[18px] px-5" value={name} maxLength={60} onChange={(e) => setName(e.target.value)} />
         </div>
 
         <div>
@@ -202,6 +203,7 @@ function UploadPage() {
             maxLength={90}
             onChange={(e) => setTagline(e.target.value)}
             placeholder="One line about your app"
+            className="h-[60px] rounded-[18px] px-5"
           />
         </div>
 
@@ -213,6 +215,7 @@ function UploadPage() {
             maxLength={2000}
             rows={5}
             onChange={(e) => setDescription(e.target.value)}
+            className="min-h-[140px] rounded-[18px] px-5 py-4"
           />
         </div>
 
@@ -220,7 +223,7 @@ function UploadPage() {
           <div>
             <Label>Category</Label>
             <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger className="mt-1.5">
+              <SelectTrigger className="mt-1.5 h-[60px] rounded-[18px] px-5">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -242,6 +245,7 @@ function UploadPage() {
               value={websiteUrl}
               onChange={(e) => setWebsiteUrl(e.target.value)}
               placeholder="https://example.mw"
+              className="h-[60px] rounded-[18px] px-5"
             />
           </div>
         ) : (
@@ -253,6 +257,7 @@ function UploadPage() {
               accept={kind === "app" ? ".apk,application/vnd.android.package-archive" : ".zip,application/zip"}
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
               required
+              className="h-[60px] rounded-[18px] px-5"
             />
             <p className="mt-1 text-xs text-muted-foreground">Maximum size: 50 MB. App listings require a package file.</p>
           </div>
@@ -266,11 +271,12 @@ function UploadPage() {
               type="file"
               accept="image/*"
               onChange={(e) => setIcon(e.target.files?.[0] ?? null)}
+              className="h-[60px] rounded-[18px] px-5"
             />
           </div>
           <div>
             <Label htmlFor="version">Version</Label>
-            <Input id="version" value={version} onChange={(e) => setVersion(e.target.value)} />
+            <Input id="version" className="h-[60px] rounded-[18px] px-5" value={version} onChange={(e) => setVersion(e.target.value)} />
           </div>
         </div>
 
@@ -282,6 +288,7 @@ function UploadPage() {
             multiple
             accept=".jpg,.jpeg,.png,.webp,.gif,.avif,image/jpeg,image/png,image/webp,image/gif,image/avif"
             onChange={(e) => setScreenshotFiles(Array.from(e.target.files ?? []))}
+            className="h-[60px] rounded-[18px] px-5"
           />
           <p className="mt-1 text-xs text-muted-foreground">
             Add up to 8 images, 10 MB each. At least 2 screenshots are required before publishing.{" "}
@@ -290,7 +297,7 @@ function UploadPage() {
         </div>
 
         <Button
-          className="w-full"
+          className="h-14 w-full rounded-full"
           size="lg"
           disabled={publish.isPending}
           onClick={() => publish.mutate()}
