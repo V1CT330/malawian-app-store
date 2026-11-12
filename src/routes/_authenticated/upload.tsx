@@ -182,7 +182,7 @@ function UploadPage() {
                   setKind(k.value);
                   setFile(null);
                 }}
-                className={`h-[68px] w-full min-w-0 rounded-full whitespace-nowrap px-3 text-center text-base font-medium shadow-sm ${k.value === "extension" ? "col-span-3" : ""}`}
+                className={`h-12 w-full min-w-0 rounded-[16px] whitespace-nowrap px-3 text-center text-base font-medium shadow-sm ${k.value === "extension" ? "col-span-3" : ""}`}
               >
                 {k.label}
               </Button>
@@ -297,7 +297,7 @@ function UploadPage() {
         </div>
 
         <Button
-          className="h-14 w-full rounded-full"
+          className="h-12 w-full rounded-[16px]"
           size="lg"
           disabled={publish.isPending}
           onClick={() => publish.mutate()}
