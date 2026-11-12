@@ -3,7 +3,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   AlertTriangle,
   ArrowRight,
-  BarChart3,
   CheckCircle2,
   Rocket,
   TrendingUp,
@@ -133,18 +132,6 @@ function ConsoleDashboard() {
   const recentStats = stats.slice(-14);
   const views = sum(stats, "views");
   const installs = sum(stats, "installs");
-  const currentPeriod = stats.slice(-14);
-  const previousPeriod = stats.slice(-28, -14);
-  const currentViews = sum(currentPeriod, "views");
-  const previousViews = sum(previousPeriod, "views");
-  const currentInstalls = sum(currentPeriod, "installs");
-  const previousInstalls = sum(previousPeriod, "installs");
-  const currentConversion = currentViews ? (currentInstalls / currentViews) * 100 : 0;
-  const previousConversion = previousViews ? (previousInstalls / previousViews) * 100 : 0;
-  const percentDelta = (current: number, previous: number): number | null => {
-    if (previous === 0) return current === 0 ? null : 100;
-    return Math.round(((current - previous) / previous) * 100);
-  };
 
   return (
     <ConsoleShell hideTitleCard>
