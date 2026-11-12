@@ -32,7 +32,7 @@ export async function createPaychanguCheckout(input: {
       callback_url: input.callbackUrl,
       return_url: input.returnUrl,
       customization: {
-        title: "Developer Pro",
+        title: "Developer Mode",
         description: "Malawian App Store annual subscription",
       },
     }),
