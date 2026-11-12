@@ -663,7 +663,7 @@ export type Database = {
           created_at: string
           id: string
           read: boolean
-          scope: "user" | "developer"
+          scope: "user" | "developer" | "social"
           title: string
           user_id: string
         }
@@ -672,7 +672,7 @@ export type Database = {
           created_at?: string
           id?: string
           read?: boolean
-          scope?: "user" | "developer"
+          scope?: "user" | "developer" | "social"
           title: string
           user_id: string
         }
@@ -681,7 +681,7 @@ export type Database = {
           created_at?: string
           id?: string
           read?: boolean
-          scope?: "user" | "developer"
+          scope?: "user" | "developer" | "social"
           title?: string
           user_id?: string
         }
