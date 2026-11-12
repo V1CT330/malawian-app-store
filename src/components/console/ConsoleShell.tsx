@@ -122,7 +122,6 @@ export function ConsoleShell({
   fullWidth?: boolean;
 }) {
   const { userId, profile } = useProfile();
-  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const isAdmin = useIsAdmin();
   const unread = useUnreadCount("developer");
   const profileAvatar = useSignedUrl(profile?.avatar_url);
