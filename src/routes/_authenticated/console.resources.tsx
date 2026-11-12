@@ -66,7 +66,7 @@ const FAQS = [
     a: "Most products are reviewed within two working days. Subscribers go into the priority queue.",
   },
   {
-    q: "What does the MK5,000 monthly subscription include?",
+    q: "What does the Developer Mode annual plan include?",
     a: SUBSCRIPTION_BENEFITS.join(". ") + ".",
   },
   {
