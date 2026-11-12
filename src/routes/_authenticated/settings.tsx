@@ -21,8 +21,9 @@ import { useIsAdmin, useMode, useProfile, useSignedUrl } from "@/hooks/useSessio
 import { ACCENT_PRESETS, useTheme } from "@/hooks/useTheme";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMwk, uploadAsset } from "@/lib/store";
-import { PRO_NAME, PRO_PRICE_MWK } from "@/lib/pro";
+import { PRO_NAME, PRO_ANNUAL_PRICE_MWK } from "@/lib/pro";
 import { hasProAccess } from "@/lib/pro-access";
+import { startDeveloperTrial } from "@/lib/subscription.functions";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -153,6 +154,8 @@ function SettingsPage() {
     onError: (error: Error) => toast.error(error.message || "Could not upload cover picture"),
   });
 
+  const beginDeveloperTrial = useServerFn(startDeveloperTrial);
+
   const setMode = useMutation({
     mutationFn: async ({
       next,
@@ -171,6 +174,7 @@ function SettingsPage() {
         })
         .eq("id", userId);
       if (error) throw error;
+      if (next === "developer") await beginDeveloperTrial();
       return next;
     },
     onSuccess: (next, variables) => {
@@ -463,7 +467,7 @@ function SettingsPage() {
                     { to: "/console", label: "Developer console", detail: "Products and publishing" },
                     { to: "/console/store", label: "Public developer profile", detail: "Your public presence" },
                     { to: "/console/verification", label: "Identity verification", detail: "Verification status" },
-                    { to: "/console/subscription", label: PRO_NAME, detail: hasProAccess(subscription.data) ? `Active · ${formatMwk(PRO_PRICE_MWK)} monthly` : "Manage your plan" },
+                    { to: "/console/subscription", label: PRO_NAME, detail: hasProAccess(subscription.data) ? `Active · ${formatMwk(PRO_ANNUAL_PRICE_MWK)} yearly` : "Manage your plan" },
                   ].map((item) => (
                     <Link key={item.to} to={item.to} className="group flex items-center gap-3 py-4 hover:text-primary">
                       <div className="min-w-0 flex-1"><p className="text-sm font-medium">{item.label}</p><p className="mt-1 text-xs text-muted-foreground">{item.detail}</p></div>
