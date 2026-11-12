@@ -236,9 +236,9 @@ export function ConsoleShell({
                 pathname === "/console" && "whitespace-nowrap",
               )}>
                 {verified ? (
-                  <>
-                    <BadgeCheck className="h-3.5 w-3.5 text-brand-green" /> Verified developer
-                  </>
+                  <span className="inline-flex items-center gap-1 rounded-full border border-brand-green/30 bg-brand-green/10 px-2 py-0.5 font-medium text-brand-green">
+                    <BadgeCheck className="h-3.5 w-3.5 shrink-0" /> Verified developer
+                  </span>
                 ) : (
                   <>
                     <ShieldCheck className="h-3.5 w-3.5" /> Verification{" "}
