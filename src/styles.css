@@ -536,14 +536,17 @@ body:has(.console-square:not(:has(.social-feed-screen))) {
   border-color: var(--border);
 }
 
-/* Soft, Google Sans-inspired typography, limited to Developer Mode. */
-.console-square:not(:has(.social-feed-screen)) {
+/* Dashboard typography: one soft, consistent family across all text and controls.
+   Preserve hierarchy through size and weight, not by mixing typefaces. */
+.console-square:has(.console-dashboard-only):not(:has(.social-feed-screen)) .console-dashboard-only {
   font-family: "Nunito Sans", "DM Sans", ui-sans-serif, system-ui, sans-serif;
   font-optical-sizing: auto;
   font-synthesis: none;
+  letter-spacing: normal;
 }
-
-.console-square:not(:has(.social-feed-screen)) :where(h1, h2, h3, h4, .font-display) {
-  font-family: "Nunito Sans", "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  letter-spacing: -0.015em;
+.console-square:has(.console-dashboard-only):not(:has(.social-feed-screen)) .console-dashboard-only :where(*) {
+  font-family: inherit !important;
+}
+.console-square:has(.console-dashboard-only):not(:has(.social-feed-screen)) .console-dashboard-only :where(h1, h2, h3, h4) {
+  letter-spacing: -0.01em;
 }
