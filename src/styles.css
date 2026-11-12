@@ -525,16 +525,9 @@ body:has(.console-square:not(:has(.social-feed-screen))) {
   border-top-color: transparent !important;
 }
 .console-square:not(:has(.social-feed-screen)) main
-  :where([class*="border-y"], [class*="border-b"], [class*="border-t"])
-  :not(input):not(textarea):not(select):not([role="combobox"]):not(table):not(thead):not(tbody):not(tfoot):not(tr):not(th):not(td):not(.console-feature-card):not(.console-chat-bubble):not([class*="border-destructive"]) {
+  :where([class*="border-y"], [class*="border-b"], [class*="border-t"]):not(input):not(textarea):not(select):not([role="combobox"]):not(table):not(thead):not(tbody):not(tfoot):not(tr):not(th):not(td):not(.console-feature-card):not(.console-chat-bubble):not([class*="border-destructive"]) {
   border-top-color: transparent !important;
   border-bottom-color: transparent !important;
-}
-.console-square:not(:has(.social-feed-screen)) main
-  :where([class*="border-y"], [class*="border-b"], [class*="border-t"])
-  :not(input):not(textarea):not(select):not([role="combobox"]):not(table):not(thead):not(tbody):not(tfoot):not(tr):not(th):not(td):not(.console-feature-card):not(.console-chat-bubble):not([class*="border-destructive"]) {
-  border-left-color: transparent !important;
-  border-right-color: transparent !important;
 }
 .console-square:not(:has(.social-feed-screen)) main :where(input, select, textarea, [role="combobox"]) {
   border-color: var(--input) !important;
