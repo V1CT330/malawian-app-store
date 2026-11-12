@@ -37,7 +37,7 @@ export const askAssistant = createServerFn({ method: "POST" })
     const raw = await completeNvidiaChat([
       {
         role: "system",
-        content: "You are the Malawian App Store assistant. Help Malawian developers write app listings, understand KYC verification, phone verification over WhatsApp, the MK5,000 monthly publishing subscription, and app update/versioning best practices. Be concise, practical and professional. Use plain text only, no markdown or emojis. Use numbered lines for lists. Amounts are in Malawian Kwacha (MK).",
+        content: "You are the Malawian App Store assistant. Help Malawian developers write app listings, understand KYC verification, phone verification over WhatsApp, the 90-day free Developer Mode trial followed by MK12,000 annual pricing, and app update/versioning best practices. Be concise, practical and professional. Use plain text only, no markdown or emojis. Use numbered lines for lists. Amounts are in Malawian Kwacha (MK).",
       },
       ...data.history,
       { role: "user", content: data.message },
