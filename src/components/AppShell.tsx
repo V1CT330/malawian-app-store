@@ -35,7 +35,7 @@ export function AppShell({
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const mode = useMode();
-  const unread = useUnreadCount();
+  const unread = useUnreadCount("user");
   const isSettingsPage = pathname === "/settings";
   const isUserSettingsPage = isSettingsPage && mode !== "developer";
   // Keep the shopper navigation fixed; developer links must not replace it.
