@@ -33,7 +33,7 @@ import { AppIcon } from "@/components/ListingCard";
 import logo from "@/assets/logo-mark.png";
 import { ConsoleShell } from "@/components/console/ConsoleShell";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
-import { useProfile, useSignedUrl, useUnreadCount } from "@/hooks/useSession";
+import { useProfile, useSignedUrl, useSocialUnreadCount } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { SocialNotificationsPanel } from "@/components/console/SocialNotificationsPanel";
@@ -130,7 +130,7 @@ function FacebookShareIcon({ className }: { className?: string }) {
 function SocialPage() {
   const { userId, profile } = useProfile();
   const ownAvatar = useSignedUrl(profile?.avatar_url);
-  const unread = useUnreadCount();
+  const unread = useSocialUnreadCount();
   const queryClient = useQueryClient();
   const [activeSection, setActiveSection] = useState<SectionId>("Feed");
   const [sidebarOpen, setSidebarOpen] = useState(false);
