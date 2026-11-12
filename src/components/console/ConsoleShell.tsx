@@ -330,7 +330,7 @@ export function ConsoleShell({
             </ol>
           )}
           {!hideTitleCard && (
-            <div className="mb-6 flex flex-wrap items-start justify-between gap-4 border-b border-border pb-5">
+            <div className="mb-6 flex flex-wrap items-start justify-between gap-4 pb-5">
               <div className="min-w-0">
                 <h1 className="font-display text-2xl font-bold leading-tight sm:text-[28px]">{title}</h1>
                 {description && (
