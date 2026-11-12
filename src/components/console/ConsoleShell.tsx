@@ -123,7 +123,7 @@ export function ConsoleShell({
 }) {
   const { userId, profile } = useProfile();
   const isAdmin = useIsAdmin();
-  const unread = useUnreadCount();
+  const unread = useUnreadCount("developer");
   const profileAvatar = useSignedUrl(profile?.avatar_url);
   const { dark, toggle } = useTheme();
   const navigate = useNavigate();
