@@ -12,14 +12,7 @@ import { ResponsiveContainer, Tooltip, Line, LineChart, CartesianGrid, XAxis, YA
 
 import { AppIcon } from "@/components/ListingCard";
 import { ConsoleShell } from "@/components/console/ConsoleShell";
-import {
-  EmptyState,
-  MetricTile,
-  RowSkeletons,
-  SectionCard,
-  StatusPill,
-  TileSkeletons,
-} from "@/components/console/primitives";
+import { StatusPill } from "@/components/console/primitives";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/useSession";
@@ -155,189 +148,111 @@ function ConsoleDashboard() {
 
   return (
     <ConsoleShell hideTitleCard>
-      <div className="console-dashboard-only dashboard-content-flat space-y-2">
-        <section className="grid border-b border-border/80 bg-background md:grid-cols-[1.35fr_1fr]">
-          <div className="flex flex-col justify-between gap-5 border-b border-border/80 px-1 py-5 sm:py-6 md:border-b-0 md:border-r md:pr-7">
-            <div>
-              <div className="mb-3 flex flex-wrap items-center gap-2">
-                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Developer console</span>
-                {subscribed && <Badge className="rounded-none">PRO ACTIVE</Badge>}
-              </div>
-              <h2 className="text-2xl font-semibold tracking-tight sm:text-[28px]">Overview</h2>
+      <div className="console-dashboard-only dashboard-content-flat space-y-6">
+        <section className="dashboard-welcome">
+          <div className="min-w-0">
+            <p className="dashboard-eyebrow">DEVELOPER WORKSPACE</p>
+            <div className="mt-2 flex flex-wrap items-center gap-3">
+              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Your publishing overview</h2>
+              {subscribed && <Badge className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-700 hover:bg-emerald-50 dark:bg-emerald-950 dark:text-emerald-300">Pro active</Badge>}
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Button asChild className="rounded-none">
-                <Link to="/upload"><Rocket className="mr-2 h-4 w-4" /> Publish a product</Link>
-              </Button>
-              <Button asChild variant="outline" className="w-full min-w-0 rounded-none sm:w-auto">
-                <Link to="/console/analytics"><BarChart3 className="mr-2 h-4 w-4" /> Open analytics</Link>
-              </Button>
-            </div>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">Track your products, understand store performance and keep every publication moving.</p>
           </div>
-          <div className="grid grid-cols-2 bg-background md:pl-2">
-            {[
-              { label: "Published", value: published.length, note: "Live listings" },
-              { label: "In review", value: pending.length, note: "Awaiting review" },
-              { label: "Drafts", value: drafts.length, note: "Not published" },
-              { label: "Action needed", value: rejected.length + tasks.filter((task) => task.tone === "info").length, note: "Fix or complete" },
-            ].map((item, index) => (
-              <div key={item.label} className={`px-4 py-4 sm:px-5 sm:py-5 ${index % 2 === 0 ? "border-r" : ""} ${index < 2 ? "border-b" : ""} border-border/80`}>
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{item.label}</p>
-                <p className={`mt-2 font-display text-3xl font-bold tabular-nums ${item.label === "Published" ? "text-brand-green" : item.label === "In review" ? "text-amber-600 dark:text-amber-400" : item.label === "Action needed" ? (item.value > 0 ? "text-brand-red" : "text-brand-green") : "text-foreground"}`}>{listingsQuery.isLoading ? "Loading" : item.value}</p>
-                <p className="mt-1 text-xs text-muted-foreground">{item.note}</p>
-              </div>
-            ))}
+          <div className="flex flex-wrap gap-2">
+            <Button asChild className="rounded-full px-5"><Link to="/upload"><Rocket className="mr-2 h-4 w-4" /> Publish a product</Link></Button>
+            <Button asChild variant="outline" className="rounded-full px-5"><Link to="/console/analytics">View analytics <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
           </div>
         </section>
 
         {(listingsQuery.isError || statsQuery.isError || reputationQuery.isError || subscriptionQuery.isError) && (
-          <div role="alert" className="flex flex-wrap items-center justify-between gap-2 border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm">
+          <div role="alert" className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-amber-500/30 bg-amber-500/5 px-4 py-3 text-sm">
             <span className="font-medium">Some dashboard information could not be loaded.</span>
-            <span className="text-xs text-muted-foreground">Displayed figures may be incomplete. Refresh the page or try again shortly.</span>
+            <span className="text-xs text-muted-foreground">Displayed figures may be incomplete. Refresh or try again shortly.</span>
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-x-5 gap-y-2 border-b border-border/80 py-2 sm:grid-cols-4 sm:gap-6">
-          {statsQuery.isLoading ? <TileSkeletons /> : (
-            <>
-              <MetricTile label="Installs (30d)" value={installs.toLocaleString("en")} delta={percentDelta(currentInstalls, previousInstalls)} hint="Recorded installs" />
-              <MetricTile label="Store views (30d)" value={views.toLocaleString("en")} delta={percentDelta(currentViews, previousViews)} hint="Product page visits" />
-              <MetricTile label="View-to-install" value={`${conversion(stats)}%`} delta={percentDelta(currentConversion, previousConversion)} hint="Views that convert" />
-              <MetricTile label="Average rating" value={Number.isFinite(rating) && rating > 0 ? rating.toFixed(1) : "N/A"} hint={`${listings.reduce((total, listing) => total + listing.rating_count, 0)} ratings`} />
-            </>
-          )}
-        </div>
+        <section aria-label="Publishing summary" className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+          {[
+            { label: "Published", value: published.length, note: "Live in the store", accent: "green" },
+            { label: "In review", value: pending.length, note: "Awaiting moderation", accent: "blue" },
+            { label: "Drafts", value: drafts.length, note: "Not yet submitted", accent: "neutral" },
+            { label: "Needs attention", value: rejected.length + tasks.filter((task) => task.tone === "info").length, note: "Fix or complete", accent: "amber" },
+          ].map((item) => (
+            <div key={item.label} className={`dashboard-stat dashboard-stat-${item.accent}`}>
+              <p className="text-sm font-medium text-muted-foreground">{item.label}</p>
+              <p className="mt-3 text-3xl font-semibold tracking-tight tabular-nums">{listingsQuery.isLoading ? <span className="inline-block h-9 w-14 animate-pulse rounded-lg bg-muted" /> : item.value}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{item.note}</p>
+            </div>
+          ))}
+        </section>
 
-        <div className="grid gap-x-8 xl:grid-cols-[1.6fr_1fr]">
-          <SectionCard
-            title="Performance over the last 30 days"
-            action={<Button asChild size="sm" variant="ghost" className="rounded-none"><Link to="/console/analytics">Detailed analytics <ArrowRight className="ml-1 h-4 w-4" /></Link></Button>}
-          >
-            {statsQuery.isLoading ? (
-              <div className="h-44 animate-pulse bg-muted" />
-            ) : stats.length === 0 || (views === 0 && installs === 0) ? (
-              <div className="flex min-h-40 flex-col items-center justify-center border border-dashed border-border px-4 py-8 text-center">
-                <TrendingUp className="mb-2 h-5 w-5 text-muted-foreground" />
-                <p className="text-sm font-medium">Performance data will appear here</p>
-                <p className="mt-1 max-w-sm text-xs text-muted-foreground">Views and installs are shown as events are recorded. Open analytics to explore the available reports.</p>
-                <Button asChild size="sm" variant="outline" className="mt-3 rounded-none"><Link to="/console/analytics">View analytics</Link></Button>
-              </div>
-            ) : (
-              <>
-                <div className="mb-4 flex flex-wrap gap-4 text-xs text-muted-foreground">
-                  <span className="inline-flex items-center gap-2"><span className="h-2 w-2 bg-[var(--google-blue)]" /> Views</span>
-                  <span className="inline-flex items-center gap-2"><span className="h-2 w-2 bg-[var(--google-green)]" /> Installs</span>
-                </div>
-                <div className="h-48 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={recentStats} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" opacity={0.18} />
-                      <XAxis dataKey="day" fontSize={10} minTickGap={18} />
-                      <YAxis fontSize={10} allowDecimals={false} />
-                      <Tooltip />
-                      <Line type="monotone" dataKey="views" name="Views" stroke="var(--google-blue)" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
-                      <Line type="monotone" dataKey="installs" name="Installs" stroke="var(--google-green)" strokeWidth={2} dot={false} activeDot={{ r: 4 }} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </>
-            )}
-          </SectionCard>
-
-          <SectionCard title="Publishing health">
-            {listingsQuery.isLoading ? <RowSkeletons count={2} /> : listings.length === 0 ? (
-              <EmptyState icon={Rocket} title="Start publishing" description="Create your first product listing to begin building your store presence." action={<Button asChild className="rounded-none"><Link to="/upload">Create listing</Link></Button>} />
-            ) : (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <LinearGauge
-                    value={published.length ? (liveReady / published.length) * 100 : 0}
-                    label="Publishing readiness"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    {liveReady} of {published.length} live listings meet every readiness check.
-                  </p>
-                </div>
-                <div className="divide-y divide-border border-y border-border">
-                  <div className="flex items-center justify-between py-3 text-sm"><span className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-brand-green" /> Published</span><strong>{published.length}</strong></div>
-                  <div className="flex items-center justify-between py-3 text-sm"><span className="flex items-center gap-2"><Rocket className="h-4 w-4 text-muted-foreground" /> In review</span><strong>{pending.length}</strong></div>
-                  <div className="flex items-center justify-between py-3 text-sm"><span className="flex items-center gap-2"><AlertTriangle className="h-4 w-4 text-muted-foreground" /> Drafts / rejected</span><strong>{drafts.length + rejected.length}</strong></div>
-                </div>
-                <Button asChild variant="outline" className="w-full rounded-none"><Link to="/console/quality">Review listing quality <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
-              </div>
-            )}
-          </SectionCard>
-        </div>
-
-        <div className="grid gap-x-8 xl:grid-cols-[1.35fr_1fr]">
-          <SectionCard title="Products" action={<Button asChild size="sm" variant="ghost" className="rounded-none"><Link to="/console/products">Manage all <ArrowRight className="ml-1 h-4 w-4" /></Link></Button>}>
-            {listingsQuery.isLoading ? <RowSkeletons /> : listings.length === 0 ? (
-              <div className="flex flex-wrap items-center justify-between gap-3 py-2"><div><p className="text-sm font-medium">No products yet</p><p className="mt-1 text-xs text-muted-foreground">Publish an app, website, AI agent or browser extension to start building your store.</p></div><Button asChild size="sm" className="rounded-none"><Link to="/upload">Create product <ArrowRight className="ml-2 h-4 w-4" /></Link></Button></div>
-            ) : (
-              <ul className="divide-y divide-border">
-                {listings.slice(0, 5).map((listing) => (
-                  <li key={listing.id}>
-                    <Link to="/console/products/$id" params={{ id: listing.id }} className="flex items-center gap-3 py-3.5 hover:bg-muted/30">
-                      <AppIcon path={listing.icon_url} name={listing.name} className="h-11 w-11 rounded-xl" />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium">{listing.name}</p>
-                        <p className="mt-1 text-xs text-muted-foreground">{listing.downloads} {metricLabel(listing.kind)} · {listing.rating_count} ratings</p>
-                      </div>
-                      <StatusPill status={listing.status} />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </SectionCard>
-
-          <div className="space-y-1">
-            <SectionCard title="Needs your attention" action={<Badge variant="outline" className={`rounded-none ${tasks.length > 0 ? "border-brand-red/40 bg-brand-red/10 text-brand-red" : "border-brand-green/40 bg-brand-green/10 text-brand-green"}`}>{tasks.length} {tasks.length === 1 ? "item" : "items"}</Badge>}>
-              {listingsQuery.isLoading ? <RowSkeletons count={2} /> : tasks.length === 0 ? (
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-brand-green" />
-                  <div>
-                    <p className="text-sm font-medium">You are all caught up</p>
-                    <p className="mt-1 text-sm text-muted-foreground">Nothing is blocked. Keep your listings complete and up to date.</p>
-                  </div>
-                </div>
+        <section className="grid gap-4 xl:grid-cols-[minmax(0,1.65fr)_minmax(280px,0.85fr)]">
+          <div className="dashboard-panel min-w-0">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div><p className="dashboard-eyebrow">STORE PERFORMANCE</p><h3 className="mt-1 text-lg font-semibold tracking-tight">The last 30 days</h3><p className="mt-1 text-sm text-muted-foreground">Views and installs recorded across your products.</p></div>
+              <Link to="/console/analytics" className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm font-medium text-primary hover:bg-primary/5">Full report <ArrowRight className="h-4 w-4" /></Link>
+            </div>
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {statsQuery.isLoading ? <div className="col-span-full grid grid-cols-2 gap-3 sm:grid-cols-4">{Array.from({ length: 4 }).map((_, index) => <div key={index} className="h-16 animate-pulse rounded-xl bg-muted" />)}</div> : <>
+                <div><p className="text-xs text-muted-foreground">Installs</p><p className="mt-1 text-xl font-semibold tabular-nums">{installs.toLocaleString("en")}</p><p className="text-xs text-muted-foreground">30-day total</p></div>
+                <div><p className="text-xs text-muted-foreground">Store views</p><p className="mt-1 text-xl font-semibold tabular-nums">{views.toLocaleString("en")}</p><p className="text-xs text-muted-foreground">30-day total</p></div>
+                <div><p className="text-xs text-muted-foreground">Conversion</p><p className="mt-1 text-xl font-semibold tabular-nums">{conversion(stats)}%</p><p className="text-xs text-muted-foreground">Views to installs</p></div>
+                <div><p className="text-xs text-muted-foreground">Average rating</p><p className="mt-1 text-xl font-semibold tabular-nums">{Number.isFinite(rating) && rating > 0 ? rating.toFixed(1) : "N/A"}</p><p className="text-xs text-muted-foreground">{listings.reduce((total, listing) => total + listing.rating_count, 0)} ratings</p></div>
+              </>}
+            </div>
+            <div className="mt-5 h-56 w-full">
+              {statsQuery.isLoading ? <div className="h-full animate-pulse rounded-xl bg-muted/70" /> : stats.length === 0 || (views === 0 && installs === 0) ? (
+                <div className="flex h-full flex-col items-center justify-center rounded-2xl bg-muted/40 px-5 text-center"><TrendingUp className="mb-2 h-6 w-6 text-muted-foreground" /><p className="text-sm font-medium">Performance data will appear here</p><p className="mt-1 max-w-sm text-xs leading-5 text-muted-foreground">Views and installs will appear as people discover and use your products.</p></div>
               ) : (
-                <ul className="divide-y divide-border">
-                  {tasks.slice(0, 5).map((task) => (
-                    <li key={task.key}>
-                      <Link to="/console/products/$id" params={{ id: task.to }} className="flex items-start gap-3 py-3 text-sm hover:text-primary">
-                        <AlertTriangle className={`mt-0.5 h-4 w-4 shrink-0 ${task.tone === "warn" ? "text-brand-red" : "text-muted-foreground"}`} />
-                        <span className="min-w-0 flex-1">{task.text}</span>
-                        <ArrowRight className="mt-0.5 h-4 w-4 shrink-0" />
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+                <ResponsiveContainer width="100%" height="100%"><LineChart data={recentStats} margin={{ top: 8, right: 12, left: -18, bottom: 0 }}><CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} /><XAxis dataKey="day" fontSize={10} minTickGap={18} axisLine={false} tickLine={false} /><YAxis fontSize={10} allowDecimals={false} axisLine={false} tickLine={false} /><Tooltip /><Line type="monotone" dataKey="views" name="Views" stroke="var(--google-blue)" strokeWidth={2.5} dot={false} activeDot={{ r: 4 }} /><Line type="monotone" dataKey="installs" name="Installs" stroke="var(--google-green)" strokeWidth={2.5} dot={false} activeDot={{ r: 4 }} /></LineChart></ResponsiveContainer>
               )}
-            </SectionCard>
-
-            <SectionCard title="Developer reputation" action={<Badge variant="secondary" className="rounded-none">{reputationTier(reputation)}</Badge>}>
-              <div className="space-y-2">
-                <p className="font-display text-lg font-semibold tabular-nums">
-                  {reputation}<span className="ml-1 text-xs font-normal text-muted-foreground">/100</span>
-                </p>
-                <LinearGauge value={reputation} label="Developer reputation" />
-                <p className="text-xs text-muted-foreground">Quality · ratings · updates</p>
-              </div>
-            </SectionCard>
-
-            <SectionCard title="Developer Pro" action={subscribed ? <Badge className="rounded-none">Active</Badge> : <Badge variant="outline" className="rounded-none">Optional</Badge>}>
-              <p className="text-sm text-muted-foreground">
-                {subscribed
-                  ? `Your subscription is active. Renews ${subscriptionQuery.data?.current_period_end?.slice(0, 10) ?? "monthly"}.`
-                  : "MK5,000 per month unlocks priority review, advanced analytics and the AI assistant."}
-              </p>
-              <Button asChild size="sm" variant={subscribed ? "outline" : "default"} className="mt-3 w-full rounded-none">
-                <Link to="/console/subscription">{subscribed ? "Manage subscription" : "Explore Developer Pro"}</Link>
-              </Button>
-            </SectionCard>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-5 text-xs text-muted-foreground"><span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-[var(--google-blue)]" /> Views</span><span className="inline-flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-[var(--google-green)]" /> Installs</span></div>
           </div>
-        </div>
+
+          <div className="dashboard-panel">
+            <p className="dashboard-eyebrow">PUBLISHING HEALTH</p><h3 className="mt-1 text-lg font-semibold tracking-tight">Your catalogue</h3>
+            {listingsQuery.isLoading ? <div className="mt-6 space-y-3"><div className="h-3 animate-pulse rounded-full bg-muted" /><div className="h-3 animate-pulse rounded-full bg-muted" /><div className="h-3 animate-pulse rounded-full bg-muted" /></div> : listings.length === 0 ? (
+              <div className="mt-6 rounded-2xl bg-muted/40 p-4"><Rocket className="h-5 w-5 text-muted-foreground" /><p className="mt-3 text-sm font-medium">Start publishing</p><p className="mt-1 text-xs leading-5 text-muted-foreground">Create your first product listing to begin building your store presence.</p><Button asChild size="sm" className="mt-4 rounded-full"><Link to="/upload">Create listing</Link></Button></div>
+            ) : <>
+              <div className="mt-6 flex items-end justify-between gap-3"><div><p className="text-3xl font-semibold tabular-nums">{published.length}</p><p className="text-xs text-muted-foreground">Published products</p></div><p className="text-sm font-medium text-emerald-700 dark:text-emerald-400">{published.length ? Math.round((liveReady / published.length) * 100) : 0}% ready</p></div>
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-emerald-500 transition-[width] duration-500" style={{ width: `${published.length ? (liveReady / published.length) * 100 : 0}%` }} /></div>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">{liveReady} of {published.length} live listings meet every readiness check.</p>
+              <div className="mt-6 space-y-4">{[{ label: "Published", value: published.length, color: "bg-emerald-500" }, { label: "In review", value: pending.length, color: "bg-blue-500" }, { label: "Drafts", value: drafts.length, color: "bg-slate-400" }, { label: "Rejected", value: rejected.length, color: "bg-rose-500" }].map((item) => <div key={item.label} className="flex items-center justify-between gap-3 text-sm"><span className="flex items-center gap-2 text-muted-foreground"><span className={`h-2 w-2 rounded-full ${item.color}`} />{item.label}</span><span className="font-semibold tabular-nums">{item.value}</span></div>)}</div>
+              <Button asChild variant="outline" className="mt-6 w-full rounded-full"><Link to="/console/quality">Review listing quality <ArrowRight className="ml-2 h-4 w-4" /></Link></Button>
+            </>}
+          </div>
+        </section>
+
+        <section className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.85fr)]">
+          <div className="dashboard-panel min-w-0">
+            <div className="flex items-center justify-between gap-3"><div><p className="dashboard-eyebrow">YOUR CATALOGUE</p><h3 className="mt-1 text-lg font-semibold tracking-tight">Recent products</h3></div><Link to="/console/products" className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-sm font-medium text-primary hover:bg-primary/5">Manage all <ArrowRight className="h-4 w-4" /></Link></div>
+            {listingsQuery.isLoading ? <div className="mt-5 space-y-4">{Array.from({ length: 3 }).map((_, index) => <div key={index} className="h-14 animate-pulse rounded-xl bg-muted" />)}</div> : listings.length === 0 ? (
+              <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-muted/40 p-4"><div><p className="text-sm font-medium">No products yet</p><p className="mt-1 text-xs text-muted-foreground">Publish an app, website, AI agent or browser extension.</p></div><Button asChild size="sm" className="rounded-full"><Link to="/upload">Create product</Link></Button></div>
+            ) : <ul className="mt-4">{listings.slice(0, 5).map((listing) => <li key={listing.id} className="border-t border-border/70 first:border-t-0"><Link to="/console/products/$id" params={{ id: listing.id }} className="flex min-w-0 items-center gap-3 rounded-xl px-2 py-3 transition-colors hover:bg-muted/50"><AppIcon path={listing.icon_url} name={listing.name} className="h-11 w-11 rounded-xl" /><div className="min-w-0 flex-1"><p className="truncate text-sm font-semibold">{listing.name}</p><p className="mt-1 truncate text-xs text-muted-foreground">{listing.downloads} {metricLabel(listing.kind)} · {listing.rating_count} ratings</p></div><StatusPill status={listing.status} /><ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground" /></Link></li>)}</ul>}
+          </div>
+
+          <div className="space-y-4">
+            <div className="dashboard-panel">
+              <div className="flex items-center justify-between gap-3"><div><p className="dashboard-eyebrow">NEXT STEPS</p><h3 className="mt-1 text-lg font-semibold tracking-tight">Needs your attention</h3></div><span className={`rounded-full px-3 py-1 text-xs font-semibold ${tasks.length ? "bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-300" : "bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"}`}>{tasks.length} {tasks.length === 1 ? "item" : "items"}</span></div>
+              {listingsQuery.isLoading ? <div className="mt-5 h-16 animate-pulse rounded-xl bg-muted" /> : tasks.length === 0 ? <div className="mt-5 flex items-start gap-3 rounded-2xl bg-emerald-50/70 p-4 dark:bg-emerald-950/30"><CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" /><div><p className="text-sm font-medium">You are all caught up</p><p className="mt-1 text-xs leading-5 text-muted-foreground">Nothing is blocked. Keep your listings complete and up to date.</p></div></div> : (
+                <ul className="mt-3 space-y-1">{tasks.slice(0, 5).map((task) => <li key={task.key}><Link to="/console/products/$id" params={{ id: task.to }} className="flex items-start gap-3 rounded-xl px-2 py-3 text-sm transition-colors hover:bg-muted/50"><AlertTriangle className={`mt-0.5 h-4 w-4 shrink-0 ${task.tone === "warn" ? "text-rose-600" : "text-amber-600"}`} /><span className="min-w-0 flex-1 leading-5">{task.text}</span><ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" /></Link></li>)}</ul>
+              )}
+            </div>
+
+            <div className="dashboard-panel">
+              <p className="dashboard-eyebrow">TRUST & QUALITY</p><div className="mt-1 flex items-center justify-between gap-3"><h3 className="text-lg font-semibold tracking-tight">Developer reputation</h3><Badge variant="secondary" className="rounded-full">{reputationTier(reputation)}</Badge></div>
+              <div className="mt-5 flex items-baseline gap-1"><span className="text-3xl font-semibold tabular-nums">{reputation}</span><span className="text-sm text-muted-foreground">/100</span></div>
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary transition-[width] duration-500" style={{ width: `${Math.max(0, Math.min(100, reputation))}%` }} /></div><p className="mt-2 text-xs text-muted-foreground">Based on quality, ratings and product updates.</p>
+            </div>
+
+            <div className="dashboard-panel">
+              <div className="flex items-center justify-between gap-2"><div><p className="dashboard-eyebrow">OPTIONAL PLAN</p><h3 className="mt-1 text-lg font-semibold tracking-tight">Developer Pro</h3></div><Badge variant={subscribed ? "default" : "outline"} className="rounded-full">{subscribed ? "Active" : "Optional"}</Badge></div>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">{subscribed ? `Your subscription is active. Renews ${subscriptionQuery.data?.current_period_end?.slice(0, 10) ?? "monthly"}.` : "MK5,000 per month unlocks priority review, advanced analytics and the AI assistant."}</p>
+              <Button asChild size="sm" variant={subscribed ? "outline" : "default"} className="mt-4 w-full rounded-full"><Link to="/console/subscription">{subscribed ? "Manage subscription" : "Explore Developer Pro"}</Link></Button>
+            </div>
+          </div>
+        </section>
       </div>
     </ConsoleShell>
   );
