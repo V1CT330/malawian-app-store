@@ -293,7 +293,7 @@ function SocialPage() {
   });
 
   const trackedAdImpressions = useRef(new Set<string>());
-  const sponsoredCampaigns = sponsoredCampaignsQuery.data ?? [];
+  const sponsoredCampaigns = useMemo(() => sponsoredCampaignsQuery.data ?? [], [sponsoredCampaignsQuery.data]);
   useEffect(() => {
     if (!userId) return;
     for (const campaign of sponsoredCampaigns) {

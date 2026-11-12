@@ -79,9 +79,9 @@ function AdminPage() {
     queryKey: ["admin-ad-campaigns"],
     enabled: isAdmin,
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("ad_campaigns")
-        .select("id,advertiser_id,name,headline,body,image_url,destination_url,placements,duration_days,budget_mwk,status,created_at")
+        .select("id,advertiser_id,name,headline,body,image_url,destination_url,placements,duration_days,budget_mwk,status,created_at,creative_type,listing_name,listing_status")
         .in("status", ["pending", "approved", "rejected", "paused", "suspended"])
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -445,7 +445,7 @@ function AdminPage() {
                 <div className="min-w-0">
                   <h3 className="font-semibold">{campaign.name}</h3>
                   <p className="text-sm text-muted-foreground">{campaign.headline}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">Advertiser {campaign.advertiser_id} · {campaign.placements.join(", ")} · {campaign.duration_days} days · {Number(campaign.budget_mwk).toLocaleString("en")} MWK proposed</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{campaign.creative_type?.replace("_", " ") || "custom"}{campaign.listing_name ? ` · ${campaign.listing_name} · ${campaign.listing_status}` : ""} · Advertiser {campaign.advertiser_id} · {campaign.placements.join(", ")} · {campaign.duration_days} days · {Number(campaign.budget_mwk).toLocaleString("en")} MWK proposed</p>
                 </div>
                 <Badge variant="secondary" className="capitalize">{campaign.status}</Badge>
               </div>
