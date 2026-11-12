@@ -122,6 +122,7 @@ export function ConsoleShell({
   fullWidth?: boolean;
 }) {
   const { userId, profile } = useProfile();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const isAdmin = useIsAdmin();
   const unread = useUnreadCount("developer");
   const profileAvatar = useSignedUrl(profile?.avatar_url);
@@ -230,7 +231,10 @@ export function ConsoleShell({
               <p className="truncate text-sm font-medium">
                 {profile?.developer_name || profile?.display_name || "Your developer account"}
               </p>
-              <p className="flex items-center gap-1 text-xs text-muted-foreground">
+              <p className={cn(
+                "flex items-center gap-1 text-xs text-muted-foreground",
+                pathname === "/console" && "whitespace-nowrap",
+              )}>
                 {verified ? (
                   <>
                     <BadgeCheck className="h-3.5 w-3.5 text-brand-green" /> Verified developer
