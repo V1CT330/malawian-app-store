@@ -82,7 +82,7 @@ function PublishingPage() {
                         <Link
                           to="/console/products/$id"
                           params={{ id: l.id }}
-                          className="flex min-w-0 items-center gap-3 py-3"
+                          className="flex items-center gap-3 py-3"
                         >
                           <AppIcon path={l.icon_url} name={l.name} className="h-10 w-10 rounded-xl" />
                           <div className="min-w-0 flex-1">
@@ -91,7 +91,7 @@ function PublishingPage() {
                               {kindLabel(l.kind)} · {readinessScore(l)}% ready
                             </p>
                           </div>
-                          <StatusPill status={l.status} className="shrink-0" />
+                          <StatusPill status={l.status} />
                         </Link>
                       </li>
                     ))}
