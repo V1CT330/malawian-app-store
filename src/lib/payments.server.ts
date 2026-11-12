@@ -33,7 +33,7 @@ export async function createPaychanguCheckout(input: {
       return_url: input.returnUrl,
       customization: {
         title: "Developer Pro",
-        description: "Malawian App Store monthly subscription",
+        description: "Malawian App Store annual subscription",
       },
     }),
   });
@@ -121,7 +121,7 @@ export async function settlePayment(txRef: string) {
     plan: "pro",
     amount_mwk: session.amount_mwk,
     payment_reference: txRef,
-    current_period_end: new Date(base + 30 * 864e5).toISOString(),
+    current_period_end: new Date(base + (session.amount_mwk >= 12000 ? 365 : 30) * 864e5).toISOString(),
   };
   if (existing) await supabaseAdmin.from("subscriptions").update(fields).eq("id", existing.id);
   else await supabaseAdmin.from("subscriptions").insert({ ...fields, user_id: session.user_id });
