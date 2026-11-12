@@ -285,8 +285,10 @@ function SocialPage() {
       const now = Date.now();
       return (data ?? []).filter((campaign: {
         starts_at: string | null; ends_at: string | null;
+        listing_id: string | null; listing_status: string | null;
       }) => (!campaign.starts_at || new Date(campaign.starts_at).getTime() <= now)
-        && (!campaign.ends_at || new Date(campaign.ends_at).getTime() > now));
+        && (!campaign.ends_at || new Date(campaign.ends_at).getTime() > now)
+        && (!campaign.listing_id || ["draft", "pending", "published"].includes(campaign.listing_status || "")));
     },
   });
 
