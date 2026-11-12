@@ -623,3 +623,59 @@ body:has(.console-square:not(:has(.social-feed-screen))) {
     box-shadow: none;
   }
 }
+
+/* Developer Mode visual system — extend the approved 1.D language without
+   changing page structure, content, controls, or behavior. Social routes are excluded. */
+.developer-mode-shell {
+  --dm-surface: oklch(1 0 0);
+  --dm-surface-muted: oklch(0.975 0.008 255);
+  --dm-border: oklch(0.91 0.018 255);
+  --dm-text: oklch(0.29 0.035 255);
+  --dm-muted: oklch(0.52 0.025 255);
+  color: var(--dm-text);
+  font-family: "Nunito Sans", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  font-optical-sizing: auto;
+  font-synthesis: none;
+}
+.developer-mode-shell :where(*) {
+  font-family: inherit;
+}
+.developer-mode-shell :where(h1, h2, h3, h4) {
+  color: var(--dm-text);
+  font-family: inherit;
+  letter-spacing: -0.015em;
+}
+.developer-mode-shell :where(p, label, small, [data-muted="true"]) {
+  text-wrap: pretty;
+}
+.developer-mode-shell main :where(.surface-card, [data-slot="card"], .console-hero, .inset-tile) {
+  border-color: var(--dm-border);
+  border-radius: 1.2rem;
+  background: var(--dm-surface);
+  box-shadow: 0 1px 3px oklch(0.22 0.025 255 / 0.035);
+}
+.developer-mode-shell main :where(input, textarea, select, [role="combobox"]) {
+  border-color: var(--dm-border);
+  border-radius: 0.8rem;
+  background-color: var(--dm-surface);
+  color: var(--dm-text);
+  font-family: inherit;
+}
+.developer-mode-shell main :where(button, [role="button"]) {
+  font-family: inherit;
+}
+.developer-mode-shell main :where(table th) {
+  color: var(--dm-muted);
+  font-weight: 650;
+}
+.developer-mode-shell aside {
+  font-family: inherit;
+}
+.developer-mode-shell header {
+  font-family: inherit;
+}
+@media (max-width: 639px) {
+  .developer-mode-shell main :where(.surface-card, [data-slot="card"], .console-hero, .inset-tile) {
+    border-radius: 1rem;
+  }
+}
