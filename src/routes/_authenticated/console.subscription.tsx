@@ -15,7 +15,7 @@ import {
   PRO_BENEFITS,
   PRO_CHECKLIST,
   PRO_NAME,
-  PRO_PRICE_MWK,
+  PRO_ANNUAL_PRICE_MWK,
   PRO_TAGLINE,
   WHY_PRO,
   WHY_PRO_CLOSING,
@@ -28,11 +28,11 @@ import { useServerFn } from "@tanstack/react-start";
 export const Route = createFileRoute("/_authenticated/console/subscription")({
   head: () => ({
     meta: [
-      { title: "Developer Pro · Malawian App Store" },
+      { title: "Developer Mode · Malawian App Store" },
       {
         name: "description",
         content:
-          "Developer Pro at MK5,000 monthly: publish, promote, get featured, analytics, Kwacha payments and a Verified Developer badge.",
+          "Developer Mode free for 3 months, then MK12,000 yearly: publish, promote, get featured, analytics, Kwacha payments and a Verified Developer badge.",
       },
       { property: "og:title", content: "Developer Pro · Malawian App Store" },
       {
@@ -67,6 +67,7 @@ function ProPage() {
 
   const status = subscription.data?.status;
   const hasAccess = hasProAccess(subscription.data);
+  const trialing = status === "trialing";
   const cancelled = status === "cancelled";
   const startCheckout = useServerFn(startProCheckout);
   const cancelSubscription = useServerFn(cancelProSubscription);
@@ -93,20 +94,21 @@ function ProPage() {
     <ConsoleShell title="Subscription">
       <h1 className="font-display text-2xl font-bold">{PRO_NAME}</h1>
       <p className="text-sm text-muted-foreground">{PRO_TAGLINE}</p>
+      <p className="mt-2 text-sm text-muted-foreground">Every new developer gets 90 days free from first Developer Mode activation. After that, the plan costs MK12,000 per year. No automatic renewal.</p>
 
       <section className="surface-card console-feature-card p-5 text-center">
-        <p className="font-display text-3xl font-bold">{formatMwk(PRO_PRICE_MWK)}</p>
-        <p className="text-sm text-muted-foreground">per month</p>
+        <p className="font-display text-3xl font-bold">{formatMwk(PRO_ANNUAL_PRICE_MWK)}</p>
+        <p className="text-sm text-muted-foreground">per year</p>
         {hasAccess ? (
           <>
-            <Badge className="mt-3">{cancelled ? "Cancelled" : "Active"}</Badge>
+            <Badge className="mt-3">{trialing ? "Free trial" : cancelled ? "Cancelled" : "Active"}</Badge>
             <p className="mt-2 text-xs text-muted-foreground">
-              {cancelled ? "Access ends" : "Renews"}{" "}
+              {cancelled ? "Access ends" : "Paid access ends"}{" "}
               {subscription.data?.current_period_end
                 ? new Date(subscription.data.current_period_end).toLocaleDateString()
-                : "monthly"}
+                : "annually"}
             </p>
-            {!cancelled && (
+            {!cancelled && !trialing && (
               <Button
                 size="sm"
                 variant="outline"
@@ -125,10 +127,10 @@ function ProPage() {
               disabled={activate.isPending}
               onClick={() => activate.mutate()}
             >
-              {activate.isPending ? "Preparing secure checkout…" : `Continue to payment · ${PRO_NAME}`}
+              {activate.isPending ? "Preparing secure checkout…" : `Pay annually · ${PRO_NAME}`}
             </Button>
             <p className="mt-2 text-xs text-muted-foreground">
-              You will continue to PayChangu to choose Airtel Money, TNM Mpamba, bank card or bank transfer.
+              Your payment is processed securely by PayChangu. This is a one-year payment; no automatic renewal is enabled.
             </p>
           </>
         )}
