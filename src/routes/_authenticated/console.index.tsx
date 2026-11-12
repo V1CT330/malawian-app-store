@@ -165,11 +165,11 @@ function ConsoleDashboard() {
               </div>
               <h2 className="text-2xl font-semibold tracking-tight sm:text-[28px]">Overview</h2>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Button asChild className="rounded-none">
+            <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap">
+              <Button asChild className="w-full min-w-0 rounded-none sm:w-auto">
                 <Link to="/upload"><Rocket className="mr-2 h-4 w-4" /> Publish a product</Link>
               </Button>
-              <Button asChild variant="outline" className="rounded-none">
+              <Button asChild variant="outline" className="w-full min-w-0 rounded-none sm:w-auto">
                 <Link to="/console/analytics"><BarChart3 className="mr-2 h-4 w-4" /> Open analytics</Link>
               </Button>
             </div>
