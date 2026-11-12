@@ -63,8 +63,8 @@ function Shelf({ title, subtitle, items }: { title: string; subtitle?: string; i
 }
 
 function SponsoredBannerImage({ path, className }: { path: string | null; className: string }) {
-  const signedUrl = useSignedUrl(path && !/^https?:\\/\\//i.test(path) ? path : null);
-  const src = path && /^https?:\\/\\//i.test(path) ? path : signedUrl;
+  const signedUrl = useSignedUrl(path && !/^https?:\/\//i.test(path) ? path : null);
+  const src = path && /^https?:\/\//i.test(path) ? path : signedUrl;
   if (!src) return null;
   return <img src={src} alt="" loading="lazy" className={className} />;
 }
@@ -127,13 +127,13 @@ function StorePage() {
     staleTime: 60_000,
   });
 
-  const storeAds = (sponsoredStoreAds.data ?? []) as Array<{
+  const storeAds = ((sponsoredStoreAds.data ?? []) as Array<{
     id: string; headline: string; body: string | null; image_url: string | null;
     destination_url: string; placements: string[]; creative_type: string;
     listing_id: string | null; listing_name: string | null; listing_slug: string | null;
     listing_icon_url: string | null; listing_banner_url: string | null;
     listing_website_url: string | null; listing_kind: string | null; listing_status: string | null;
-  }>;
+  }>).filter((ad) => ad.creative_type === "app_listing" || ad.creative_type === "website_banner");
   const sponsoredApps = storeAds.filter((ad) => ad.creative_type === "app_listing" && ad.listing_kind === "app");
   const sponsoredWebsites = storeAds.filter((ad) => ad.creative_type === "website_banner" && (!ad.listing_kind || ad.listing_kind === "website"));
   const trackedStoreImpressions = useRef(new Set<string>());

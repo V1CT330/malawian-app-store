@@ -128,8 +128,8 @@ function FacebookShareIcon({ className }: { className?: string }) {
 }
 
 function SponsoredSocialImage({ path }: { path: string | null }) {
-  const signedUrl = useSignedUrl(path && !/^https?:\\/\\//i.test(path) ? path : null);
-  const src = path && /^https?:\\/\\//i.test(path) ? path : signedUrl;
+  const signedUrl = useSignedUrl(path && !/^https?:\/\//i.test(path) ? path : null);
+  const src = path && /^https?:\/\//i.test(path) ? path : signedUrl;
   if (!src) return null;
   return <img src={src} alt="" loading="lazy" className="mb-3 max-h-72 w-full object-contain" />;
 }
