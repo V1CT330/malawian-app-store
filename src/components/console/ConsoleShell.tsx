@@ -234,7 +234,7 @@ export function ConsoleShell({
               </p>
               <div className="mt-0.5 flex min-w-0 items-center text-xs leading-4 text-muted-foreground">
                 {verified ? (
-                  <span className="inline-flex max-w-full shrink-0 items-center gap-1 whitespace-nowrap rounded-full border border-brand-green/30 bg-brand-green/10 px-2 py-0.5 font-medium text-brand-green">
+                  <span className="inline-flex max-w-full shrink-0 items-center gap-1 whitespace-nowrap font-medium text-brand-green">
                     <BadgeCheck className="h-3.5 w-3.5 shrink-0" />
                     <span>Verified developer</span>
                   </span>
