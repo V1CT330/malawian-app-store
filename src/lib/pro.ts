@@ -4,12 +4,13 @@
  */
 import { supabase } from "@/integrations/supabase/client";
 
-export const PRO_PRICE_MWK = 5000;
-export const PRO_NAME = "Developer Pro";
+export const PRO_ANNUAL_PRICE_MWK = 12000;
+export const PRO_TRIAL_DAYS = 90;
+export const PRO_NAME = "Developer Mode";
 export const PRO_TAGLINE =
-  "The professional toolkit for developers building Malawi's digital future.";
+  "Your complete developer workspace, free for the first three months.";
 export const CORE_MESSAGE = "Build locally. Promote locally. Get discovered locally.";
-export const CORE_SUPPORT = "One professional toolkit for Malawian developers.";
+export const CORE_SUPPORT = "One annual plan for Malawian developers.";
 
 export const PRO_BENEFITS = [
   { title: "Publish", detail: "Publish unlimited eligible apps and websites." },
