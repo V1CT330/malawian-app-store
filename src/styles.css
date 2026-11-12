@@ -550,3 +550,76 @@ body:has(.console-square:not(:has(.social-feed-screen))) {
 .console-square:has(.console-dashboard-only):not(:has(.social-feed-screen)) .console-dashboard-only :where(h1, h2, h3, h4) {
   letter-spacing: -0.01em;
 }
+
+
+/* 1.D dashboard redesign — deliberately limited to the dashboard route. */
+.console-dashboard-only {
+  color: var(--foreground);
+  font-family: "Nunito Sans", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+}
+.console-dashboard-only .dashboard-welcome {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0.5rem 0 1.25rem;
+}
+.console-dashboard-only .dashboard-eyebrow {
+  color: var(--muted-foreground);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  line-height: 1.4;
+}
+.console-dashboard-only .dashboard-stat {
+  min-width: 0;
+  padding: 1.15rem 1.2rem;
+  border: 1px solid var(--border);
+  border-radius: 1.15rem;
+  background: var(--card);
+  box-shadow: 0 1px 2px oklch(0.2 0.03 255 / 0.035);
+}
+.console-dashboard-only .dashboard-stat-green { border-top: 3px solid oklch(0.66 0.15 150); }
+.console-dashboard-only .dashboard-stat-blue { border-top: 3px solid oklch(0.64 0.14 250); }
+.console-dashboard-only .dashboard-stat-neutral { border-top: 3px solid oklch(0.72 0.015 255); }
+.console-dashboard-only .dashboard-stat-amber { border-top: 3px solid oklch(0.76 0.14 75); }
+.console-dashboard-only .dashboard-panel {
+  min-width: 0;
+  padding: 1.35rem;
+  border: 1px solid var(--border);
+  border-radius: 1.35rem;
+  background: var(--card);
+  box-shadow: 0 2px 8px oklch(0.2 0.03 255 / 0.035);
+}
+.console-dashboard-only :where(h2, h3, p, span, a, button) {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 639px) {
+  .console-dashboard-only { gap: 1rem; }
+  .console-dashboard-only .dashboard-welcome {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1rem;
+    padding-bottom: 0.25rem;
+  }
+  .console-dashboard-only .dashboard-welcome > div:last-child {
+    width: 100%;
+  }
+  .console-dashboard-only .dashboard-welcome > div:last-child > a {
+    flex: 1 1 auto;
+  }
+  .console-dashboard-only .dashboard-stat {
+    padding: 0.95rem;
+    border-radius: 1rem;
+  }
+  .console-dashboard-only .dashboard-panel {
+    padding: 1rem;
+    border-radius: 1.1rem;
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .console-dashboard-only .dashboard-stat,
+  .console-dashboard-only .dashboard-panel {
+    box-shadow: none;
+  }
+}
