@@ -190,7 +190,7 @@ export function ConsoleShell({
 
       <div className="flex min-w-0 flex-1 flex-col">
         {!hideTopBar && <header className="sticky top-0 z-50 shrink-0 bg-background">
-          <div className="mx-auto flex w-full max-w-6xl items-center gap-2 px-3 py-3 sm:px-6">
+          <div className="mx-auto flex w-full max-w-6xl items-center gap-1.5 px-2.5 py-2.5 sm:gap-2 sm:px-6 sm:py-3">
             <Sheet open={drawer} onOpenChange={setDrawer}>
               <SheetTrigger asChild>
                 <Button
@@ -228,30 +228,28 @@ export function ConsoleShell({
             </Sheet>
 
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium">
+              <p className="truncate text-sm font-medium leading-5">
                 {profile?.developer_name || profile?.display_name || "Your developer account"}
               </p>
-              <p className={cn(
-                "flex items-center gap-1 text-xs text-muted-foreground",
-                pathname === "/console" && "whitespace-nowrap",
-              )}>
+              <div className="mt-0.5 flex min-w-0 items-center text-xs leading-4 text-muted-foreground">
                 {verified ? (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-brand-green/30 bg-brand-green/10 px-2 py-0.5 font-medium text-brand-green">
-                    <BadgeCheck className="h-3.5 w-3.5 shrink-0" /> Verified developer
+                  <span className="inline-flex max-w-full shrink-0 items-center gap-1 whitespace-nowrap rounded-full border border-brand-green/30 bg-brand-green/10 px-2 py-0.5 font-medium text-brand-green">
+                    <BadgeCheck className="h-3.5 w-3.5 shrink-0" />
+                    <span>Verified developer</span>
                   </span>
                 ) : (
-                  <>
-                    <ShieldCheck className="h-3.5 w-3.5" /> Verification{" "}
-                    {profile?.kyc_status ?? "none"}
-                  </>
+                  <span className="inline-flex min-w-0 items-center gap-1 truncate">
+                    <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
+                    <span className="truncate">Verification {profile?.kyc_status ?? "none"}</span>
+                  </span>
                 )}
-              </p>
+              </div>
             </div>
 
-            <Button variant="ghost" size="icon" aria-label="Toggle theme" onClick={toggle}>
+            <Button className="hidden sm:inline-flex" variant="ghost" size="icon" aria-label="Toggle theme" onClick={toggle}>
               {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
-            <Button asChild variant="ghost" size="icon" aria-label="Help">
+            <Button className="hidden sm:inline-flex" asChild variant="ghost" size="icon" aria-label="Help">
               <Link to="/console/resources">
                 <CircleHelp className="h-5 w-5" />
               </Link>
