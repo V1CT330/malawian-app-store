@@ -341,7 +341,7 @@ function AnalyticsPage() {
     .sort((a, b) => b.installs - a.installs);
 
   const hasEvents = currentInstalls.length + currentViews.length > 0;
-  const periodLabel = `${isoDate(bounds.start)} – ${isoDate(bounds.end)}`;
+  const periodLabel = `${isoDate(bounds.start)} to ${isoDate(bounds.end)}`;
   const dataStatus = events.isError
     ? "Analytics data could not be loaded. Retry to check the event tables and permissions."
     : events.isLoading
@@ -493,8 +493,8 @@ function AnalyticsPage() {
           <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             <Metric label="App installs" value={formatNumber(appInstalls.length)} hint="Tracked events in selected period" icon={Download} current={appInstalls.length} previous={previousAppInstalls.length} />
             <Metric label="Product views" value={formatNumber(appViews.length)} hint="Tracked app listing views" icon={Eye} current={appViews.length} previous={previousAppViews.length} />
-            <Metric label="View-to-install rate" value={appViews.length ? `${conversion.toFixed(1)}%` : "—"} hint="Installs divided by tracked app views" icon={TrendingUp} current={conversion} previous={previousConversion} />
-            <Metric label="Average rating" value={ratingCount ? averageRating.toFixed(2) : "—"} hint={`${formatNumber(ratingCount)} ratings across selected products`} icon={Star} />
+            <Metric label="View to install rate" value={appViews.length ? `${conversion.toFixed(1)}%` : "Not available"} hint="Installs divided by tracked app views" icon={TrendingUp} current={conversion} previous={previousConversion} />
+            <Metric label="Average rating" value={ratingCount ? averageRating.toFixed(2) : "Not available"} hint={`${formatNumber(ratingCount)} ratings across selected products`} icon={Star} />
           </div>
 
           <section className="surface-card mt-4 border border-border p-4">
@@ -595,9 +595,9 @@ function AnalyticsPage() {
                       <td className="px-3 py-3"><Badge variant={listing.status === "published" ? "default" : "secondary"} className="capitalize">{listing.status}</Badge></td>
                       <td className="px-3 py-3 text-right tabular-nums">{formatNumber(views)}</td>
                       <td className="px-3 py-3 text-right tabular-nums">{formatNumber(installs)}</td>
-                      <td className="px-3 py-3 text-right tabular-nums">{views ? `${rate.toFixed(1)}%` : "—"}</td>
+                      <td className="px-3 py-3 text-right tabular-nums">{views ? `${rate.toFixed(1)}%` : "Not available"}</td>
                       <td className="px-3 py-3 text-right tabular-nums">{formatNumber(listing.downloads)}</td>
-                      <td className="px-3 py-3 text-right tabular-nums">{listing.rating_count ? `${Number(listing.rating_avg).toFixed(1)} ★` : "—"}</td>
+                      <td className="px-3 py-3 text-right tabular-nums">{listing.rating_count ? `${Number(listing.rating_avg).toFixed(1)} ★` : "Not available"}</td>
                     </tr>
                   ))}
                   {productRows.length === 0 && <tr><td colSpan={7} className="px-3 py-8 text-center text-muted-foreground">Publish products to see performance comparisons.</td></tr>}

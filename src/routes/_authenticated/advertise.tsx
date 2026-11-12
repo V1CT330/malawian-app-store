@@ -129,7 +129,7 @@ function AdvertisePage() {
       const amount = Number(budget);
       const duration = Number(days);
       if (!Number.isInteger(amount) || amount < 1000) throw new Error("Minimum proposed budget is MK1,000.");
-      if (!Number.isInteger(duration) || duration < 1 || duration > 90) throw new Error("Campaign duration must be 1–90 days.");
+      if (!Number.isInteger(duration) || duration < 1 || duration > 90) throw new Error("Campaign duration must be between 1 and 90 days.");
       if (!placements.length) throw new Error("Choose at least one placement.");
       const { error } = await (supabase as any).from("ad_campaigns").insert({
         advertiser_id: userId,
@@ -188,7 +188,7 @@ function AdvertisePage() {
       breadcrumbs={[{ label: "Console", to: "/console" }, { label: "Ads Manager" }]}
     >
       <section className="mb-4 border border-amber-500/40 bg-amber-500/5 p-4">
-        <p className="text-sm font-semibold">Pilot mode — no payment is collected</p>
+        <p className="text-sm font-semibold">Pilot mode. No payment is collected.</p>
         <p className="mt-1 text-sm text-muted-foreground">
           Campaigns are submitted for manual approval. Budgets are proposed amounts, not charges.
           Checkout, verified delivery and billing are not connected yet.

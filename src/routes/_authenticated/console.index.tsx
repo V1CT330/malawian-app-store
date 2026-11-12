@@ -183,7 +183,7 @@ function ConsoleDashboard() {
             ].map((item, index) => (
               <div key={item.label} className={`px-4 py-4 sm:px-5 sm:py-5 ${index % 2 === 0 ? "border-r" : ""} ${index < 2 ? "border-b" : ""} border-border/80`}>
                 <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{item.label}</p>
-                <p className={`mt-2 font-display text-3xl font-bold tabular-nums ${item.label === "Published" ? "text-brand-green" : item.label === "In review" ? "text-amber-600 dark:text-amber-400" : item.label === "Action needed" ? (item.value > 0 ? "text-brand-red" : "text-brand-green") : "text-foreground"}`}>{listingsQuery.isLoading ? "—" : item.value}</p>
+                <p className={`mt-2 font-display text-3xl font-bold tabular-nums ${item.label === "Published" ? "text-brand-green" : item.label === "In review" ? "text-amber-600 dark:text-amber-400" : item.label === "Action needed" ? (item.value > 0 ? "text-brand-red" : "text-brand-green") : "text-foreground"}`}>{listingsQuery.isLoading ? "Loading" : item.value}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{item.note}</p>
               </div>
             ))}
