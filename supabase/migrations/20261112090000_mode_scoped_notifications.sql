@@ -25,8 +25,14 @@ CREATE INDEX IF NOT EXISTS notifications_user_scope_unread_idx
 UPDATE public.notifications
 SET scope = 'developer'
 WHERE title = 'Identity verification update'
+   OR title LIKE 'KYC %'
+   OR title LIKE 'Release % approved'
+   OR title LIKE 'Release % rejected'
    OR title LIKE '% is live'
    OR title LIKE '% needs changes'
+   OR title LIKE '% was published'
+   OR title LIKE '% was rejected'
+   OR title LIKE '% was pending'
    OR title LIKE 'New review on %'
    OR title LIKE '% needs a security review';
 
@@ -56,8 +62,14 @@ AS $$
 BEGIN
   IF NEW.scope = 'user' AND (
     NEW.title = 'Identity verification update'
+    OR NEW.title LIKE 'KYC %'
+    OR NEW.title LIKE 'Release % approved'
+    OR NEW.title LIKE 'Release % rejected'
     OR NEW.title LIKE '% is live'
     OR NEW.title LIKE '% needs changes'
+    OR NEW.title LIKE '% was published'
+    OR NEW.title LIKE '% was rejected'
+    OR NEW.title LIKE '% was pending'
     OR NEW.title LIKE 'New review on %'
     OR NEW.title LIKE '% needs a security review'
   ) THEN
