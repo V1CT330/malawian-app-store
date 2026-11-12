@@ -294,17 +294,18 @@ function SocialPage() {
 
   const trackedAdImpressions = useRef(new Set<string>());
   const sponsoredCampaigns = useMemo(() => sponsoredCampaignsQuery.data ?? [], [sponsoredCampaignsQuery.data]);
+  const sponsoredCampaignIds = sponsoredCampaigns.map((campaign: { id: string }) => campaign.id).join(",");
   useEffect(() => {
-    if (!userId) return;
-    for (const campaign of sponsoredCampaigns) {
-      if (trackedAdImpressions.current.has(campaign.id)) continue;
-      trackedAdImpressions.current.add(campaign.id);
-      void socialDb.from("ad_events").insert({ campaign_id: campaign.id, event_type: "impression", viewer_id: userId })
+    if (!userId || !sponsoredCampaignIds) return;
+    for (const campaignId of sponsoredCampaignIds.split(",").filter(Boolean)) {
+      if (trackedAdImpressions.current.has(campaignId)) continue;
+      trackedAdImpressions.current.add(campaignId);
+      void socialDb.from("ad_events").insert({ campaign_id: campaignId, event_type: "impression", viewer_id: userId })
         .then(({ error }: { error: { code?: string } | null }) => {
-          if (error && error.code !== "23505") trackedAdImpressions.current.delete(campaign.id);
+          if (error && error.code !== "23505") trackedAdImpressions.current.delete(campaignId);
         });
     }
-  }, [userId, sponsoredCampaigns.map((campaign: { id: string }) => campaign.id).join(",")]);
+  }, [userId, sponsoredCampaignIds]);
 
   const connectionsQuery = useQuery({
     queryKey: ["social", "connections", userId],
