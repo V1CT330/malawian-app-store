@@ -518,6 +518,31 @@ body:has(.console-square:not(:has(.social-feed-screen))) {
 }
 
 
+/* Remove decorative separators across Developer Mode content only.
+   Keep form outlines, table grids, intentional feature/error surfaces, and Social intact. */
+.console-square:not(:has(.social-feed-screen)) main
+  :where([class*="divide-y"]) > * + *:not(tr) {
+  border-top-color: transparent !important;
+}
+.console-square:not(:has(.social-feed-screen)) main
+  :where([class*="border-y"], [class*="border-b"], [class*="border-t"])
+  :not(input):not(textarea):not(select):not([role="combobox"]):not(table):not(thead):not(tbody):not(tfoot):not(tr):not(th):not(td):not(.console-feature-card):not(.console-chat-bubble):not([class*="border-destructive"]) {
+  border-top-color: transparent !important;
+  border-bottom-color: transparent !important;
+}
+.console-square:not(:has(.social-feed-screen)) main
+  :where([class*="border-y"], [class*="border-b"], [class*="border-t"])
+  :not(input):not(textarea):not(select):not([role="combobox"]):not(table):not(thead):not(tbody):not(tfoot):not(tr):not(th):not(td):not(.console-feature-card):not(.console-chat-bubble):not([class*="border-destructive"]) {
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+}
+.console-square:not(:has(.social-feed-screen)) main :where(input, select, textarea, [role="combobox"]) {
+  border-color: var(--input) !important;
+}
+.console-square:not(:has(.social-feed-screen)) main :where(table, thead, tbody, tfoot, tr, th, td) {
+  border-color: var(--border);
+}
+
 /* Soft, Google Sans-inspired typography, limited to Developer Mode. */
 .console-square:not(:has(.social-feed-screen)) {
   font-family: "Nunito Sans", "DM Sans", ui-sans-serif, system-ui, sans-serif;
