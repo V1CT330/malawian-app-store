@@ -41,7 +41,7 @@ export function AppShell({
   // Keep the shopper navigation fixed; developer links must not replace it.
 
   return (
-    <div className={cn("flex min-h-screen flex-col", mode === "developer" ? "bg-background" : "bg-[#f8fafd]")}>
+    <div className="flex min-h-screen flex-col bg-background">
       <header
         className={cn("sticky top-0 z-30 bg-background px-3 pb-2 pt-3", isSettingsPage && "hidden")}
         style={{ paddingTop: "calc(0.75rem + env(safe-area-inset-top))" }}
