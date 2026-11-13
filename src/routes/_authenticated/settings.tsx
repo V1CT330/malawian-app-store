@@ -232,7 +232,7 @@ function SettingsPage() {
 
   return (
     <AppShell>
-      <div className={cn("mx-auto w-full max-w-4xl", mode === "developer" ? "" : "rounded-[28px] bg-card px-4 shadow-sm ring-1 ring-border/50 sm:px-8")}>
+      <div className={cn("mx-auto w-full max-w-4xl", mode === "developer" ? "" : "user-account-settings rounded-[28px] px-4 py-5 sm:px-8 sm:py-8")}>
         <header className={cn("border-b border-border/70 pb-5", mode === "developer" ? "pt-0" : "pt-6")}>
           <p className="text-xs font-semibold tracking-wide text-primary">YOUR ACCOUNT</p>
           <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight sm:text-4xl">Account settings</h1>
