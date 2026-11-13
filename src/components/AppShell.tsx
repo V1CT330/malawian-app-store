@@ -47,7 +47,7 @@ export function AppShell({
         style={{ paddingTop: "calc(0.75rem + env(safe-area-inset-top))" }}
       >
         <div className="mx-auto w-full max-w-5xl">
-          <div className={cn("flex items-center gap-3", isSettingsPage ? "justify-between py-1" : "rounded-full bg-secondary px-3 py-2 shadow-soft")}>
+          <div className={cn("flex items-center gap-3", isSettingsPage ? "justify-between py-1" : "rounded-full border border-[#e5eaf1] bg-white px-3 py-2 shadow-sm")}>
             <Link to="/" aria-label="Malawian App Store home" className="shrink-0">
               <img
                 src={logo}
@@ -76,7 +76,7 @@ export function AppShell({
                   }}
                   placeholder="Search apps & websites"
                   aria-label="Search apps and websites"
-                  className="min-w-0 min-h-10 flex-1 bg-transparent text-base outline-none placeholder:text-muted-foreground sm:text-sm"
+                  className="min-w-0 min-h-10 flex-1 bg-transparent text-base text-[#202124] outline-none placeholder:text-[#687386] sm:text-sm"
                 />
               </>
             )}
@@ -123,7 +123,7 @@ export function AppShell({
       </footer>
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-30 w-full bg-background/95 backdrop-blur"
+        className="fixed inset-x-0 bottom-0 z-30 w-full border-t border-[#e7ebf1] bg-white/95 backdrop-blur"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
         aria-label="Primary navigation"
       >
@@ -140,8 +140,8 @@ export function AppShell({
               >
                 <span
                   className={cn(
-                    "relative flex h-7 w-16 items-center justify-center rounded-full transition-colors",
-                    active ? "bg-accent text-accent-foreground" : "text-muted-foreground",
+                    "relative flex h-8 w-16 items-center justify-center rounded-full transition-colors",
+                    active ? "bg-[#d3e3fd] text-[#0842a0]" : "text-[#5f6877] hover:bg-[#f1f4f9]",
                   )}
                 >
                   <Icon className="h-5 w-5" />
@@ -149,7 +149,7 @@ export function AppShell({
                     <span className="absolute right-3 top-0 h-2 w-2 rounded-full bg-destructive" />
                   )}
                 </span>
-                <span className={active ? "text-foreground" : "text-muted-foreground"}>
+                <span className={active ? "font-semibold text-[#202124]" : "text-[#5f6877]"}>
                   {item.label}
                 </span>
               </Link>
