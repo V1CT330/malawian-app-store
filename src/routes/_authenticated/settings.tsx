@@ -25,6 +25,7 @@ import { formatMwk, uploadAsset } from "@/lib/store";
 import { PRO_NAME, PRO_ANNUAL_PRICE_MWK } from "@/lib/pro";
 import { hasProAccess } from "@/lib/pro-access";
 import { startDeveloperTrial } from "@/lib/subscription.functions";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -233,7 +234,7 @@ function SettingsPage() {
     <AppShell>
       <div className={cn("mx-auto w-full max-w-4xl", mode === "developer" ? "" : "rounded-[28px] bg-card px-4 shadow-sm ring-1 ring-border/50 sm:px-8")}>
         <header className={cn("border-b border-border/70 pb-5", mode === "developer" ? "pt-0" : "pt-6")}>
-          <p className="text-xs font-semibold tracking-wide text-primary">Your Google-style account space</p>
+          <p className="text-xs font-semibold tracking-wide text-primary">YOUR ACCOUNT</p>
           <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight sm:text-4xl">Account settings</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
             Manage your profile, preferences and how you use Malawian App Store.
@@ -455,7 +456,7 @@ function SettingsPage() {
                     {setMode.isPending ? "Switching…" : "Developer Mode"}
                   </Button>
                   <Button
-                    className="h-12 w-full rounded-none border border-black bg-white px-3 font-semibold text-black shadow-none transition-colors hover:bg-gray-100"
+                    className={cn("h-12 w-full px-4 font-semibold shadow-none transition-colors", mode === "developer" ? "rounded-none border border-black bg-white text-black hover:bg-gray-100" : "rounded-full border border-sky-200 bg-sky-50 text-sky-900 hover:bg-sky-100")}
                     onClick={() => navigate({ to: "/console/social" })}
                   >
                     Social
