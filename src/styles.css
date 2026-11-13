@@ -679,3 +679,159 @@ body:has(.console-square:not(:has(.social-feed-screen))) {
     border-radius: 1rem;
   }
 }
+
+
+/* User Mode account settings experiment only.
+   This class is rendered exclusively by the /settings route while in User Mode. */
+.user-account-settings {
+  --uas-blue: #1a73e8;
+  --uas-ink: #202124;
+  --uas-muted: #5f6368;
+  --uas-line: #e3e8ef;
+  color: var(--uas-ink);
+  background:
+    radial-gradient(ellipse at 92% 2%, rgba(210, 227, 252, 0.82) 0, rgba(210, 227, 252, 0) 34%),
+    radial-gradient(ellipse at 4% 18%, rgba(232, 240, 254, 0.9) 0, rgba(232, 240, 254, 0) 30%),
+    #f6f9fe;
+  font-family: "Nunito Sans", "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  font-optical-sizing: auto;
+  font-synthesis: none;
+  letter-spacing: normal;
+}
+.user-account-settings :where(*) {
+  font-family: inherit;
+}
+.user-account-settings :where(h1, h2, h3, h4) {
+  color: var(--uas-ink);
+  font-family: inherit;
+  letter-spacing: -0.02em;
+}
+.user-account-settings > header {
+  border: 0;
+  padding: 1.25rem 0 1.5rem;
+}
+.user-account-settings > header > p:first-child {
+  color: var(--uas-blue);
+  font-size: 0.7rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+.user-account-settings > header h1 {
+  font-size: clamp(1.8rem, 4vw, 2.45rem);
+  font-weight: 650;
+}
+.user-account-settings > header nav {
+  gap: 0.45rem;
+  margin-top: 1.35rem;
+}
+.user-account-settings > header nav a {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.6rem 1rem;
+  color: #4f5b6b;
+  font-weight: 600;
+  text-decoration: none;
+}
+.user-account-settings > header nav a:first-child,
+.user-account-settings > header nav a:hover {
+  background: #dce9fb;
+  color: #174ea6;
+}
+.user-account-settings > section {
+  margin-top: 0.9rem;
+  border: 1px solid var(--uas-line);
+  border-radius: 1.35rem;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 1.5rem;
+  box-shadow: 0 1px 2px rgba(60, 64, 67, 0.035);
+}
+.user-account-settings > section > div > div:first-child h2 {
+  font-size: 1.08rem;
+  font-weight: 700;
+}
+.user-account-settings > section > div > div:first-child p {
+  color: var(--uas-muted);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+.user-account-settings section :where(p, label, button, a, input, textarea) {
+  overflow-wrap: anywhere;
+}
+.user-account-settings section :where(input:not([type="color"]), textarea) {
+  border-color: #d5dce6;
+  border-radius: 0.8rem;
+  background: #fff;
+  color: var(--uas-ink);
+  font-family: inherit;
+}
+.user-account-settings section :where(input:not([type="color"]), textarea):focus {
+  border-color: var(--uas-blue);
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.12);
+}
+.user-account-settings #profile img,
+.user-account-settings #profile > div > div:nth-child(2) > div:nth-child(2) > div {
+  border-radius: 0.9rem;
+}
+.user-account-settings #profile > div > div:nth-child(2) > div:first-child > div:first-child {
+  border-radius: 50%;
+}
+.user-account-settings #profile :where(.border-b) {
+  border-bottom-color: #edf0f4;
+}
+.user-account-settings #preferences :where(.border-b) {
+  border-bottom-color: #edf0f4;
+}
+.user-account-settings section :where(button, [role="switch"]) {
+  font-family: inherit;
+}
+.user-account-settings > div:last-child {
+  padding: 1.5rem 0 0.5rem;
+}
+.user-account-settings > div:last-child > p {
+  color: var(--uas-muted);
+}
+@media (max-width: 639px) {
+  .user-account-settings {
+    padding: 1rem 0.85rem 1.25rem !important;
+    border-radius: 1.25rem;
+  }
+  .user-account-settings > header {
+    padding: 0.65rem 0.25rem 1rem;
+  }
+  .user-account-settings > section {
+    margin-top: 0.75rem;
+    border-radius: 1.1rem;
+    padding: 1.1rem 1rem;
+  }
+  .user-account-settings > section > div {
+    gap: 1.1rem;
+  }
+  .user-account-settings #profile .relative.h-28 {
+    border-radius: 0.85rem;
+  }
+}
+.dark .user-account-settings {
+  --uas-ink: #e8eaed;
+  --uas-muted: #bdc1c6;
+  --uas-line: #343a46;
+  background:
+    radial-gradient(ellipse at 92% 2%, rgba(39, 65, 103, 0.38) 0, transparent 34%),
+    #171b22;
+}
+.dark .user-account-settings > section {
+  background: #20252d;
+  box-shadow: none;
+}
+.dark .user-account-settings section :where(input:not([type="color"]), textarea) {
+  border-color: #46505e;
+  background: #191e26;
+  color: #e8eaed;
+}
+.dark .user-account-settings > header nav a {
+  color: #c5cfdd;
+}
+.dark .user-account-settings > header nav a:first-child,
+.dark .user-account-settings > header nav a:hover {
+  background: #263b59;
+  color: #a8c7fa;
+}

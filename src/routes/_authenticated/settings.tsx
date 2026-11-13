@@ -25,6 +25,7 @@ import { formatMwk, uploadAsset } from "@/lib/store";
 import { PRO_NAME, PRO_ANNUAL_PRICE_MWK } from "@/lib/pro";
 import { hasProAccess } from "@/lib/pro-access";
 import { startDeveloperTrial } from "@/lib/subscription.functions";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -231,16 +232,16 @@ function SettingsPage() {
 
   return (
     <AppShell>
-      <div className="mx-auto w-full max-w-4xl">
-        <header className="border-b border-border pb-5 pt-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Your account</p>
-          <h1 className="mt-2 font-display text-3xl font-bold tracking-tight sm:text-4xl">Settings</h1>
+      <div className={cn("mx-auto w-full max-w-4xl", mode === "developer" ? "" : "user-account-settings rounded-[28px] px-4 py-5 sm:px-8 sm:py-8")}>
+        <header className={cn("border-b border-border/70 pb-5", mode === "developer" ? "pt-0" : "pt-6")}>
+          <p className="text-xs font-semibold tracking-wide text-primary">YOUR ACCOUNT</p>
+          <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight sm:text-4xl">Account settings</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
             Manage your profile, preferences and how you use Malawian App Store.
           </p>
-          <nav aria-label="Settings sections" className="mt-5 flex max-w-full gap-5 overflow-x-auto border-b border-border text-sm">
-            <a href="#profile" className="shrink-0 border-b-2 border-primary pb-3 font-medium">Profile</a>
-            <a href="#preferences" className="shrink-0 border-b-2 border-transparent pb-3 text-muted-foreground hover:text-foreground">Appearance</a>
+          <nav aria-label="Settings sections" className="mt-5 flex max-w-full gap-2 overflow-x-auto pb-1 text-sm">
+            <a href="#profile" className="shrink-0 rounded-full bg-accent px-4 py-2 font-medium text-accent-foreground">Profile</a>
+            <a href="#preferences" className="shrink-0 rounded-full px-4 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">Appearance</a>
             <a href="#workspace" className="shrink-0 border-b-2 border-transparent pb-3 text-muted-foreground hover:text-foreground">Workspace</a>
           </nav>
         </header>
@@ -314,7 +315,7 @@ function SettingsPage() {
                     onChange={(event) => setDisplayName(event.target.value)}
                     maxLength={80}
                     placeholder="How should we call you?"
-                    className="h-11 w-full border border-border bg-background px-3 text-sm outline-none transition-colors focus:border-primary"
+                    className="h-11 w-full rounded-xl border border-border bg-background px-4 text-sm outline-none transition-colors focus:border-primary focus:ring-2 focus:ring-primary/10"
                   />
                   <p className="text-xs text-muted-foreground">Up to 80 characters.</p>
                 </div>
@@ -332,14 +333,14 @@ function SettingsPage() {
                       value={bio ?? profile?.bio ?? ""}
                       onChange={(event) => setBio(event.target.value)}
                       placeholder="A little about yourself…"
-                      className="min-h-24 resize-y rounded-none border-border"
+                      className="min-h-24 resize-y rounded-xl border-border"
                     />
                     <p className="text-right text-xs text-muted-foreground">{(bio ?? profile?.bio ?? "").length}/300</p>
                   </div>
                 )}
                 <div>
                   <Button
-                    className="rounded-none px-5"
+                    className="rounded-full px-6"
                     disabled={saveProfile.isPending}
                     onClick={() => saveProfile.mutate()}
                   >
@@ -442,7 +443,7 @@ function SettingsPage() {
                 </div>
                 <div className="mt-4 grid grid-cols-1 gap-3">
                   <Button
-                    className="h-12 w-full rounded-none border border-black bg-white px-3 font-semibold text-black shadow-none transition-colors hover:bg-gray-100"
+                    className={cn("h-12 w-full px-4 font-semibold shadow-none transition-colors", mode === "developer" ? "rounded-none border border-black bg-white text-black hover:bg-gray-100" : "rounded-full border border-sky-200 bg-sky-50 text-sky-900 hover:bg-sky-100")}
                     disabled={setMode.isPending}
                     onClick={() => {
                       if (mode === "developer") {
@@ -455,7 +456,7 @@ function SettingsPage() {
                     {setMode.isPending ? "Switching…" : "Developer Mode"}
                   </Button>
                   <Button
-                    className="h-12 w-full rounded-none border border-black bg-white px-3 font-semibold text-black shadow-none transition-colors hover:bg-gray-100"
+                    className={cn("h-12 w-full px-4 font-semibold shadow-none transition-colors", mode === "developer" ? "rounded-none border border-black bg-white text-black hover:bg-gray-100" : "rounded-full border border-sky-200 bg-sky-50 text-sky-900 hover:bg-sky-100")}
                     onClick={() => navigate({ to: "/console/social" })}
                   >
                     Social
@@ -504,7 +505,7 @@ function SettingsPage() {
 
         <div className="flex flex-col gap-3 py-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs leading-5 text-muted-foreground">Your account settings are saved to your profile or device as appropriate.</p>
-          <Button variant="outline" className="w-full rounded-none border-destructive/40 text-destructive hover:bg-destructive/5 hover:text-destructive sm:w-auto" onClick={signOut}>
+          <Button variant="outline" className="w-full rounded-full border-destructive/40 text-destructive hover:bg-destructive/5 hover:text-destructive sm:w-auto" onClick={signOut}>
             <LogOut className="mr-2 h-4 w-4" /> Sign out
           </Button>
         </div>
