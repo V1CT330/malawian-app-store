@@ -14,6 +14,9 @@ import { useRequireDeveloper } from "@/hooks/useRequireDeveloper";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadAsset } from "@/lib/store";
 
+// Manual uploads stay hidden until the production private KYC storage bucket is provisioned.
+const MANUAL_KYC_UPLOAD_ENABLED = false;
+
 export const Route = createFileRoute("/_authenticated/console/verification")({
   head: () => ({
     meta: [
@@ -21,7 +24,7 @@ export const Route = createFileRoute("/_authenticated/console/verification")({
       {
         name: "description",
         content:
-          "Save your WhatsApp contact number and verify your identity manually or securely through Didit.",
+          "Save your WhatsApp contact number and verify your identity securely through Didit.",
       },
       { property: "og:title", content: "Developer verification · Malawian App Store" },
       { property: "og:description", content: "Earn the Verified Developer badge and build trust." },
@@ -194,70 +197,71 @@ function VerificationPage() {
       </section>
 
       <section className="surface-card mt-4 space-y-3 p-4">
-        <h2 className="font-display text-base font-semibold">Identity documents</h2>
+        <h2 className="font-display text-base font-semibold">Identity verification</h2>
         <p className="text-xs text-muted-foreground">
-          Choose manual review by the MAS team or automatic identity verification through Didit.
+          Verify securely through Didit. MAS updates your status only after the provider result is received and validated.
         </p>
-        <div>
-          <Label htmlFor="fullname">Full legal name</Label>
-          <Input
-            id="fullname"
-            value={fullName}
-            maxLength={80}
-            onChange={(e) => setFullName(e.target.value)}
-          />
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div>
-            <Label htmlFor="idtype">Document type</Label>
+        {MANUAL_KYC_UPLOAD_ENABLED ? (
+          <>
+            <div>
+              <Label htmlFor="fullname">Full legal name</Label>
+              <Input
+                id="fullname"
+                value={fullName}
+                maxLength={80}
+                onChange={(e) => setFullName(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <Label htmlFor="idtype">Document type</Label>
+                <Input
+                  id="idtype"
+                  value={idType}
+                  onChange={(e) => setIdType(e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="idnumber">Document number</Label>
+                <Input
+                  id="idnumber"
+                  value={idNumber}
+                  maxLength={40}
+                  onChange={(e) => setIdNumber(e.target.value)}
+                />
+              </div>
+            </div>
             <Input
-              id="idtype"
-              value={idType}
-              onChange={(e) => setIdType(e.target.value)}
+              aria-label="Upload national ID or passport for manual review"
+              type="file"
+              accept="image/*,application/pdf"
+              onChange={(e) => setIdDoc(e.target.files?.[0] ?? null)}
             />
-          </div>
-          <div>
-            <Label htmlFor="idnumber">Document number</Label>
-            <Input
-              id="idnumber"
-              value={idNumber}
-              maxLength={40}
-              onChange={(e) => setIdNumber(e.target.value)}
-            />
-          </div>
-        </div>
-        <Input
-          aria-label="Upload national ID or passport for manual review"
-          type="file"
-          accept="image/*,application/pdf"
-          onChange={(e) => setIdDoc(e.target.files?.[0] ?? null)}
-        />
+            <Button
+              className="w-full"
+              disabled={submitKyc.isPending || !userId}
+              onClick={() => submitKyc.mutate()}
+            >
+              {submitKyc.isPending ? "Submitting…" : "Submit for verification"}
+            </Button>
+          </>
+        ) : (
+          <p className="text-xs text-muted-foreground">
+            Manual document upload is temporarily unavailable while secure document storage is being provisioned. Use the Didit option below.
+          </p>
+        )}
+        <Button
+          className="w-full"
+          variant="outline"
+          disabled={startDidit.isPending || !userId}
+          onClick={() => startDidit.mutate()}
+        >
+          <ShieldCheck className="mr-2 h-4 w-4" />
+          {startDidit.isPending ? "Preparing Didit…" : "Verify with Didit"}
+          {!startDidit.isPending && <ExternalLink className="ml-2 h-4 w-4" />}
+        </Button>
         <p className="text-xs text-muted-foreground">
-          These details and the uploaded document are used for manual review. Didit collects the
-          information required by its own hosted workflow when you choose automatic verification.
-        </p>
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <Button
-            className="w-full sm:flex-1"
-            disabled={submitKyc.isPending || !userId}
-            onClick={() => submitKyc.mutate()}
-          >
-            {submitKyc.isPending ? "Submitting…" : "Submit for verification"}
-          </Button>
-          <Button
-            className="w-full sm:flex-1"
-            variant="outline"
-            disabled={startDidit.isPending || !userId}
-            onClick={() => startDidit.mutate()}
-          >
-            <ShieldCheck className="mr-2 h-4 w-4" />
-            {startDidit.isPending ? "Preparing Didit…" : "Verify automatically with Didit"}
-            {!startDidit.isPending && <ExternalLink className="ml-2 h-4 w-4" />}
-          </Button>
-        </div>
-        <p className="text-xs text-muted-foreground">
-          Automatic verification opens Didit in a secure page. Your MAS status changes only after
-          the verification result is received and validated.
+          Didit opens in a secure hosted page. Your MAS status changes only after the verification result is received and validated.
         </p>
       </section>
 
