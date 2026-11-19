@@ -30,6 +30,7 @@ import {
 import { toast } from "sonner";
 
 import { AppIcon } from "@/components/ListingCard";
+import logo from "@/assets/logo-mark.png";
 import { ConsoleShell } from "@/components/console/ConsoleShell";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useProfile, useSignedUrl, useSocialUnreadCount } from "@/hooks/useSession";
@@ -789,20 +790,23 @@ function SocialPage() {
       <section className="social-feed-screen min-h-[calc(100vh-4rem)] w-full min-w-0 max-w-full overflow-x-clip border-b border-border/70 bg-background">
         {!isComposerOpen && <>
         <div className="flex items-center justify-between gap-2 bg-background px-4 py-3.5 sm:px-6">
-          <div className="min-w-0">
-            <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">Social</h1>
-            <p className="mt-0.5 hidden text-xs text-muted-foreground sm:block">Connect, share, and discover the MAS community.</p>
+          <div className="flex min-w-0 items-center gap-3">
+             <img src={logo} alt="Malawian App Store" width={32} height={32} className="h-8 w-8 shrink-0 [filter:brightness(0)_saturate(100%)_invert(24%)_sepia(91%)_saturate(2550%)_hue-rotate(202deg)_brightness(96%)_contrast(102%)]" />
+             <div className="min-w-0">
+               <h1 className="text-xl font-semibold tracking-tight text-[#1877F2] sm:text-2xl">Social</h1>
+               <p className="mt-0.5 hidden text-xs text-muted-foreground sm:block">Connect, share, and discover the MAS community.</p>
+             </div>
           </div>
-          <button type="button" onClick={() => setSidebarOpen(true)} aria-label="Open social menu" title="Social menu" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <button type="button" onClick={() => setSidebarOpen(true)} aria-label="Open sidebar menu" title="Sidebar menu" className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <Menu className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
-        <nav aria-label="Social menu" className="sticky top-0 z-20 flex w-full min-w-0 gap-1 overflow-x-auto border-b border-border bg-background px-2 sm:justify-center sm:gap-3">
+        <nav aria-label="Social menu" className="sticky top-0 z-20 flex w-full min-w-0 items-stretch justify-evenly border-b border-border bg-background px-1 sm:px-3">
           {sections.map(({ id, icon: Icon }) => {
             const selected = activeSection === id;
             return (
               <button key={id} type="button" onClick={() => setActiveSection(id)} aria-label={id} title={id} aria-current={selected ? "page" : undefined}
-                className={cn("flex min-h-14 min-w-[76px] shrink-0 flex-col items-center justify-center border-b-2 px-2 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring", selected ? "border-[#1877F2] text-[#1877F2]" : "border-transparent text-muted-foreground hover:border-border hover:text-foreground")}>
+                className={cn("flex min-h-12 min-w-0 flex-1 flex-col items-center justify-center border-b-2 px-1 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring", selected ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:border-border hover:text-foreground")}>
                 <span className="relative flex h-6 w-6 shrink-0 items-center justify-center">
                   <Icon className="h-5 w-5" aria-hidden="true" />
                   {((id === "Notifications" && unread > 0) || (id === "Messages" && unreadMessages > 0)) && (
@@ -811,14 +815,13 @@ function SocialPage() {
                     </span>
                   )}
                 </span>
-                <span className="mt-1 whitespace-nowrap text-[11px] font-medium leading-none">{id === "Notifications" ? "Alerts" : id}</span>
               </button>
             );
           })}
         </nav>
         </>}
 
-        <main className={cn("min-h-[220px] w-full min-w-0 max-w-full overflow-x-clip", activeSection === "Feed" && "mx-auto max-w-3xl", activeSection !== "Feed" && "social-no-horizontal-lines")}>
+        <main className={cn("min-h-[220px] w-full min-w-0 max-w-full overflow-x-clip", activeSection !== "Feed" && "social-no-horizontal-lines")}>
           {!userId ? (
             <div className="px-4 py-8 text-sm text-muted-foreground">Sign in to use Social.</div>
           ) : activeSection === "Feed" ? (
@@ -861,8 +864,8 @@ function SocialPage() {
                 </form>
               </div>
             ) : (
-            <div className="mx-auto w-full max-w-3xl space-y-3 px-3 pb-6 pt-3 sm:px-4">
-              <button type="button" onClick={() => setIsComposerOpen(true)} className="flex w-full items-center gap-3 rounded-2xl border border-border bg-background px-4 py-3 text-left shadow-sm transition-colors hover:bg-muted/30 sm:px-5">
+            <div className="w-full space-y-0 pb-0 pt-0">
+              <button type="button" onClick={() => setIsComposerOpen(true)} className="flex w-full items-center gap-3 border-y border-border/80 bg-background px-4 py-3 text-left sm:px-5">
                 <Avatar profile={profile as SocialProfile | null} />
                 <span className="min-w-0 flex-1 rounded-full border border-border/70 bg-muted/30 px-4 py-3 text-sm text-muted-foreground">Share something</span>
               </button>
@@ -873,7 +876,7 @@ function SocialPage() {
                 listing_icon_url: string | null; listing_banner_url: string | null; listing_status: string | null;
               }) => {
                 const appContent = <div className="flex items-center gap-3"><AppIcon path={campaign.listing_icon_url} name={campaign.listing_name || campaign.headline} className="h-14 w-14 rounded-2xl" /><div className="min-w-0 flex-1"><h3 className="text-base font-bold">{campaign.listing_name || campaign.headline}</h3>{campaign.body && <p className="mt-1 text-sm leading-6 text-muted-foreground">{campaign.body}</p>}<span className="mt-2 inline-block text-xs font-semibold text-primary">{campaign.listing_status === "published" ? "View app" : "Coming Soon"}</span></div></div>;
-                return <article key={campaign.id} className="relative w-full rounded-2xl border border-border bg-background px-4 py-4 shadow-sm sm:px-5">
+                return <article key={campaign.id} className="relative w-full border-b-[3px] border-muted-foreground/30 bg-background px-4 py-4 sm:px-5">
                   <div className="mb-3 flex items-center justify-between gap-2"><span className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground"><Megaphone className="h-3.5 w-3.5" /> Sponsored</span><span className="text-[11px] text-muted-foreground">Advertisement</span></div>
                   {campaign.creative_type === "app_listing" ? (campaign.listing_status === "published" && campaign.listing_slug
                     ? <Link to="/apps/$slug" params={{ slug: campaign.listing_slug }} onClick={() => { void socialDb.from("ad_events").insert({ campaign_id: campaign.id, event_type: "click", viewer_id: userId }); }} className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">{appContent}</Link>
@@ -897,7 +900,7 @@ function SocialPage() {
                 const reacted = optimisticReactions[post.id] ?? postReactions.some((reaction) => reaction.user_id === userId);
                 const postComments = commentsByPost.get(post.id) ?? [];
                 return (
-                  <article key={post.id} className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-border bg-background px-4 pt-4 pb-3 shadow-sm sm:px-5">
+                  <article key={post.id} className="relative w-full min-w-0 overflow-x-clip border-b-[3px] border-muted-foreground/30 bg-background px-4 pt-3 pb-4 sm:px-5">
                     <div className="flex items-start gap-3">
                       <Avatar profile={author} />
                       <div className="min-w-0 flex-1">
@@ -924,15 +927,15 @@ function SocialPage() {
                     <p className="whitespace-pre-wrap break-words py-1 text-sm leading-6">{post.body}</p>
                     {post.media_url && post.media_type === "image" && <div className="-mx-4 mb-4 flex w-[calc(100%+2rem)] min-w-0 justify-center overflow-hidden bg-muted/20 sm:-mx-5 sm:w-[calc(100%+2.5rem)]"><img src={post.media_url} alt="Post attachment" loading="lazy" className="block h-auto max-h-[70svh] sm:max-h-[min(75vh,720px)] w-full max-w-full object-contain object-center" /></div>}
                     {post.media_url && post.media_type === "video" && <div className="-mx-4 mb-4 flex w-[calc(100%+2rem)] min-w-0 justify-center overflow-hidden bg-black sm:-mx-5 sm:w-[calc(100%+2.5rem)]"><video src={post.media_url} controls preload="metadata" className="block h-auto max-h-[70svh] sm:max-h-[min(75vh,720px)] w-full max-w-full object-contain object-center" aria-label="Post video attachment" /></div>}
-                    <div className="mt-3 flex items-center justify-around gap-2 border-t border-border/70 pt-2 text-sm text-muted-foreground">
+                    <div className="mt-4 flex items-center justify-around gap-2 pt-3 pb-1 text-sm text-muted-foreground">
                       <button type="button" disabled={toggleReaction.isPending} onClick={() => {
                         const nextReacted = !reacted;
                         setOptimisticReactions((current) => ({ ...current, [post.id]: nextReacted }));
                         toggleReaction.mutate({ postId: post.id, reacted });
-                      }} className="flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl px-3 py-2 transition-colors hover:bg-muted" aria-label={reacted ? "Unlike post" : "Like post"} aria-pressed={reacted}>
-                        <ThumbsUp className={cn("h-5 w-5 text-[#1877F2] transition-colors", reacted && "fill-current")} /> <span>{reacted ? "Liked" : "Like"}</span>
+                      }} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-muted px-3 py-2 transition-colors hover:bg-muted/80 hover:text-foreground" aria-label={reacted ? "Unlike post" : "Like post"} aria-pressed={reacted}>
+                        <ThumbsUp className={cn("h-5 w-5 transition-colors", reacted && "fill-current text-[#1877F2]")} /> <span>{postReactions.length}</span>
                       </button>
-                      <Link to="/console/social-post/$postId" params={{ postId: post.id }} state={{ fromSocialFeed: true }} aria-label={postComments.length + " comments. Open discussion"} title={postComments.length + " comments"} className="flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl px-3 py-2 transition-colors hover:bg-muted"><MessageCircle className="h-5 w-5" /> <span>Comment</span></Link>
+                      <Link to="/console/social-post/$postId" params={{ postId: post.id }} state={{ fromSocialFeed: true }} aria-label={postComments.length + " comments. Open discussion"} title={postComments.length + " comments"} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-muted px-3 py-2 transition-colors hover:bg-muted/80 hover:text-foreground"><MessageCircle className="h-5 w-5" /></Link>
                       <button type="button" aria-label="Share post" title="Share post" onClick={() => {
                         const shareText = post.body + "\n\n" + window.location.origin + "/console/social";
                         if (navigator.share) {
@@ -940,7 +943,7 @@ function SocialPage() {
                         } else {
                           void navigator.clipboard.writeText(shareText).then(() => toast.success("Post copied for sharing")).catch(() => toast.error("Could not copy post"));
                         }
-                      }} className="flex min-h-10 flex-1 items-center justify-center gap-2 rounded-xl px-3 py-2 transition-colors hover:bg-muted"><FacebookShareIcon className="h-5 w-5" /> <span>Share</span></button>
+                      }} className="flex flex-1 items-center justify-center gap-2 rounded-full bg-muted px-3 py-2 transition-colors hover:bg-muted/80 hover:text-foreground"><FacebookShareIcon className="h-5 w-5" /></button>
                     </div>
                   </article>
                 );
