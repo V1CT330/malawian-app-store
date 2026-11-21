@@ -835,3 +835,29 @@ body:has(.console-square:not(:has(.social-feed-screen))) {
   background: #263b59;
   color: #a8c7fa;
 }
+
+
+/* Project-wide scrollbar policy: keep every scroll container usable, hide only its visual bar. */
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+*::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Image previews fade in only after their source has loaded. */
+.mas-fade-preview {
+  opacity: 0;
+  transition: opacity 320ms ease;
+}
+.mas-fade-preview.is-loaded {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mas-fade-preview {
+    transition: none;
+  }
+}
