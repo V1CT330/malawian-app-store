@@ -8,6 +8,46 @@ import { useSignedUrl } from "@/hooks/useSession";
 import { type Listing } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
+
+/** Image preview that fades in after the browser confirms the image is loaded. */
+function FadePreviewImage({
+  src,
+  alt,
+  className,
+  loading,
+  draggable,
+  onError,
+}: {
+  src: string;
+  alt: string;
+  className: string;
+  loading?: "eager" | "lazy";
+  draggable?: boolean;
+  onError?: React.ReactEventHandler<HTMLImageElement>;
+}) {
+  const imageRef = useRef<HTMLImageElement>(null);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    setLoaded(false);
+    const image = imageRef.current;
+    if (image?.complete && image.naturalWidth > 0) setLoaded(true);
+  }, [src]);
+
+  return (
+    <img
+      ref={imageRef}
+      src={src}
+      alt={alt}
+      loading={loading}
+      draggable={draggable}
+      className={cn(className, "mas-fade-preview", loaded && "is-loaded")}
+      onLoad={() => setLoaded(true)}
+      onError={onError}
+    />
+  );
+}
+
 export function AppIcon({
   path,
   name,
@@ -26,7 +66,7 @@ export function AppIcon({
       )}
     >
       {url ? (
-        <img src={url} alt={`${name} icon`} className="h-full w-full object-cover" loading="lazy" />
+        <FadePreviewImage src={url} alt={`${name} icon`} className="h-full w-full object-cover" loading="lazy" />
       ) : (
         <span className="font-display text-lg font-semibold">{name.slice(0, 2).toUpperCase()}</span>
       )}
@@ -75,7 +115,7 @@ function ScreenshotThumb({
         kind === "website" && (compact ? "h-[108px] max-w-[224px]" : "h-[150px] max-w-[300px]"),
       )}
     >
-      <img
+      <FadePreviewImage
         src={src}
         alt={`${name} preview ${index + 1}`}
         loading="lazy"
@@ -101,12 +141,11 @@ function ScreenshotViewerImage({
   return (
     <div className="flex h-full w-full shrink-0 items-center justify-center">
       {src && (
-        <img
+        <FadePreviewImage
           src={src}
           alt={`${name} screenshot ${index + 1}`}
           draggable={false}
-          className="h-auto max-h-[98dvh] w-auto max-w-[96vw] select-none rounded-2xl object-contain shadow-2xl"
-          style={{ visibility: active ? "visible" : "hidden" }}
+          className={cn("h-auto max-h-[98dvh] w-auto max-w-[96vw] select-none rounded-2xl object-contain shadow-2xl", !active && "invisible")}
         />
       )}
     </div>
