@@ -4,14 +4,14 @@ import { Download, Shield } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { AppShell } from "@/components/AppShell";
+import { AdminShell } from "@/components/admin/AdminShell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { useIsAdmin, useSession } from "@/hooks/useSession";
+import { useAdminAccess, useSession } from "@/hooks/useSession";
 import { supabase } from "@/integrations/supabase/client";
 import { signedAssetUrl, type Listing } from "@/lib/store";
 
@@ -44,7 +44,8 @@ type ProfileRow = {
 
 function AdminPage() {
   const { userId } = useSession();
-  const isAdmin = useIsAdmin();
+  const adminAccess = useAdminAccess();
+  const isAdmin = adminAccess.data === true;
   const queryClient = useQueryClient();
   const [notice, setNotice] = useState({ title: "", body: "" });
 
@@ -333,19 +334,43 @@ function AdminPage() {
     onError: (e: Error) => toast.error(e.message),
   });
 
+  if (adminAccess.isPending) {
+    return (
+      <AdminShell>
+        <section className="mx-auto mt-10 max-w-xl rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <Shield className="mx-auto h-7 w-7 text-slate-500" />
+          <h1 className="mt-3 font-display text-xl font-semibold">Verifying administrator access</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Checking your assigned MAS permissions…</p>
+        </section>
+      </AdminShell>
+    );
+  }
+
+  if (adminAccess.isError) {
+    return (
+      <AdminShell>
+        <section className="mx-auto mt-10 max-w-xl rounded-2xl border border-amber-300/70 bg-white p-6 text-center shadow-sm dark:border-amber-900 dark:bg-slate-900">
+          <Shield className="mx-auto h-7 w-7 text-amber-600" />
+          <h1 className="mt-3 font-display text-xl font-semibold">Administrator access could not be verified</h1>
+          <p className="mt-2 text-sm text-muted-foreground">No admin data was loaded. Retry the permission check.</p>
+          <Button className="mt-4" variant="outline" onClick={() => void adminAccess.refetch()}>Retry access check</Button>
+        </section>
+      </AdminShell>
+    );
+  }
+
   if (!isAdmin) {
     return (
-      <AppShell>
-        <div className="surface-card mt-6 space-y-3 p-6 text-center">
-          <Shield className="mx-auto h-6 w-6 text-muted-foreground" />
-          <h1 className="font-display text-xl font-bold">Admin panel</h1>
-          <p className="text-sm text-muted-foreground">
-            This area is restricted to store administrators. For security, administrator access
-            cannot be claimed from a public sign-in session. The platform owner must provision an
-            administrator account through a trusted operator process.
+      <AdminShell>
+        <section className="mx-auto mt-10 max-w-xl rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <Shield className="mx-auto h-7 w-7 text-slate-500" />
+          <h1 className="mt-3 font-display text-xl font-semibold">Restricted administration area</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            This account does not hold the MAS administrator role. Developer verification and ordinary sign-in do not grant administrative access.
           </p>
-        </div>
-      </AppShell>
+          <Button asChild className="mt-4" variant="outline"><Link to="/">Return to MAS</Link></Button>
+        </section>
+      </AdminShell>
     );
   }
 
@@ -354,13 +379,13 @@ function AdminPage() {
   );
 
   return (
-    <AppShell>
+    <AdminShell>
       <h1 className="flex items-center gap-2 font-display text-2xl font-bold">
         <Shield className="h-5 w-5" /> Admin panel
       </h1>
 
       <Tabs defaultValue="review" className="mt-4">
-        <TabsList className="flex-wrap">
+        <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 rounded-xl border border-slate-200 bg-white p-1.5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <TabsTrigger value="review">Review</TabsTrigger>
           <TabsTrigger value="ads">Ads</TabsTrigger>
           <TabsTrigger value="releases">Releases</TabsTrigger>
@@ -673,6 +698,6 @@ function AdminPage() {
           </div>
         </TabsContent>
       </Tabs>
-    </AppShell>
+    </AdminShell>
   );
 }
