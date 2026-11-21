@@ -36,15 +36,16 @@ export function AppShell({
   const navigate = useNavigate();
   const mode = useMode();
   const unread = useUnreadCount("user");
-  const isSettingsPage = pathname === "/settings";
+  const isSettingsPage = pathname === "/settings" || pathname.startsWith("/settings/");
   const isUserSettingsPage = isSettingsPage && mode !== "developer";
+  const hideGlobalHeader = isSettingsPage || pathname === "/notifications";
   const showGlobalSearch = pathname === "/" || pathname === "/library";
   // Keep the shopper navigation fixed; developer links must not replace it.
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header
-        className={cn("sticky top-0 z-30 bg-background px-3 pb-2 pt-3", isSettingsPage && "hidden")}
+        className={cn("sticky top-0 z-30 bg-background px-3 pb-2 pt-3", hideGlobalHeader && "hidden")}
         style={{ paddingTop: "calc(0.75rem + env(safe-area-inset-top))" }}
       >
         <div className="mx-auto w-full max-w-5xl">
