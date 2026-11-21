@@ -38,6 +38,7 @@ export function AppShell({
   const unread = useUnreadCount("user");
   const isSettingsPage = pathname === "/settings";
   const isUserSettingsPage = isSettingsPage && mode !== "developer";
+  const showGlobalSearch = pathname === "/" || pathname === "/library";
   // Keep the shopper navigation fixed; developer links must not replace it.
 
   return (
@@ -57,7 +58,7 @@ export function AppShell({
                 className="h-7 w-7"
               />
             </Link>
-            {!isSettingsPage && (
+            {showGlobalSearch && (
               <>
                 <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
                 <input
