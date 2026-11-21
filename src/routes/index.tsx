@@ -92,7 +92,7 @@ function StorePage() {
       const [listingsResult, profilesResult] = await Promise.all([
         supabase
           .from("listings")
-          .select("id,developer_id,slug,name,tagline,description,category,kind,icon_url,downloads,rating_avg,rating_count,created_at,status")
+          .select("id,developer_id,slug,name,tagline,description,category,kind,icon_url,screenshots,downloads,rating_avg,rating_count,created_at,status")
           .eq("status", "published")
           .order("created_at", { ascending: false }),
         supabase.from("public_profiles").select("id,developer_name,display_name"),

@@ -32,7 +32,76 @@ export function AppIcon({
   );
 }
 
-/** Play Store style vertical tile used inside horizontal carousels. */
+
+/** Swipeable store previews for app screenshots and website captures. */
+function ListingScreenshot({
+  path,
+  name,
+  index,
+  kind,
+  compact,
+}: {
+  path: string;
+  name: string;
+  index: number;
+  kind: Listing["kind"];
+  compact: boolean;
+}) {
+  const isRemoteUrl = /^https?:\\/\\//i.test(path);
+  const signedUrl = useSignedUrl(isRemoteUrl ? null : path);
+  const src = isRemoteUrl ? path : signedUrl;
+  if (!src) return null;
+
+  const sizeClass = kind === "website"
+    ? compact ? "h-[108px] w-[160px]" : "h-[150px] w-[224px]"
+    : compact ? "h-[168px] w-[96px]" : "h-[240px] w-[136px]";
+
+  return (
+    <div className={cn("shrink-0 snap-start overflow-hidden rounded-xl border border-border bg-secondary", sizeClass)}>
+      <img
+        src={src}
+        alt={`${name} preview ${index + 1}`}
+        loading="lazy"
+        className="h-full w-full object-cover"
+        onError={(event) => { event.currentTarget.style.display = "none"; }}
+      />
+    </div>
+  );
+}
+
+export function ListingScreenshotStrip({
+  screenshots,
+  name,
+  kind,
+  compact = false,
+}: {
+  screenshots: string[] | null | undefined;
+  name: string;
+  kind: Listing["kind"];
+  compact?: boolean;
+}) {
+  const paths = (screenshots ?? []).filter((path): path is string => typeof path === "string" && path.trim().length > 0);
+  if (paths.length === 0) return null;
+
+  return (
+    <div
+      className={cn("-mx-1 flex snap-x snap-mandatory gap-2 overflow-x-auto overscroll-x-contain px-1 pb-2", compact ? "mt-2" : "mt-3")}
+      aria-label={`${name} screenshots`}
+    >
+      {paths.map((path, index) => (
+        <ListingScreenshot
+          key={`${path}-${index}`}
+          path={path}
+          name={name}
+          index={index}
+          kind={kind}
+          compact={compact}
+        />
+      ))}
+    </div>
+  );
+}
+\n/** Play Store style vertical tile used inside horizontal carousels. */
 export function ListingTile({ listing }: { listing: Listing }) {
   return (
     <Link
@@ -66,8 +135,9 @@ export function ListingCard({ listing }: { listing: Listing }) {
     <Link
       to="/apps/$slug"
       params={{ slug: listing.slug }}
-      className="flex items-center gap-4 rounded-none border-0 px-1 py-2 shadow-none transition-colors hover:bg-secondary active:scale-[0.99]"
+      className="flex flex-col rounded-none border-0 px-1 py-2 shadow-none transition-colors hover:bg-secondary active:scale-[0.99]"
     >
+      <div className="flex items-center gap-4">
       <AppIcon
         path={listing.icon_url}
         name={listing.name}
@@ -98,6 +168,8 @@ export function ListingCard({ listing }: { listing: Listing }) {
           </span>
         </div>
       </div>
+      </div>
+      <ListingScreenshotStrip screenshots={listing.screenshots} name={listing.name} kind={listing.kind} compact />
     </Link>
   );
 }

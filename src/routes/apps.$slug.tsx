@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { AppShell } from "@/components/AppShell";
-import { AppIcon, Stars } from "@/components/ListingCard";
+import { AppIcon, ListingScreenshotStrip, Stars } from "@/components/ListingCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -299,6 +299,8 @@ function ListingDetail() {
             </div>
           </div>
         </header>
+
+        <ListingScreenshotStrip screenshots={listing.screenshots} name={listing.name} kind={listing.kind} />
 
         <div className="grid grid-cols-3 gap-3 text-center">
           <div className="surface-card p-3">
