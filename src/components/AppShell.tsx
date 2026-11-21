@@ -48,7 +48,7 @@ export function AppShell({
         style={{ paddingTop: "calc(0.75rem + env(safe-area-inset-top))" }}
       >
         <div className="mx-auto w-full max-w-5xl">
-          <div className={cn("flex items-center gap-3", isSettingsPage ? "justify-between py-1" : "rounded-full bg-secondary px-3 py-2 shadow-soft")}>
+          <div className={cn("flex items-center gap-3", showGlobalSearch ? "rounded-full bg-secondary px-3 py-2 shadow-soft" : "py-1")}>
             <Link to="/" aria-label="Malawian App Store home" className="shrink-0">
               <img
                 src={logo}
