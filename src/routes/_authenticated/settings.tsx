@@ -5,6 +5,7 @@ import {
   ChevronRight,
   LogOut,
   Moon,
+  Palette,
   Store,
 } from "lucide-react";
 import { useRef, useState } from "react";
@@ -159,6 +160,9 @@ function SettingsPage() {
   const previousWorkspaceRef = useRef({ mode, isDeveloper: profile?.is_developer ?? false });
 
   const setMode = useMutation({
+    onMutate: () => {
+      previousWorkspaceRef.current = { mode, isDeveloper: profile?.is_developer ?? false };
+    },
     mutationFn: async ({
       next,
       acceptTerms,
@@ -239,24 +243,6 @@ function SettingsPage() {
     await queryClient.cancelQueries();
     queryClient.clear();
     navigate({ to: "/auth", replace: true });
-  }
-
-  if (setMode.isPending) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background px-4" role="status" aria-live="polite">
-        <div className="w-full max-w-sm text-center">
-          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-muted border-t-primary" aria-hidden="true" />
-          <h1 className="mt-5 text-lg font-semibold">Switching workspace</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Opening your {mode === "developer" ? "developer" : "user"} workspace…</p>
-        </div>
-        <DeveloperTermsDialog
-          open={termsOpen}
-          onOpenChange={setTermsOpen}
-          pending={setMode.isPending}
-          onAccept={() => setMode.mutate({ next: "developer", acceptTerms: true })}
-        />
-      </div>
-    );
   }
 
   const initial = (profile?.display_name || profile?.developer_name || account.data?.email || "U")
@@ -493,6 +479,7 @@ function SettingsPage() {
                   </Button>
                   <Button
                     className="h-12 w-full rounded-lg border border-border bg-background px-4 font-semibold shadow-none transition-colors hover:bg-muted"
+                    disabled={setMode.isPending}
                     onClick={() => navigate({ to: "/console/social" })}
                   >
                     Social
