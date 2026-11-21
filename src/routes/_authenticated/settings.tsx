@@ -158,6 +158,8 @@ function SettingsPage() {
   });
 
   const beginDeveloperTrial = useServerFn(startDeveloperTrial);
+  // Preserve the current settings presentation while the server switches workspace mode.
+  const stableSettingsMode = useRef({ mode, isDeveloper: profile?.is_developer ?? false });
 
   const setMode = useMutation({
     mutationFn: async ({
@@ -201,8 +203,26 @@ function SettingsPage() {
       toast.success(next === "developer" ? "Developer workspace on" : "Back to the store");
       navigate({ to: next === "developer" ? "/console" : "/" });
     },
-    onError: (error: Error) => toast.error(error.message),
+    onError: async (error: Error, variables) => {
+      if (variables.next === "developer" && userId) {
+        const previous = stableSettingsMode.current;
+        const { error: rollbackError } = await supabase
+          .from("profiles")
+          .update({ mode: previous.mode, is_developer: previous.isDeveloper })
+          .eq("id", userId);
+        queryClient.setQueryData(["profile", userId], (current: typeof profile) =>
+          current ? { ...current, mode: previous.mode, is_developer: previous.isDeveloper } : current,
+        );
+        if (rollbackError) console.error("Could not roll back failed Developer Mode activation:", rollbackError.message);
+      }
+      toast.error(error.message);
+    },
   });
+
+  const settingsMode = setMode.isPending ? stableSettingsMode.current.mode : mode;
+  if (!setMode.isPending) {
+    stableSettingsMode.current = { mode, isDeveloper: profile?.is_developer ?? false };
+  }
 
   function toggleDeveloper(on: boolean) {
     if (!on) {
@@ -233,14 +253,14 @@ function SettingsPage() {
 
   return (
     <AppShell>
-      <div className={cn("mx-auto w-full", mode === "developer" ? "max-w-4xl" : "user-account-settings max-w-6xl")}>
-        <header className={cn("border-b border-border/70 pb-5", mode === "developer" ? "pt-0" : "uas-header")}>
-          <p className="text-xs font-semibold tracking-wide text-primary">{mode === "developer" ? "YOUR ACCOUNT" : "ACCOUNT"}</p>
+      <div className={cn("mx-auto w-full", settingsMode === "developer" ? "max-w-4xl" : "user-account-settings max-w-6xl")}>
+        <header className={cn("border-b border-border/70 pb-5", settingsMode === "developer" ? "pt-0" : "uas-header")}>
+          <p className="text-xs font-semibold tracking-wide text-primary">{settingsMode === "developer" ? "YOUR ACCOUNT" : "ACCOUNT"}</p>
           <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight sm:text-4xl">Account settings</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
             Manage your profile, preferences and how you use Malawian App Store.
           </p>
-          {mode === "developer" && (
+          {settingsMode === "developer" && (
             <nav aria-label="Settings sections" className="mt-5 flex max-w-full gap-2 overflow-x-auto pb-1 text-sm">
             <a href="#profile" className="shrink-0 rounded-full bg-accent px-4 py-2 font-medium text-accent-foreground">Profile</a>
             <a href="#preferences" className="shrink-0 rounded-full px-4 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">Appearance</a>
@@ -248,15 +268,15 @@ function SettingsPage() {
           </nav>
           )}
         </header>
-        <div className={mode === "user" ? "uas-layout" : ""}>
-          {mode === "user" && (
+        <div className={settingsMode === "user" ? "uas-layout" : ""}>
+          {settingsMode === "user" && (
             <nav className="uas-side-nav" aria-label="Account settings">
               <a href="#profile"><UserRound aria-hidden="true" /><span>Profile</span></a>
               <a href="#preferences"><Palette aria-hidden="true" /><span>Appearance</span></a>
               <a href="#workspace"><Store aria-hidden="true" /><span>Workspace</span></a>
             </nav>
           )}
-          <div className={mode === "user" ? "uas-content" : ""}>
+          <div className={settingsMode === "user" ? "uas-content" : ""}>
 
         <section id="profile" className="scroll-mt-24 border-b border-border py-7 sm:py-8">
           <div className="grid gap-6 sm:grid-cols-[200px_minmax(0,1fr)] sm:gap-10">
@@ -442,12 +462,12 @@ function SettingsPage() {
                     <p className="text-sm font-medium">
                       {setMode.isPending
                         ? "Switching workspace…"
-                        : mode === "developer"
+                        : settingsMode === "developer"
                           ? "Developer workspace"
                           : "User mode"}
                     </p>
                     <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                      {mode === "developer"
+                      {settingsMode === "developer"
                         ? "Manage your published products and developer tools."
                         : "Discover apps, save products and manage your library."}
                     </p>
@@ -455,10 +475,10 @@ function SettingsPage() {
                 </div>
                 <div className="mt-4 grid grid-cols-1 gap-3">
                   <Button
-                    className={cn("h-12 w-full px-4 font-semibold shadow-none transition-colors", mode === "developer" ? "rounded-none border border-black bg-white text-black hover:bg-gray-100" : "rounded-full border border-sky-200 bg-sky-50 text-sky-900 hover:bg-sky-100")}
+                    className={cn("h-12 w-full px-4 font-semibold shadow-none transition-colors", settingsMode === "developer" ? "rounded-none border border-black bg-white text-black hover:bg-gray-100" : "rounded-full border border-sky-200 bg-sky-50 text-sky-900 hover:bg-sky-100")}
                     disabled={setMode.isPending}
                     onClick={() => {
-                      if (mode === "developer") {
+                      if (settingsMode === "developer") {
                         navigate({ to: "/console" });
                       } else {
                         toggleDeveloper(true);
@@ -468,14 +488,14 @@ function SettingsPage() {
                     {setMode.isPending ? "Switching…" : "Developer Mode"}
                   </Button>
                   <Button
-                    className={cn("h-12 w-full px-4 font-semibold shadow-none transition-colors", mode === "developer" ? "rounded-none border border-black bg-white text-black hover:bg-gray-100" : "rounded-full border border-sky-200 bg-sky-50 text-sky-900 hover:bg-sky-100")}
+                    className={cn("h-12 w-full px-4 font-semibold shadow-none transition-colors", settingsMode === "developer" ? "rounded-none border border-black bg-white text-black hover:bg-gray-100" : "rounded-full border border-sky-200 bg-sky-50 text-sky-900 hover:bg-sky-100")}
                     onClick={() => navigate({ to: "/console/social" })}
                   >
                     Social
                   </Button>
                 </div>
               </div>
-              {mode === "developer" ? (
+              {settingsMode === "developer" ? (
                 <div className="divide-y divide-border">
                   {[
                     { to: "/console", label: "Developer console", detail: "Products and publishing" },
