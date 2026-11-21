@@ -1,8 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Globe, Smartphone, Star } from "lucide-react";
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 import { Badge } from "@/components/ui/badge";
 import { useSignedUrl } from "@/hooks/useSession";
@@ -36,59 +35,85 @@ export function AppIcon({
 }
 
 
-/** Swipeable store previews with a tap-to-expand image viewer. */
-function ListingScreenshot({
+/** Resolve a screenshot URL from private storage or a public URL. */
+function useScreenshotSource(path: string) {
+  const isRemoteUrl = path.startsWith("http://") || path.startsWith("https://");
+  const signedUrl = useSignedUrl(isRemoteUrl ? null : path);
+  return isRemoteUrl ? path : signedUrl;
+}
+
+function ScreenshotThumb({
   path,
   name,
   index,
   kind,
   compact,
+  onOpen,
 }: {
   path: string;
   name: string;
   index: number;
   kind: Listing["kind"];
   compact: boolean;
+  onOpen: (index: number) => void;
 }) {
-  const [open, setOpen] = useState(false);
-  const isRemoteUrl = path.startsWith("http://") || path.startsWith("https://");
-  const signedUrl = useSignedUrl(isRemoteUrl ? null : path);
-  const src = isRemoteUrl ? path : signedUrl;
+  const src = useScreenshotSource(path);
   if (!src) return null;
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={(event) => { event.preventDefault(); event.stopPropagation(); setOpen(true); }}
-        aria-label={`View ${name} screenshot ${index + 1}`}
-        className={cn(
-          "flex shrink-0 snap-start items-center justify-center overflow-hidden rounded-xl border border-border bg-secondary/50 p-1 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-          compact ? "h-[168px] max-w-[136px]" : "h-[240px] max-w-[192px]",
-          kind === "website" && (compact ? "h-[108px] max-w-[224px]" : "h-[150px] max-w-[300px]"),
-        )}
-      >
-        <img
-          src={src}
-          alt={`${name} preview ${index + 1}`}
-          loading="lazy"
-          className="h-full w-auto max-w-full rounded-lg object-contain"
-          onError={(event) => { event.currentTarget.closest("button")?.remove(); }}
-        />
-      </button>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="flex h-[92dvh] w-[96vw] max-w-5xl items-center justify-center border-0 bg-black/95 p-2 sm:rounded-xl">
-          <img
-            src={src}
-            alt={`${name} screenshot ${index + 1}`}
-            className="max-h-[86dvh] max-w-[92vw] object-contain"
-          />
-        </DialogContent>
-      </Dialog>
-    </>
+    <button
+      type="button"
+      onClick={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        onOpen(index);
+      }}
+      aria-label={`View ${name} screenshot ${index + 1}`}
+      className={cn(
+        "flex shrink-0 snap-start items-center justify-center overflow-hidden rounded-xl border border-border bg-secondary/50 p-1 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+        compact ? "h-[168px] max-w-[136px]" : "h-[240px] max-w-[192px]",
+        kind === "website" && (compact ? "h-[108px] max-w-[224px]" : "h-[150px] max-w-[300px]"),
+      )}
+    >
+      <img
+        src={src}
+        alt={`${name} preview ${index + 1}`}
+        loading="lazy"
+        className="h-full w-auto max-w-full rounded-lg object-contain"
+        onError={(event) => { event.currentTarget.closest("button")?.remove(); }}
+      />
+    </button>
   );
 }
 
+function ScreenshotViewerImage({
+  path,
+  name,
+  index,
+  active,
+}: {
+  path: string;
+  name: string;
+  index: number;
+  active: boolean;
+}) {
+  const src = useScreenshotSource(path);
+  return (
+    <div className="flex h-full w-full shrink-0 items-center justify-center">
+      {src && (
+        <img
+          src={src}
+          alt={`${name} screenshot ${index + 1}`}
+          draggable={false}
+          className="h-full w-full select-none object-contain"
+          style={{ visibility: active ? "visible" : "hidden" }}
+        />
+      )}
+    </div>
+  );
+}
+
+/** Google Play-style screenshot strip and edge-to-edge swipe viewer. */
 export function ListingScreenshotStrip({
   screenshots,
   name,
@@ -101,24 +126,94 @@ export function ListingScreenshotStrip({
   compact?: boolean;
 }) {
   const paths = (screenshots ?? []).filter((path): path is string => typeof path === "string" && path.trim().length > 0);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const touchStartX = useRef<number | null>(null);
+  const backHandlerActive = useRef(false);
+  const isOpen = activeIndex !== null;
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const closeOnBack = () => {
+      backHandlerActive.current = false;
+      setActiveIndex(null);
+    };
+    window.history.pushState({ masScreenshotViewer: true }, "");
+    backHandlerActive.current = true;
+    window.addEventListener("popstate", closeOnBack);
+    return () => {
+      window.removeEventListener("popstate", closeOnBack);
+      backHandlerActive.current = false;
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowRight") setActiveIndex((current) => current === null ? null : Math.min(paths.length - 1, current + 1));
+      if (event.key === "ArrowLeft") setActiveIndex((current) => current === null ? null : Math.max(0, current - 1));
+      if (event.key === "Escape") window.history.back();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isOpen, paths.length]);
+
   if (paths.length === 0) return null;
 
+  const handleTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (touchStartX.current === null || activeIndex === null) return;
+    const delta = event.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(delta) > 45) {
+      setActiveIndex(Math.max(0, Math.min(paths.length - 1, activeIndex + (delta < 0 ? 1 : -1))));
+    }
+    touchStartX.current = null;
+  };
+
   return (
-    <div
-      className={cn("-mx-1 flex snap-x snap-mandatory gap-2 overflow-x-auto overscroll-x-contain px-1 pb-2", compact ? "mt-2" : "mt-3")}
-      aria-label={`${name} screenshots`}
-    >
-      {paths.map((path, index) => (
-        <ListingScreenshot
-          key={`${path}-${index}`}
-          path={path}
-          name={name}
-          index={index}
-          kind={kind}
-          compact={compact}
-        />
-      ))}
-    </div>
+    <>
+      <div
+        className={cn("-mx-1 flex snap-x snap-mandatory gap-2 overflow-x-auto overscroll-x-contain px-1 pb-2", compact ? "mt-2" : "mt-3")}
+        aria-label={`${name} screenshots`}
+      >
+        {paths.map((path, index) => (
+          <ScreenshotThumb
+            key={`${path}-${index}`}
+            path={path}
+            name={name}
+            index={index}
+            kind={kind}
+            compact={compact}
+            onOpen={setActiveIndex}
+          />
+        ))}
+      </div>
+
+      {isOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${name} screenshots`}
+          className="fixed inset-0 z-[100] h-[100dvh] w-screen overflow-hidden bg-black"
+          onTouchStart={(event) => { touchStartX.current = event.touches[0].clientX; }}
+          onTouchEnd={handleTouchEnd}
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div
+            className="flex h-full w-full transition-transform duration-200 ease-out"
+            style={{ transform: `translateX(-${activeIndex * 100}%)` }}
+          >
+            {paths.map((path, index) => (
+              <ScreenshotViewerImage
+                key={`${path}-viewer-${index}`}
+                path={path}
+                name={name}
+                index={index}
+                active={activeIndex === index}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
