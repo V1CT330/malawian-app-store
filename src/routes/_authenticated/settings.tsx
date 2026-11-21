@@ -24,7 +24,6 @@ import { formatMwk, uploadAsset } from "@/lib/store";
 import { PRO_NAME, PRO_ANNUAL_PRICE_MWK } from "@/lib/pro";
 import { hasProAccess } from "@/lib/pro-access";
 import { startDeveloperTrial } from "@/lib/subscription.functions";
-import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
@@ -480,7 +479,7 @@ function SettingsPage() {
                 </div>
                 <div className="mt-4 grid grid-cols-1 gap-3">
                   <Button
-                    className={cn("h-12 w-full px-4 font-semibold shadow-none transition-colors", settingsMode === "developer" ? "rounded-none border border-black bg-white text-black hover:bg-gray-100" : "rounded-full border border-sky-200 bg-sky-50 text-sky-900 hover:bg-sky-100")}
+                    className="h-12 w-full rounded-lg border border-border bg-background px-4 font-semibold shadow-none transition-colors hover:bg-muted"
                     disabled={setMode.isPending}
                     onClick={() => {
                       if (settingsMode === "developer") {
@@ -493,7 +492,7 @@ function SettingsPage() {
                     {setMode.isPending ? "Switching…" : "Developer Mode"}
                   </Button>
                   <Button
-                    className={cn("h-12 w-full px-4 font-semibold shadow-none transition-colors", settingsMode === "developer" ? "rounded-none border border-black bg-white text-black hover:bg-gray-100" : "rounded-full border border-sky-200 bg-sky-50 text-sky-900 hover:bg-sky-100")}
+                    className="h-12 w-full rounded-lg border border-border bg-background px-4 font-semibold shadow-none transition-colors hover:bg-muted"
                     onClick={() => navigate({ to: "/console/social" })}
                   >
                     Social
