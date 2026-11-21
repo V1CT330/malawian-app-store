@@ -177,15 +177,6 @@ INSERT INTO public.platform_settings (key, value) VALUES
   ('commission', '{"standard":15,"premium":10,"referral":5}'::jsonb)
 ON CONFLICT (key) DO NOTHING;
 
--- Demo catalogue
-INSERT INTO public.listings (developer_id, slug, name, tagline, description, category, kind, website_url, price_mwk, monetization, status, downloads, rating_avg, rating_count, featured)
-VALUES
- ('11111111-1111-4111-8111-111111111101','mzuni-notes','Mzuni Notes','Lecture notes & past papers','Offline-first study companion for Malawian university students with past papers, notes and revision timers.','Education','app',null,0,'free','published',18420,4.6,932,true),
- ('11111111-1111-4111-8111-111111111102','malipo-pay','Malipo Pay','Airtel Money & Mpamba in one wallet','Send, receive and reconcile mobile money across Airtel Money and TNM Mpamba with instant receipts.','Finance','app',null,2500,'paid','published',9310,4.4,511,true),
- ('11111111-1111-4111-8111-111111111103','nyasa-news','Nyasa News','Malawi headlines, live','Breaking news, sports and business from trusted Malawian newsrooms, with low-data mode.','News','app',null,0,'freemium','published',24500,4.2,1280,false),
- ('11111111-1111-4111-8111-111111111104','chigwirizano-market','Chigwirizano Market','Buy and sell locally','Community marketplace for produce, electronics and services across Lilongwe, Blantyre and Mzuzu.','Shopping','website','https://chigwirizano.mw',0,'ads','published',7600,4.1,320,false),
- ('11111111-1111-4111-8111-111111111105','moyo-health','Moyo Health','Clinic finder & reminders','Find nearby clinics, book appointments and get medication reminders in Chichewa and English.','Health','app',null,0,'donations','published',5120,4.7,214,true),
- ('11111111-1111-4111-8111-111111111106','tili-transport','Tili Transport','Minibus routes & fares','Live minibus routes, fares and stage maps for Malawi''s major cities.','Transport','app',null,1200,'paid','published',3980,4.0,167,false),
- ('11111111-1111-4111-8111-111111111107','kwacha-books','Kwacha Books','Small business accounting','Simple bookkeeping, invoices and tax summaries built for Malawian SMEs.','Business','app',null,0,'subscription','published',2870,4.5,143,false),
- ('11111111-1111-4111-8111-111111111108','warm-heart-tours','Warm Heart Tours','Travel Malawi','Discover lodges, lake trips and safaris with local guides and instant booking.','Entertainment','website','https://warmhearttours.mw',0,'affiliate','published',4400,4.3,198,false)
-ON CONFLICT DO NOTHING;
+-- Fictional demo catalogue seed retired. Existing demo rows are removed by
+-- the later admin_release_review_and_demo_cleanup migration.
+
