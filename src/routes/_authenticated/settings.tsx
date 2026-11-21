@@ -7,6 +7,7 @@ import {
   Moon,
   Palette,
   Store,
+  MessageCircle,
 } from "lucide-react";
 import { useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -43,7 +44,7 @@ export const Route = createFileRoute("/_authenticated/settings")({
   component: SettingsPage,
 });
 
-function SettingsPage() {
+function SettingsPage({ section = "overview" }: { section?: "overview" | "profile" | "appearance" | "workspace" | "account" }) {
   const { userId, profile } = useProfile();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -256,11 +257,21 @@ function SettingsPage() {
         <div aria-hidden="true" className="pointer-events-none absolute -left-24 top-[28rem] -z-10 h-48 w-1/2 rounded-[2.5rem] bg-blue-100/50 blur-3xl dark:bg-blue-950/20" />
         <header className="mb-4">
           <p className="text-sm font-medium text-sky-700 dark:text-sky-300">Malawian App Store · {settingsMode === "developer" ? "Developer account" : "Your account"}</p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Settings</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">Manage your account, personal details, appearance and workspace preferences.</p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">{section === "overview" ? "Settings" : ({ profile: "Personal information", appearance: "Appearance", workspace: "Workspace", account: "Account" } as const)[section]}</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{section === "overview" ? "Choose which settings you want to manage." : "Manage this part of your MAS account."}</p>
+          {section !== "overview" && <Link to="/settings" className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-sky-700 hover:underline dark:text-sky-300"><ChevronRight className="h-4 w-4 rotate-180" />Back to Settings</Link>}
         </header>
         <div className="mx-auto w-full max-w-3xl min-w-0 space-y-4">
-            <section id="profile" className="scroll-mt-24 rounded-2xl border border-border/70 bg-background/90 p-4 sm:p-5">
+            {section === "overview" && (
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Link to="/settings/profile" className="group flex items-center gap-4 rounded-2xl border border-border/70 bg-background/90 p-5 transition-colors hover:border-sky-300 hover:bg-sky-50/50 dark:hover:bg-sky-950/20"><Camera className="h-5 w-5 text-sky-700 dark:text-sky-300" /><span className="min-w-0 flex-1"><span className="block font-semibold">Profile</span><span className="mt-1 block text-sm text-muted-foreground">Photo, cover, name and bio</span></span><ChevronRight className="h-4 w-4 text-muted-foreground" /></Link>
+                <Link to="/settings/appearance" className="group flex items-center gap-4 rounded-2xl border border-border/70 bg-background/90 p-5 transition-colors hover:border-sky-300 hover:bg-sky-50/50 dark:hover:bg-sky-950/20"><Palette className="h-5 w-5 text-sky-700 dark:text-sky-300" /><span className="min-w-0 flex-1"><span className="block font-semibold">Appearance</span><span className="mt-1 block text-sm text-muted-foreground">Theme and accent colour</span></span><ChevronRight className="h-4 w-4 text-muted-foreground" /></Link>
+                <Link to="/settings/workspace" className="group flex items-center gap-4 rounded-2xl border border-border/70 bg-background/90 p-5 transition-colors hover:border-sky-300 hover:bg-sky-50/50 dark:hover:bg-sky-950/20"><Store className="h-5 w-5 text-sky-700 dark:text-sky-300" /><span className="min-w-0 flex-1"><span className="block font-semibold">Workspace</span><span className="mt-1 block text-sm text-muted-foreground">Developer Mode and Social</span></span><ChevronRight className="h-4 w-4 text-muted-foreground" /></Link>
+                <Link to="/settings/account" className="group flex items-center gap-4 rounded-2xl border border-border/70 bg-background/90 p-5 transition-colors hover:border-sky-300 hover:bg-sky-50/50 dark:hover:bg-sky-950/20"><LogOut className="h-5 w-5 text-sky-700 dark:text-sky-300" /><span className="min-w-0 flex-1"><span className="block font-semibold">Account</span><span className="mt-1 block text-sm text-muted-foreground">Sign-in details and access</span></span><ChevronRight className="h-4 w-4 text-muted-foreground" /></Link>
+              </div>
+            )}
+            {section === "profile" && (
+<section id="profile" className="scroll-mt-24 rounded-2xl border border-border/70 bg-background/90 p-4 sm:p-5">
               <div className="mb-4"><h2 className="text-xl font-semibold tracking-tight">Personal information</h2><p className="mt-1 text-sm text-muted-foreground">Manage the information shown on your MAS profile.</p></div>
               <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
                 <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-sky-100 bg-sky-50 text-2xl font-semibold text-sky-800 dark:border-sky-900 dark:bg-sky-950 dark:text-sky-200">{avatar ? <img src={avatar} alt="Your profile" className="h-full w-full object-cover" /> : <span>{initial}</span>}</div>
@@ -275,20 +286,42 @@ function SettingsPage() {
                 <Button className="rounded-full bg-sky-700 px-6 text-white hover:bg-sky-800" disabled={saveProfile.isPending} onClick={() => saveProfile.mutate()}>{saveProfile.isPending ? "Saving…" : "Save profile"}</Button>
               </div>
             </section>
-            <section id="appearance" className="scroll-mt-24 rounded-3xl border border-border/70 bg-background/90 p-5 shadow-sm sm:p-7">
+            )}
+            {section === "appearance" && (
+<section id="appearance" className="scroll-mt-24 rounded-3xl border border-border/70 bg-background/90 p-5 shadow-sm sm:p-7">
               <div className="mb-5"><h2 className="text-xl font-semibold tracking-tight">Appearance</h2><p className="mt-1 text-sm text-muted-foreground">Choose how MAS looks on this device.</p></div>
               <div className="flex items-center justify-between gap-4 rounded-2xl bg-muted/40 p-4"><div className="flex items-start gap-3"><Moon className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" /><div><p className="text-sm font-medium">Dark theme</p><p className="mt-1 text-sm text-muted-foreground">Use a darker interface in low light.</p></div></div><Switch aria-label="Toggle dark theme" checked={dark} onCheckedChange={setTheme} /></div>
               <div className="mt-5 flex items-start gap-3"><Palette className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" /><div className="min-w-0 flex-1"><p className="text-sm font-medium">Accent color</p><p className="mt-1 text-sm leading-5 text-muted-foreground">Customize the highlight color across the store and Developer Mode. Your choice is saved on this device.</p><div className="mt-4 flex flex-wrap gap-2">{ACCENT_PRESETS.map((preset) => <button key={preset.value} type="button" onClick={() => setAccent(preset.value)} aria-label={`Use ${preset.name} accent color`} aria-pressed={accent.toLowerCase() === preset.value.toLowerCase()} title={preset.name} className={`flex h-9 items-center gap-2 rounded-full border px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${accent.toLowerCase() === preset.value.toLowerCase() ? "border-sky-500 bg-sky-50 dark:bg-sky-950/50" : "border-border hover:bg-muted/60"}`}><span className="h-4 w-4 rounded-full border border-black/10" style={{ backgroundColor: preset.value }} />{preset.name}</button>)}</div><div className="mt-4 flex flex-wrap items-center gap-3"><label className="flex items-center gap-3 rounded-xl border border-border px-3 py-2 text-sm"><span className="text-muted-foreground">Custom color</span><input aria-label="Choose custom accent color" type="color" value={/^#[0-9a-f]{6}$/i.test(accent) ? accent : "#168447"} onChange={(event) => setAccent(event.target.value)} className="h-8 w-10 cursor-pointer border-0 bg-transparent p-0" /></label><span className="font-mono text-xs uppercase text-muted-foreground">{accent}</span></div></div></div>
             </section>
-            <section id="workspace" className="scroll-mt-24 rounded-3xl border border-border/70 bg-background/90 p-5 shadow-sm sm:p-7">
-              <div className="mb-5"><h2 className="text-xl font-semibold tracking-tight">Workspace</h2><p className="mt-1 text-sm text-muted-foreground">Choose how you use Malawian App Store.</p></div>
-              <div className="flex flex-col gap-4 rounded-2xl bg-sky-50/70 p-4 dark:bg-sky-950/20 sm:flex-row sm:items-center"><div className="flex min-w-0 flex-1 items-start gap-3"><Store className="mt-0.5 h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300" /><div><p className="text-sm font-semibold">{setMode.isPending ? "Switching workspace…" : settingsMode === "developer" ? "Developer workspace" : "User mode"}</p><p className="mt-1 text-sm leading-6 text-muted-foreground">{settingsMode === "developer" ? "Manage published products and developer tools." : "Discover apps, save products and manage your library."}</p></div></div><Button className="rounded-full bg-sky-700 text-white hover:bg-sky-800" disabled={setMode.isPending} onClick={() => { if (settingsMode === "developer") navigate({ to: "/console" }); else toggleDeveloper(true); }}>{setMode.isPending ? "Switching…" : settingsMode === "developer" ? "Open Developer Console" : "Enable Developer Mode"}</Button></div>
-              <div className="mt-4 divide-y divide-border">{settingsMode === "developer" ? <><Link to="/console" className="flex items-center gap-3 py-4 hover:text-sky-700 dark:hover:text-sky-300"><span className="min-w-0 flex-1"><p className="text-sm font-medium">Developer console</p><p className="mt-1 text-xs text-muted-foreground">Products and publishing</p></span><ChevronRight className="h-4 w-4 text-muted-foreground" /></Link><Link to="/console/store" className="flex items-center gap-3 py-4 hover:text-sky-700 dark:hover:text-sky-300"><span className="min-w-0 flex-1"><p className="text-sm font-medium">Public developer profile</p><p className="mt-1 text-xs text-muted-foreground">Your public presence</p></span><ChevronRight className="h-4 w-4 text-muted-foreground" /></Link><Link to="/console/verification" className="flex items-center gap-3 py-4 hover:text-sky-700 dark:hover:text-sky-300"><span className="min-w-0 flex-1"><p className="text-sm font-medium">Identity verification</p><p className="mt-1 text-xs text-muted-foreground">Verification status</p></span><ChevronRight className="h-4 w-4 text-muted-foreground" /></Link><Link to="/console/subscription" className="flex items-center gap-3 py-4 hover:text-sky-700 dark:hover:text-sky-300"><span className="min-w-0 flex-1"><p className="text-sm font-medium">{PRO_NAME}</p><p className="mt-1 text-xs text-muted-foreground">{hasProAccess(subscription.data) ? `Active · ${formatMwk(PRO_ANNUAL_PRICE_MWK)} yearly` : "Manage your plan"}</p></span><ChevronRight className="h-4 w-4 text-muted-foreground" /></Link>{isAdmin && <Link to="/admin" className="flex items-center gap-3 py-4 hover:text-sky-700 dark:hover:text-sky-300"><span className="min-w-0 flex-1"><p className="text-sm font-medium">Administration dashboard</p><p className="mt-1 text-xs text-muted-foreground">Review submissions and manage MAS</p></span><ChevronRight className="h-4 w-4 text-muted-foreground" /></Link>}</> : <><Link to="/" className="flex items-center gap-3 py-4 hover:text-sky-700 dark:hover:text-sky-300"><span className="min-w-0 flex-1"><p className="text-sm font-medium">Browse apps and websites</p><p className="mt-1 text-xs text-muted-foreground">Discover products on MAS.</p></span><ChevronRight className="h-4 w-4 text-muted-foreground" /></Link><Link to="/library" className="flex items-center gap-3 py-4 hover:text-sky-700 dark:hover:text-sky-300"><span className="min-w-0 flex-1"><p className="text-sm font-medium">My library</p><p className="mt-1 text-xs text-muted-foreground">Saved, installed and recently opened products.</p></span><ChevronRight className="h-4 w-4 text-muted-foreground" /></Link></>}</div>
+            )}
+            {section === "workspace" && (
+            <section id="workspace" className="rounded-2xl border border-border/70 bg-background/90 p-4 sm:p-5">
+              <div className="mb-4"><h2 className="text-xl font-semibold tracking-tight">Workspace</h2><p className="mt-1 text-sm text-muted-foreground">Choose where you want to work in MAS.</p></div>
+              <div className="divide-y divide-border">
+                <div className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center">
+                  <div className="flex min-w-0 flex-1 items-start gap-3"><Store className="mt-0.5 h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300" /><div><p className="text-sm font-semibold">Developer Mode</p><p className="mt-1 text-sm text-muted-foreground">{settingsMode === "developer" ? "Open your Developer Console." : "Switch to the developer workspace."}</p></div></div>
+                  <Button className="rounded-full bg-sky-700 text-white hover:bg-sky-800" disabled={setMode.isPending} onClick={() => { if (settingsMode === "developer") navigate({ to: "/console" }); else toggleDeveloper(true); }}>{setMode.isPending ? "Switching…" : settingsMode === "developer" ? "Open Developer Mode" : "Enable Developer Mode"}</Button>
+                </div>
+                <Link to="/console/social" className="flex items-center gap-3 py-4 hover:text-sky-700 dark:hover:text-sky-300">
+                  <MessageCircle className="h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300" />
+                  <span className="min-w-0 flex-1"><p className="text-sm font-semibold">Social</p><p className="mt-1 text-sm text-muted-foreground">Open the MAS Social space.</p></span>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </Link>
+              </div>
             </section>
-            <section id="account" className="scroll-mt-24 rounded-3xl border border-border/70 bg-background/90 p-5 shadow-sm sm:p-7"><div className="mb-4"><h2 className="text-xl font-semibold tracking-tight">Account</h2><p className="mt-1 text-sm text-muted-foreground">Your sign-in details and account access.</p></div><div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div className="min-w-0"><p className="text-sm font-medium">Signed-in email</p><p className="mt-1 break-all text-sm text-muted-foreground">{account.data?.email ?? "Loading account email…"}</p></div><Button variant="outline" className="w-full rounded-full border-destructive/40 text-destructive hover:bg-destructive/5 hover:text-destructive sm:w-auto" onClick={signOut}><LogOut className="mr-2 h-4 w-4" />Sign out</Button></div></section>
+            )}
+            {section === "account" && (
+<section id="account" className="scroll-mt-24 rounded-3xl border border-border/70 bg-background/90 p-5 shadow-sm sm:p-7"><div className="mb-4"><h2 className="text-xl font-semibold tracking-tight">Account</h2><p className="mt-1 text-sm text-muted-foreground">Your sign-in details and account access.</p></div><div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div className="min-w-0"><p className="text-sm font-medium">Signed-in email</p><p className="mt-1 break-all text-sm text-muted-foreground">{account.data?.email ?? "Loading account email…"}</p></div><Button variant="outline" className="w-full rounded-full border-destructive/40 text-destructive hover:bg-destructive/5 hover:text-destructive sm:w-auto" onClick={signOut}><LogOut className="mr-2 h-4 w-4" />Sign out</Button></div>
+            )}
+            </section>
           </div>
       </main>
       <DeveloperTermsDialog open={termsOpen} onOpenChange={setTermsOpen} pending={setMode.isPending} onAccept={() => setMode.mutate({ next: "developer", acceptTerms: true })} />
     </AppShell>
   );
 }
+
+export function ProfileSettingsPage() { return <SettingsPage section="profile" />; }
+export function AppearanceSettingsPage() { return <SettingsPage section="appearance" />; }
+export function WorkspaceSettingsPage() { return <SettingsPage section="workspace" />; }
+export function AccountSettingsPage() { return <SettingsPage section="account" />; }
