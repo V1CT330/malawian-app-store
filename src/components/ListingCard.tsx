@@ -105,7 +105,7 @@ function ScreenshotViewerImage({
           src={src}
           alt={`${name} screenshot ${index + 1}`}
           draggable={false}
-          className="h-full w-full select-none object-contain"
+          className="h-auto max-h-[92dvh] w-auto max-w-[94vw] select-none rounded-2xl object-contain shadow-2xl"
           style={{ visibility: active ? "visible" : "hidden" }}
         />
       )}
@@ -128,21 +128,17 @@ export function ListingScreenshotStrip({
   const paths = (screenshots ?? []).filter((path): path is string => typeof path === "string" && path.trim().length > 0);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const touchStartX = useRef<number | null>(null);
-  const backHandlerActive = useRef(false);
   const isOpen = activeIndex !== null;
 
   useEffect(() => {
     if (!isOpen) return;
     const closeOnBack = () => {
-      backHandlerActive.current = false;
       setActiveIndex(null);
     };
     window.history.pushState({ masScreenshotViewer: true }, "");
-    backHandlerActive.current = true;
     window.addEventListener("popstate", closeOnBack);
     return () => {
       window.removeEventListener("popstate", closeOnBack);
-      backHandlerActive.current = false;
     };
   }, [isOpen]);
 
@@ -199,7 +195,7 @@ export function ListingScreenshotStrip({
         >
           <div
             className="flex h-full w-full transition-transform duration-200 ease-out"
-            style={{ transform: `translateX(-${activeIndex * 100}%)` }}
+            style={{ transform: `translateX(-${activeIndex * 100}vw)` }}
           >
             {paths.map((path, index) => (
               <ScreenshotViewerImage
