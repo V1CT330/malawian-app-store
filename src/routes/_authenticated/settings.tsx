@@ -251,34 +251,24 @@ function SettingsPage() {
 
   return (
     <AppShell>
-      <main className="relative isolate mx-auto w-full max-w-6xl overflow-hidden px-3 py-6 sm:px-6 sm:py-9">
+      <main className="relative isolate mx-auto w-full max-w-4xl overflow-hidden px-3 py-5 sm:px-6 sm:py-7">
         <div aria-hidden="true" className="pointer-events-none absolute -right-20 top-8 -z-10 h-56 w-2/3 rounded-[3rem] bg-sky-100/70 blur-3xl dark:bg-sky-950/30" />
         <div aria-hidden="true" className="pointer-events-none absolute -left-24 top-[28rem] -z-10 h-48 w-1/2 rounded-[2.5rem] bg-blue-100/50 blur-3xl dark:bg-blue-950/20" />
-        <header className="mb-8">
+        <header className="mb-4">
           <p className="text-sm font-medium text-sky-700 dark:text-sky-300">Malawian App Store · {settingsMode === "developer" ? "Developer account" : "Your account"}</p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Settings</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">Manage your account, personal details, appearance and workspace preferences.</p>
         </header>
-        <div className="grid gap-6 lg:grid-cols-[230px_minmax(0,1fr)] lg:gap-10">
-          <aside className="h-fit rounded-3xl border border-sky-100 bg-sky-50/70 p-3 dark:border-sky-900/50 dark:bg-sky-950/20 lg:sticky lg:top-24">
-            <p className="px-3 pb-2 pt-1 text-xs font-semibold uppercase tracking-wider text-sky-800/70 dark:text-sky-200/70">Settings menu</p>
-            <nav aria-label="Settings navigation" className="grid grid-cols-2 gap-1 lg:grid-cols-1">
-              <a href="#profile" className="rounded-2xl px-3 py-3 text-sm font-medium hover:bg-white/80 dark:hover:bg-slate-900/70">Profile</a>
-              <a href="#appearance" className="rounded-2xl px-3 py-3 text-sm font-medium hover:bg-white/80 dark:hover:bg-slate-900/70">Appearance</a>
-              <a href="#workspace" className="rounded-2xl px-3 py-3 text-sm font-medium hover:bg-white/80 dark:hover:bg-slate-900/70">Workspace</a>
-              <a href="#account" className="rounded-2xl px-3 py-3 text-sm font-medium hover:bg-white/80 dark:hover:bg-slate-900/70">Account</a>
-            </nav>
-          </aside>
-          <div className="min-w-0 space-y-6">
-            <section id="profile" className="scroll-mt-24 rounded-3xl border border-border/70 bg-background/90 p-5 shadow-sm sm:p-7">
-              <div className="mb-6"><h2 className="text-xl font-semibold tracking-tight">Personal information</h2><p className="mt-1 text-sm text-muted-foreground">Manage the information shown on your MAS profile.</p></div>
+        <div className="mx-auto w-full max-w-3xl min-w-0 space-y-4">
+            <section id="profile" className="scroll-mt-24 rounded-2xl border border-border/70 bg-background/90 p-4 sm:p-5">
+              <div className="mb-4"><h2 className="text-xl font-semibold tracking-tight">Personal information</h2><p className="mt-1 text-sm text-muted-foreground">Manage the information shown on your MAS profile.</p></div>
               <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
                 <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-sky-100 bg-sky-50 text-2xl font-semibold text-sky-800 dark:border-sky-900 dark:bg-sky-950 dark:text-sky-200">{avatar ? <img src={avatar} alt="Your profile" className="h-full w-full object-cover" /> : <span>{initial}</span>}</div>
                 <div className="min-w-0 flex-1"><p className="font-semibold">{profile?.display_name || "Your name"}</p><p className="mt-1 break-all text-sm text-muted-foreground">{account.data?.email ?? "Loading account email…"}</p>
                   {profile?.is_developer ? <Link to="/console/store" className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-sky-700 hover:underline dark:text-sky-300">Manage public developer profile <ChevronRight className="h-4 w-4" /></Link> : <><button type="button" onClick={() => avatarInput.current?.click()} disabled={uploadAvatar.isPending} className="mt-2 inline-flex items-center gap-2 text-sm font-medium text-sky-700 hover:underline disabled:opacity-50 dark:text-sky-300"><Camera className="h-4 w-4" />{uploadAvatar.isPending ? "Uploading photo…" : "Change profile photo"}</button><input ref={avatarInput} type="file" accept="image/*" className="sr-only" aria-label="Choose profile photo" onChange={(event) => { const file = event.target.files?.[0]; if (file) uploadAvatar.mutate(file); event.currentTarget.value = ""; }} /><p className="mt-1 text-xs text-muted-foreground">Images up to 5 MB.</p></>}
                 </div>
               </div>
-              <div className="mt-6 space-y-4">
+              <div className="mt-6 space-y-3">
                 <div className="space-y-2"><p className="text-sm font-medium">Cover picture</p><div className="relative h-28 overflow-hidden rounded-2xl bg-sky-50 dark:bg-sky-950/40 sm:h-36">{cover ? <img src={cover} alt="Your profile cover" className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-sm text-muted-foreground">No cover picture selected</div>}</div><button type="button" onClick={() => coverInput.current?.click()} disabled={uploadCover.isPending} className="inline-flex items-center gap-2 text-sm font-medium text-sky-700 hover:underline disabled:opacity-50 dark:text-sky-300"><Camera className="h-4 w-4" />{uploadCover.isPending ? "Uploading cover…" : cover ? "Change cover picture" : "Add cover picture"}</button><input ref={coverInput} type="file" accept="image/*" className="sr-only" aria-label="Choose profile cover picture" onChange={(event) => { const file = event.target.files?.[0]; if (file) uploadCover.mutate(file); event.currentTarget.value = ""; }} /><p className="text-xs text-muted-foreground">Wide images up to 8 MB.</p></div>
                 <div className="grid gap-2"><Label htmlFor="display" className="text-sm">Display name</Label><input id="display" value={displayName ?? profile?.display_name ?? ""} onChange={(event) => setDisplayName(event.target.value)} maxLength={80} placeholder="How should we call you?" className="h-11 w-full rounded-xl border border-border bg-background px-4 text-sm outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/15" /><p className="text-xs text-muted-foreground">Up to 80 characters.</p></div>
                 {profile?.is_developer ? <p className="text-sm leading-6 text-muted-foreground">Your developer name, professional bio and public links are managed in your developer profile so they stay consistent across MAS.</p> : <div className="grid gap-2"><Label htmlFor="bio" className="text-sm">Bio</Label><Textarea id="bio" rows={4} maxLength={300} value={bio ?? profile?.bio ?? ""} onChange={(event) => setBio(event.target.value)} placeholder="A little about yourself…" className="min-h-24 resize-y rounded-xl border-border" /><p className="text-right text-xs text-muted-foreground">{(bio ?? profile?.bio ?? "").length}/300</p></div>}
@@ -297,7 +287,6 @@ function SettingsPage() {
             </section>
             <section id="account" className="scroll-mt-24 rounded-3xl border border-border/70 bg-background/90 p-5 shadow-sm sm:p-7"><div className="mb-4"><h2 className="text-xl font-semibold tracking-tight">Account</h2><p className="mt-1 text-sm text-muted-foreground">Your sign-in details and account access.</p></div><div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div className="min-w-0"><p className="text-sm font-medium">Signed-in email</p><p className="mt-1 break-all text-sm text-muted-foreground">{account.data?.email ?? "Loading account email…"}</p></div><Button variant="outline" className="w-full rounded-full border-destructive/40 text-destructive hover:bg-destructive/5 hover:text-destructive sm:w-auto" onClick={signOut}><LogOut className="mr-2 h-4 w-4" />Sign out</Button></div></section>
           </div>
-        </div>
       </main>
       <DeveloperTermsDialog open={termsOpen} onOpenChange={setTermsOpen} pending={setMode.isPending} onAccept={() => setMode.mutate({ next: "developer", acceptTerms: true })} />
     </AppShell>
