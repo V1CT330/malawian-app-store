@@ -60,7 +60,7 @@ function ListingScreenshot({
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={(event) => { event.preventDefault(); event.stopPropagation(); setOpen(true); }}
         aria-label={`View ${name} screenshot ${index + 1}`}
         className={cn(
           "flex shrink-0 snap-start items-center justify-center overflow-hidden rounded-xl border border-border bg-secondary/50 p-1 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
