@@ -47,7 +47,7 @@ function ListingScreenshot({
   kind: Listing["kind"];
   compact: boolean;
 }) {
-  const isRemoteUrl = /^https?:\\/\\//i.test(path);
+  const isRemoteUrl = path.startsWith("http://") || path.startsWith("https://");
   const signedUrl = useSignedUrl(isRemoteUrl ? null : path);
   const src = isRemoteUrl ? path : signedUrl;
   if (!src) return null;
@@ -63,7 +63,7 @@ function ListingScreenshot({
         alt={`${name} preview ${index + 1}`}
         loading="lazy"
         className="h-full w-full object-cover"
-        onError={(event) => { event.currentTarget.style.display = "none"; }}
+        onError={(event) => { event.currentTarget.parentElement?.remove(); }}
       />
     </div>
   );
@@ -101,7 +101,8 @@ export function ListingScreenshotStrip({
     </div>
   );
 }
-\n/** Play Store style vertical tile used inside horizontal carousels. */
+
+/** Play Store style vertical tile used inside horizontal carousels. */
 export function ListingTile({ listing }: { listing: Listing }) {
   return (
     <Link
