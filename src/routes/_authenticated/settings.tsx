@@ -256,18 +256,16 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
         <div aria-hidden="true" className="pointer-events-none absolute -right-20 top-8 -z-10 h-56 w-2/3 rounded-[3rem] bg-sky-100/70 blur-3xl dark:bg-sky-950/30" />
         <div aria-hidden="true" className="pointer-events-none absolute -left-24 top-[28rem] -z-10 h-48 w-1/2 rounded-[2.5rem] bg-blue-100/50 blur-3xl dark:bg-blue-950/20" />
         <header className="mb-4">
-          <p className="text-sm font-medium text-sky-700 dark:text-sky-300">Malawian App Store · {settingsMode === "developer" ? "Developer account" : "Your account"}</p>
           {section !== "overview" && <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">{({ profile: "Personal information", appearance: "Appearance", workspace: "Workspace", account: "Account" } as const)[section]}</h1>}
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{section === "overview" ? "Manage your profile, appearance and MAS spaces." : "Manage this part of your MAS account."}</p>
           {section !== "overview" && <Link to="/settings" className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-sky-700 hover:underline dark:text-sky-300"><ChevronRight className="h-4 w-4 rotate-180" />Back to Settings</Link>}
         </header>
         <div className="mx-auto w-full max-w-3xl min-w-0 space-y-4">
             {section === "overview" && (
-              <div className="divide-y divide-border border-y border-border">
+              <div className="space-y-1">
                 <Link to="/settings/profile" className="group flex min-h-16 items-center gap-4 py-4 transition-colors hover:text-sky-700 dark:hover:text-sky-300">
                   <Camera className="h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300" />
                   <span className="min-w-0 flex-1"><span className="block font-semibold">Profile</span><span className="mt-1 block text-sm text-muted-foreground">Photo, cover, name and bio</span></span>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 </Link>
                 <Link to="/settings/appearance" className="group flex min-h-16 items-center gap-4 py-4 transition-colors hover:text-sky-700 dark:hover:text-sky-300">
                   <Palette className="h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300" />
