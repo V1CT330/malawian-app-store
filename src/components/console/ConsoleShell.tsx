@@ -204,10 +204,10 @@ export function ConsoleShell({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="lg:hidden"
+                  className="h-11 w-11 lg:hidden"
                   aria-label="Open console menu"
                 >
-                  <Menu className="h-6 w-6" strokeWidth={2.75} />
+                  <Menu className="h-8 w-8" strokeWidth={3} />
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-[260px] bg-sidebar p-3">
