@@ -5,9 +5,7 @@ import {
   ChevronRight,
   LogOut,
   Moon,
-  Palette,
   Store,
-  UserRound,
 } from "lucide-react";
 import { useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -158,8 +156,8 @@ function SettingsPage() {
   });
 
   const beginDeveloperTrial = useServerFn(startDeveloperTrial);
-  // Preserve the current settings presentation while the server switches workspace mode.
-  const stableSettingsMode = useRef({ mode, isDeveloper: profile?.is_developer ?? false });
+  // Retain the previous workspace only for rollback if developer activation fails.
+  const previousWorkspaceRef = useRef({ mode, isDeveloper: profile?.is_developer ?? false });
 
   const setMode = useMutation({
     mutationFn: async ({
@@ -205,7 +203,7 @@ function SettingsPage() {
     },
     onError: async (error: Error, variables) => {
       if (variables.next === "developer" && userId) {
-        const previous = stableSettingsMode.current;
+        const previous = previousWorkspaceRef.current;
         const { error: rollbackError } = await supabase
           .from("profiles")
           .update({ mode: previous.mode, is_developer: previous.isDeveloper })
@@ -219,10 +217,7 @@ function SettingsPage() {
     },
   });
 
-  const settingsMode = setMode.isPending ? stableSettingsMode.current.mode : mode;
-  if (!setMode.isPending) {
-    stableSettingsMode.current = { mode, isDeveloper: profile?.is_developer ?? false };
-  }
+  const settingsMode = mode;
 
   function toggleDeveloper(on: boolean) {
     if (!on) {
@@ -247,14 +242,32 @@ function SettingsPage() {
     navigate({ to: "/auth", replace: true });
   }
 
+  if (setMode.isPending) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4" role="status" aria-live="polite">
+        <div className="w-full max-w-sm text-center">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-muted border-t-primary" aria-hidden="true" />
+          <h1 className="mt-5 text-lg font-semibold">Switching workspace</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Opening your {mode === "developer" ? "developer" : "user"} workspace…</p>
+        </div>
+        <DeveloperTermsDialog
+          open={termsOpen}
+          onOpenChange={setTermsOpen}
+          pending={setMode.isPending}
+          onAccept={() => setMode.mutate({ next: "developer", acceptTerms: true })}
+        />
+      </div>
+    );
+  }
+
   const initial = (profile?.display_name || profile?.developer_name || account.data?.email || "U")
     .slice(0, 1)
     .toUpperCase();
 
   return (
     <AppShell>
-      <div className={cn("mx-auto w-full", settingsMode === "developer" ? "max-w-4xl" : "user-account-settings max-w-6xl")}>
-        <header className={cn("border-b border-border/70 pb-5", settingsMode === "developer" ? "pt-0" : "uas-header")}>
+      <div className="mx-auto w-full max-w-4xl">
+        <header className="border-b border-border/70 pb-5 pt-0">
           <p className="text-xs font-semibold tracking-wide text-primary">{settingsMode === "developer" ? "YOUR ACCOUNT" : "ACCOUNT"}</p>
           <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight sm:text-4xl">Account settings</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
@@ -268,15 +281,7 @@ function SettingsPage() {
           </nav>
           )}
         </header>
-        <div className={settingsMode === "user" ? "uas-layout" : ""}>
-          {settingsMode === "user" && (
-            <nav className="uas-side-nav" aria-label="Account settings">
-              <a href="#profile"><UserRound aria-hidden="true" /><span>Profile</span></a>
-              <a href="#preferences"><Palette aria-hidden="true" /><span>Appearance</span></a>
-              <a href="#workspace"><Store aria-hidden="true" /><span>Workspace</span></a>
-            </nav>
-          )}
-          <div className={settingsMode === "user" ? "uas-content" : ""}>
+        <div>
 
         <section id="profile" className="scroll-mt-24 border-b border-border py-7 sm:py-8">
           <div className="grid gap-6 sm:grid-cols-[200px_minmax(0,1fr)] sm:gap-10">
@@ -542,7 +547,6 @@ function SettingsPage() {
           </Button>
         </div>
           </div>
-        </div>
       </div>
 
       <DeveloperTermsDialog
