@@ -270,22 +270,18 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
                 <Link to="/settings/appearance" className="group flex min-h-16 items-center gap-4 py-4 transition-colors hover:text-sky-700 dark:hover:text-sky-300">
                   <Palette className="h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300" />
                   <span className="min-w-0 flex-1"><span className="block font-semibold">Appearance</span><span className="mt-1 block text-sm text-muted-foreground">Theme and accent colour</span></span>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 </Link>
                 <button type="button" disabled={setMode.isPending} onClick={() => toggleDeveloper(true)} className="group flex min-h-16 w-full items-center gap-4 py-4 text-left transition-colors hover:text-sky-700 disabled:opacity-50 dark:hover:text-sky-300">
                   <Store className="h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300" />
                   <span className="min-w-0 flex-1"><span className="block font-semibold">Developer Mode</span><span className="mt-1 block text-sm text-muted-foreground">{setMode.isPending ? "Switching workspace…" : settingsMode === "developer" ? "Open your Developer workspace" : "Switch to the developer workspace"}</span></span>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 </button>
                 <Link to="/console/social" className="group flex min-h-16 items-center gap-4 py-4 transition-colors hover:text-sky-700 dark:hover:text-sky-300">
                   <MessageCircle className="h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300" />
                   <span className="min-w-0 flex-1"><span className="block font-semibold">Social</span><span className="mt-1 block text-sm text-muted-foreground">Open MAS Social</span></span>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 </Link>
                 <button type="button" onClick={() => void signOut()} className="group flex min-h-16 w-full items-center gap-4 py-4 text-left text-destructive transition-colors hover:bg-destructive/5">
                   <LogOut className="h-5 w-5 shrink-0" />
                   <span className="min-w-0 flex-1"><span className="block font-semibold">Sign out</span><span className="mt-1 block text-sm text-muted-foreground">Sign out of your MAS account</span></span>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 </button>
               </div>
             )}
@@ -324,7 +320,6 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
                 <Link to="/console/social" className="flex items-center gap-3 py-4 hover:text-sky-700 dark:hover:text-sky-300">
                   <MessageCircle className="h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300" />
                   <span className="min-w-0 flex-1"><p className="text-sm font-semibold">Social</p><p className="mt-1 text-sm text-muted-foreground">Open the MAS Social space.</p></span>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 </Link>
               </div>
             </section>
