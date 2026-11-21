@@ -29,13 +29,13 @@ import { startDeveloperTrial } from "@/lib/subscription.functions";
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
     meta: [
-      { title: "Account settings · Malawian App Store" },
+      { title: "Settings · Malawian App Store" },
       {
         name: "description",
-        content: "Manage your account, profile, appearance, workspace and account preferences.",
+        content: "Manage your profile, appearance, workspace and account preferences.",
       },
-      { property: "og:title", content: "Account settings · Malawian App Store" },
-      { property: "og:description", content: "Manage your Malawian App Store account." },
+      { property: "og:title", content: "Settings · Malawian App Store" },
+      { property: "og:description", content: "Manage your Malawian App Store profile and preferences." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
