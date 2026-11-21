@@ -300,8 +300,6 @@ function ListingDetail() {
           </div>
         </header>
 
-        <ListingScreenshotStrip screenshots={listing.screenshots} name={listing.name} kind={listing.kind} />
-
         <div className="grid grid-cols-3 gap-3 text-center">
           <div className="surface-card p-3">
             <p className="font-display text-lg font-bold">{listing.rating_avg.toFixed(1)}</p>
@@ -354,6 +352,8 @@ function ListingDetail() {
             {saved.data ? "Remove from saved" : "Save to library"}
           </Button>
         )}
+
+        <ListingScreenshotStrip screenshots={listing.screenshots} name={listing.name} kind={listing.kind} />
 
         {developerQuery.data && (
           <Link
