@@ -8,7 +8,7 @@ export default defineTool({
   title: "Get app details",
   description:
     "Fetch full details, latest versions and recent reviews for one published app by its slug.",
-  inputSchema: { slug: z.string().trim().min(1).describe("The app slug, e.g. mzuni-notes.") },
+  inputSchema: { slug: z.string().trim().min(1).describe("The URL slug of the published app.") },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: async ({ slug }, ctx) => {
     if (!ctx.isAuthenticated()) {
