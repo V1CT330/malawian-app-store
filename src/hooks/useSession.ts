@@ -92,12 +92,12 @@ export function useProfile() {
   };
 }
 
-/** True when the signed-in account holds the admin role. */
-export function useIsAdmin() {
-  const { userId } = useSession();
-  const query = useQuery({
+/** Query the signed-in account's explicit MAS administrator role. */
+export function useAdminAccess() {
+  const { userId, ready } = useSession();
+  return useQuery({
     queryKey: ["is-admin", userId],
-    enabled: Boolean(userId),
+    enabled: Boolean(userId && ready),
     queryFn: async () => {
       const { data, error } = await supabase
         .from("user_roles")
@@ -109,7 +109,11 @@ export function useIsAdmin() {
       return Boolean(data);
     },
   });
-  return query.data ?? false;
+}
+
+/** True only after the administrator role query confirms access. */
+export function useIsAdmin() {
+  return useAdminAccess().data === true;
 }
 
 /**
