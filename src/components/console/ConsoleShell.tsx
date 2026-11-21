@@ -142,8 +142,15 @@ export function ConsoleShell({
       const { error } = await supabase.from("profiles").update({ mode: "user" }).eq("id", userId!);
       if (error) throw error;
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["profile", userId] });
+    onSuccess: () => {
+      // Switch the cached source of truth immediately so User Mode renders
+      // without briefly falling back to stale Developer Mode/profile UI.
+      queryClient.setQueryData(["profile", userId], (current: typeof profile) =>
+        current ? { ...current, mode: "user" } : current,
+      );
+      // Reconcile with the server in the background; the database update has
+      // already succeeded before this callback runs.
+      void queryClient.invalidateQueries({ queryKey: ["profile", userId] });
       navigate({ to: "/" });
     },
     onError: (e: Error) => toast.error(e.message),
@@ -200,7 +207,7 @@ export function ConsoleShell({
                   className="lg:hidden"
                   aria-label="Open console menu"
                 >
-                  <Menu className="h-5 w-5" />
+                  <Menu className="h-6 w-6" strokeWidth={2.75} />
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-[260px] bg-sidebar p-3">
@@ -234,8 +241,8 @@ export function ConsoleShell({
               </p>
               <div className="mt-0.5 flex min-w-0 items-center text-xs leading-4 text-muted-foreground">
                 {verified ? (
-                  <span className="inline-flex max-w-full shrink-0 items-center gap-1 whitespace-nowrap font-medium text-brand-green">
-                    <BadgeCheck className="h-3.5 w-3.5 shrink-0" />
+                  <span className="inline-flex max-w-full shrink-0 items-center gap-1 whitespace-nowrap font-medium text-muted-foreground">
+                    <BadgeCheck className="h-4 w-4 shrink-0 text-sky-600 dark:text-sky-400" />
                     <span>Verified developer</span>
                   </span>
                 ) : (
