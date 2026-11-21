@@ -1,5 +1,8 @@
 import { Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { Globe, Smartphone, Star } from "lucide-react";
+
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 import { Badge } from "@/components/ui/badge";
 import { useSignedUrl } from "@/hooks/useSession";
@@ -33,7 +36,7 @@ export function AppIcon({
 }
 
 
-/** Swipeable store previews for app screenshots and website captures. */
+/** Swipeable store previews with a tap-to-expand image viewer. */
 function ListingScreenshot({
   path,
   name,
@@ -47,25 +50,42 @@ function ListingScreenshot({
   kind: Listing["kind"];
   compact: boolean;
 }) {
+  const [open, setOpen] = useState(false);
   const isRemoteUrl = path.startsWith("http://") || path.startsWith("https://");
   const signedUrl = useSignedUrl(isRemoteUrl ? null : path);
   const src = isRemoteUrl ? path : signedUrl;
   if (!src) return null;
 
-  const sizeClass = kind === "website"
-    ? compact ? "h-[108px] w-[160px]" : "h-[150px] w-[224px]"
-    : compact ? "h-[168px] w-[96px]" : "h-[240px] w-[136px]";
-
   return (
-    <div className={cn("shrink-0 snap-start overflow-hidden rounded-xl border border-border bg-secondary", sizeClass)}>
-      <img
-        src={src}
-        alt={`${name} preview ${index + 1}`}
-        loading="lazy"
-        className="h-full w-full object-cover"
-        onError={(event) => { event.currentTarget.parentElement?.remove(); }}
-      />
-    </div>
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label={`View ${name} screenshot ${index + 1}`}
+        className={cn(
+          "flex shrink-0 snap-start items-center justify-center overflow-hidden rounded-xl border border-border bg-secondary/50 p-1 transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+          compact ? "h-[168px] max-w-[136px]" : "h-[240px] max-w-[192px]",
+          kind === "website" && (compact ? "h-[108px] max-w-[224px]" : "h-[150px] max-w-[300px]"),
+        )}
+      >
+        <img
+          src={src}
+          alt={`${name} preview ${index + 1}`}
+          loading="lazy"
+          className="h-full w-auto max-w-full rounded-lg object-contain"
+          onError={(event) => { event.currentTarget.closest("button")?.remove(); }}
+        />
+      </button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="flex h-[92dvh] w-[96vw] max-w-5xl items-center justify-center border-0 bg-black/95 p-2 sm:rounded-xl">
+          <img
+            src={src}
+            alt={`${name} screenshot ${index + 1}`}
+            className="max-h-[86dvh] max-w-[92vw] object-contain"
+          />
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
