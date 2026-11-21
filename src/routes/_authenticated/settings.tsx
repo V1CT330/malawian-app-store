@@ -7,6 +7,7 @@ import {
   Moon,
   Palette,
   Store,
+  UserRound,
 } from "lucide-react";
 import { useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -232,19 +233,30 @@ function SettingsPage() {
 
   return (
     <AppShell>
-      <div className={cn("mx-auto w-full max-w-4xl", mode === "developer" ? "" : "user-account-settings rounded-[28px] px-4 py-5 sm:px-8 sm:py-8")}>
-        <header className={cn("border-b border-border/70 pb-5", mode === "developer" ? "pt-0" : "pt-6")}>
-          <p className="text-xs font-semibold tracking-wide text-primary">YOUR ACCOUNT</p>
+      <div className={cn("mx-auto w-full", mode === "developer" ? "max-w-4xl" : "user-account-settings max-w-6xl")}>
+        <header className={cn("border-b border-border/70 pb-5", mode === "developer" ? "pt-0" : "uas-header")}>
+          <p className="text-xs font-semibold tracking-wide text-primary">{mode === "developer" ? "YOUR ACCOUNT" : "ACCOUNT"}</p>
           <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight sm:text-4xl">Account settings</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
             Manage your profile, preferences and how you use Malawian App Store.
           </p>
-          <nav aria-label="Settings sections" className="mt-5 flex max-w-full gap-2 overflow-x-auto pb-1 text-sm">
+          {mode === "developer" && (
+            <nav aria-label="Settings sections" className="mt-5 flex max-w-full gap-2 overflow-x-auto pb-1 text-sm">
             <a href="#profile" className="shrink-0 rounded-full bg-accent px-4 py-2 font-medium text-accent-foreground">Profile</a>
             <a href="#preferences" className="shrink-0 rounded-full px-4 py-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">Appearance</a>
             <a href="#workspace" className="shrink-0 border-b-2 border-transparent pb-3 text-muted-foreground hover:text-foreground">Workspace</a>
           </nav>
+          )}
         </header>
+        <div className={mode === "user" ? "uas-layout" : ""}>
+          {mode === "user" && (
+            <nav className="uas-side-nav" aria-label="Account settings">
+              <a href="#profile"><UserRound aria-hidden="true" /><span>Profile</span></a>
+              <a href="#preferences"><Palette aria-hidden="true" /><span>Appearance</span></a>
+              <a href="#workspace"><Store aria-hidden="true" /><span>Workspace</span></a>
+            </nav>
+          )}
+          <div className={mode === "user" ? "uas-content" : ""}>
 
         <section id="profile" className="scroll-mt-24 border-b border-border py-7 sm:py-8">
           <div className="grid gap-6 sm:grid-cols-[200px_minmax(0,1fr)] sm:gap-10">
@@ -508,6 +520,8 @@ function SettingsPage() {
           <Button variant="outline" className="w-full rounded-full border-destructive/40 text-destructive hover:bg-destructive/5 hover:text-destructive sm:w-auto" onClick={signOut}>
             <LogOut className="mr-2 h-4 w-4" /> Sign out
           </Button>
+        </div>
+          </div>
         </div>
       </div>
 
