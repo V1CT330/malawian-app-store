@@ -257,17 +257,38 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
         <div aria-hidden="true" className="pointer-events-none absolute -left-24 top-[28rem] -z-10 h-48 w-1/2 rounded-[2.5rem] bg-blue-100/50 blur-3xl dark:bg-blue-950/20" />
         <header className="mb-4">
           <p className="text-sm font-medium text-sky-700 dark:text-sky-300">Malawian App Store · {settingsMode === "developer" ? "Developer account" : "Your account"}</p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">{section === "overview" ? "Settings" : ({ profile: "Personal information", appearance: "Appearance", workspace: "Workspace", account: "Account" } as const)[section]}</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{section === "overview" ? "Choose which settings you want to manage." : "Manage this part of your MAS account."}</p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">{section === "overview" ? "Account" : ({ profile: "Personal information", appearance: "Appearance", workspace: "Workspace", account: "Account" } as const)[section]}</h1>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{section === "overview" ? "Manage your profile, appearance and MAS spaces." : "Manage this part of your MAS account."}</p>
           {section !== "overview" && <Link to="/settings" className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-sky-700 hover:underline dark:text-sky-300"><ChevronRight className="h-4 w-4 rotate-180" />Back to Settings</Link>}
         </header>
         <div className="mx-auto w-full max-w-3xl min-w-0 space-y-4">
             {section === "overview" && (
-              <div className="grid gap-3 sm:grid-cols-2">
-                <Link to="/settings/profile" className="group flex items-center gap-4 rounded-2xl border border-border/70 bg-background/90 p-5 transition-colors hover:border-sky-300 hover:bg-sky-50/50 dark:hover:bg-sky-950/20"><Camera className="h-5 w-5 text-sky-700 dark:text-sky-300" /><span className="min-w-0 flex-1"><span className="block font-semibold">Profile</span><span className="mt-1 block text-sm text-muted-foreground">Photo, cover, name and bio</span></span><ChevronRight className="h-4 w-4 text-muted-foreground" /></Link>
-                <Link to="/settings/appearance" className="group flex items-center gap-4 rounded-2xl border border-border/70 bg-background/90 p-5 transition-colors hover:border-sky-300 hover:bg-sky-50/50 dark:hover:bg-sky-950/20"><Palette className="h-5 w-5 text-sky-700 dark:text-sky-300" /><span className="min-w-0 flex-1"><span className="block font-semibold">Appearance</span><span className="mt-1 block text-sm text-muted-foreground">Theme and accent colour</span></span><ChevronRight className="h-4 w-4 text-muted-foreground" /></Link>
-                <Link to="/settings/workspace" className="group flex items-center gap-4 rounded-2xl border border-border/70 bg-background/90 p-5 transition-colors hover:border-sky-300 hover:bg-sky-50/50 dark:hover:bg-sky-950/20"><Store className="h-5 w-5 text-sky-700 dark:text-sky-300" /><span className="min-w-0 flex-1"><span className="block font-semibold">Workspace</span><span className="mt-1 block text-sm text-muted-foreground">Developer Mode and Social</span></span><ChevronRight className="h-4 w-4 text-muted-foreground" /></Link>
-                <Link to="/settings/account" className="group flex items-center gap-4 rounded-2xl border border-border/70 bg-background/90 p-5 transition-colors hover:border-sky-300 hover:bg-sky-50/50 dark:hover:bg-sky-950/20"><LogOut className="h-5 w-5 text-sky-700 dark:text-sky-300" /><span className="min-w-0 flex-1"><span className="block font-semibold">Account</span><span className="mt-1 block text-sm text-muted-foreground">Sign-in details and access</span></span><ChevronRight className="h-4 w-4 text-muted-foreground" /></Link>
+              <div className="divide-y divide-border border-y border-border">
+                <Link to="/settings/profile" className="group flex min-h-16 items-center gap-4 py-4 transition-colors hover:text-sky-700 dark:hover:text-sky-300">
+                  <Camera className="h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300" />
+                  <span className="min-w-0 flex-1"><span className="block font-semibold">Profile</span><span className="mt-1 block text-sm text-muted-foreground">Photo, cover, name and bio</span></span>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </Link>
+                <Link to="/settings/appearance" className="group flex min-h-16 items-center gap-4 py-4 transition-colors hover:text-sky-700 dark:hover:text-sky-300">
+                  <Palette className="h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300" />
+                  <span className="min-w-0 flex-1"><span className="block font-semibold">Appearance</span><span className="mt-1 block text-sm text-muted-foreground">Theme and accent colour</span></span>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </Link>
+                <button type="button" disabled={setMode.isPending} onClick={() => toggleDeveloper(true)} className="group flex min-h-16 w-full items-center gap-4 py-4 text-left transition-colors hover:text-sky-700 disabled:opacity-50 dark:hover:text-sky-300">
+                  <Store className="h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300" />
+                  <span className="min-w-0 flex-1"><span className="block font-semibold">Developer Mode</span><span className="mt-1 block text-sm text-muted-foreground">{setMode.isPending ? "Switching workspace…" : settingsMode === "developer" ? "Open your Developer workspace" : "Switch to the developer workspace"}</span></span>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </button>
+                <Link to="/console/social" className="group flex min-h-16 items-center gap-4 py-4 transition-colors hover:text-sky-700 dark:hover:text-sky-300">
+                  <MessageCircle className="h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300" />
+                  <span className="min-w-0 flex-1"><span className="block font-semibold">Social</span><span className="mt-1 block text-sm text-muted-foreground">Open MAS Social</span></span>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </Link>
+                <button type="button" onClick={() => void signOut()} className="group flex min-h-16 w-full items-center gap-4 py-4 text-left text-destructive transition-colors hover:bg-destructive/5">
+                  <LogOut className="h-5 w-5 shrink-0" />
+                  <span className="min-w-0 flex-1"><span className="block font-semibold">Sign out</span><span className="mt-1 block text-sm text-muted-foreground">Sign out of your MAS account</span></span>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </button>
               </div>
             )}
             {section === "profile" && (
