@@ -417,6 +417,11 @@ export interface FileRoutesByTo {
   '/resources': typeof AuthenticatedResourcesRoute
   '/security': typeof AuthenticatedSecurityRoute
   '/settings': typeof AuthenticatedSettingsRoute
+
+  '/settings/profile': typeof AuthenticatedSettingsProfileRoute
+  '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
+  '/settings/workspace': typeof AuthenticatedSettingsWorkspaceRoute
+  '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/spotlight': typeof AuthenticatedSpotlightRoute
   '/team': typeof AuthenticatedTeamRoute
   '/upload': typeof AuthenticatedUploadRoute
@@ -468,6 +473,10 @@ export interface FileRoutesById {
   '/_authenticated/resources': typeof AuthenticatedResourcesRoute
   '/_authenticated/security': typeof AuthenticatedSecurityRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/settings/profile': typeof AuthenticatedSettingsProfileRoute
+  '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
+  '/_authenticated/settings/workspace': typeof AuthenticatedSettingsWorkspaceRoute
+  '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/spotlight': typeof AuthenticatedSpotlightRoute
   '/_authenticated/team': typeof AuthenticatedTeamRoute
   '/_authenticated/upload': typeof AuthenticatedUploadRoute
