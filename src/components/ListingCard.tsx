@@ -105,7 +105,7 @@ function ScreenshotViewerImage({
           src={src}
           alt={`${name} screenshot ${index + 1}`}
           draggable={false}
-          className="h-auto max-h-[92dvh] w-auto max-w-[94vw] select-none rounded-2xl object-contain shadow-2xl"
+          className="h-auto max-h-[98dvh] w-auto max-w-[96vw] select-none rounded-2xl object-contain shadow-2xl"
           style={{ visibility: active ? "visible" : "hidden" }}
         />
       )}
@@ -188,7 +188,7 @@ export function ListingScreenshotStrip({
           role="dialog"
           aria-modal="true"
           aria-label={`${name} screenshots`}
-          className="fixed inset-0 z-[100] h-[100dvh] w-screen overflow-hidden bg-black"
+          className="fixed inset-0 z-[100] h-[100dvh] w-screen overflow-hidden bg-[#F8FAFF]"
           onTouchStart={(event) => { touchStartX.current = event.touches[0].clientX; }}
           onTouchEnd={handleTouchEnd}
           onClick={(event) => event.stopPropagation()}
