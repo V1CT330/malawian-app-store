@@ -861,3 +861,9 @@ body:has(.console-square:not(:has(.social-feed-screen))) {
     transition: none;
   }
 }
+
+/* Radix renders its own scrollbar elements, separate from browser scrollbars. */
+[data-radix-scroll-area-scrollbar],
+[data-radix-scroll-area-corner] {
+  display: none !important;
+}
