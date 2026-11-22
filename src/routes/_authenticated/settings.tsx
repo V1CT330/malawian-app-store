@@ -246,6 +246,29 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
     navigate({ to: "/auth", replace: true });
   }
 
+  if (setMode.isPending) {
+    return (
+      <main
+        className="flex min-h-screen items-center justify-center bg-background px-6"
+        aria-live="polite"
+        aria-busy="true"
+      >
+        <div className="flex flex-col items-center gap-4 text-center">
+          <span
+            aria-hidden="true"
+            className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"
+          />
+          <div>
+            <p className="font-semibold">Switching workspace</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Your workspace is being updated. This may take a moment.
+            </p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   const initial = (profile?.display_name || profile?.developer_name || account.data?.email || "U")
     .slice(0, 1)
     .toUpperCase();
