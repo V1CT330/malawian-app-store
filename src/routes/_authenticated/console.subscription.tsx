@@ -97,7 +97,7 @@ function ProPage() {
       <p className="mt-2 text-sm text-muted-foreground">Developer accounts remain free. Developer Pro is optional at MK5,000 per month and includes one published listing. Additional published listings cost MK1,000 each per month. New developers may start with a one-time 90-day Pro trial. No automatic renewal.</p>
 
       <section className="surface-card console-feature-card p-5 text-center">
-        <p className="font-display text-3xl font-bold">{formatMwk(PRO_ANNUAL_PRICE_MWK)}</p>
+        <p className="font-display text-3xl font-bold">{formatMwk(PRO_MONTHLY_PRICE_MWK)}</p>
         <p className="text-sm text-muted-foreground">per month</p>
         {hasAccess ? (
           <>

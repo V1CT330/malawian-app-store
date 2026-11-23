@@ -28,7 +28,6 @@ import { useIsAdmin, useMode, useProfile, useSignedUrl } from "@/hooks/useSessio
 import { ACCENT_PRESETS, useTheme } from "@/hooks/useTheme";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMwk, uploadAsset } from "@/lib/store";
-import { PRO_NAME, PRO_ANNUAL_PRICE_MWK } from "@/lib/pro";
 import { hasProAccess } from "@/lib/pro-access";
 import { startDeveloperTrial } from "@/lib/subscription.functions";
 
