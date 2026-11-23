@@ -102,12 +102,12 @@ export async function fetchReputation(developerId: string) {
 }
 
 export const SUBSCRIPTION_BENEFITS = [
-  "Verified developer badge",
-  "Unlimited product uploads",
+  "One published listing included",
+  "Additional published listings at MK1,000 per listing/month",
   "Priority review queue",
   "Advanced analytics",
   "AI publishing assistant",
-  "Featured developer profile",
+  "Featured developer profile opportunities",
   "Beta testing tools",
   "Team collaboration",
   "Priority support",

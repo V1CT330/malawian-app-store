@@ -15,7 +15,7 @@ import {
   PRO_BENEFITS,
   PRO_CHECKLIST,
   PRO_NAME,
-  PRO_ANNUAL_PRICE_MWK,
+  PRO_MONTHLY_PRICE_MWK,
   PRO_TAGLINE,
   WHY_PRO,
   WHY_PRO_CLOSING,
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/_authenticated/console/subscription")({
       {
         name: "description",
         content:
-          "Developer Mode free for 3 months, then MK12,000 yearly: publish, promote, get featured, analytics, Kwacha payments and a Verified Developer badge.",
+          "Optional Developer Pro at MK5,000/month, including one published listing and advanced developer tools.",
       },
       { property: "og:title", content: "Developer Pro · Malawian App Store" },
       {
@@ -94,11 +94,11 @@ function ProPage() {
     <ConsoleShell title="Subscription">
       <h1 className="font-display text-2xl font-bold">{PRO_NAME}</h1>
       <p className="text-sm text-muted-foreground">{PRO_TAGLINE}</p>
-      <p className="mt-2 text-sm text-muted-foreground">Every new developer gets 90 days free from first Developer Mode activation. After that, the plan costs MK12,000 per year. No automatic renewal.</p>
+      <p className="mt-2 text-sm text-muted-foreground">Developer accounts remain free. Developer Pro is optional at MK5,000 per month and includes one published listing. Additional published listings cost MK1,000 each per month. New developers may start with a one-time 90-day Pro trial. No automatic renewal.</p>
 
       <section className="surface-card console-feature-card p-5 text-center">
         <p className="font-display text-3xl font-bold">{formatMwk(PRO_ANNUAL_PRICE_MWK)}</p>
-        <p className="text-sm text-muted-foreground">per year</p>
+        <p className="text-sm text-muted-foreground">per month</p>
         {hasAccess ? (
           <>
             <Badge className="mt-3">{trialing ? "Free trial" : cancelled ? "Cancelled" : "Active"}</Badge>
@@ -106,7 +106,7 @@ function ProPage() {
               {cancelled ? "Access ends" : "Paid access ends"}{" "}
               {subscription.data?.current_period_end
                 ? new Date(subscription.data.current_period_end).toLocaleDateString()
-                : "annually"}
+                : "monthly"}
             </p>
             {!cancelled && !trialing && (
               <Button
@@ -127,10 +127,10 @@ function ProPage() {
               disabled={activate.isPending}
               onClick={() => activate.mutate()}
             >
-              {activate.isPending ? "Preparing secure checkout…" : `Pay annually · ${PRO_NAME}`}
+              {activate.isPending ? "Preparing secure checkout…" : `Pay monthly · ${PRO_NAME}`}
             </Button>
             <p className="mt-2 text-xs text-muted-foreground">
-              Your payment is processed securely by PayChangu. This is a one-year payment; no automatic renewal is enabled.
+              Your payment is processed securely by PayChangu for one month. There is no automatic renewal.
             </p>
           </>
         )}

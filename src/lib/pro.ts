@@ -1,56 +1,44 @@
 /**
  * Developer Pro positioning and Founding Developer programme copy.
- * Kept in one place so the developer section stays consistent.
+ * Pricing is centralised in monetization.ts.
  */
 import { supabase } from "@/integrations/supabase/client";
+import { DEVELOPER_PRO_MONTHLY_PRICE_MWK } from "@/lib/monetization";
 
-export const PRO_ANNUAL_PRICE_MWK = 12000;
+export const PRO_MONTHLY_PRICE_MWK = DEVELOPER_PRO_MONTHLY_PRICE_MWK;
 export const PRO_TRIAL_DAYS = 90;
-export const PRO_NAME = "Developer Mode";
+export const PRO_NAME = "Developer Pro";
 export const PRO_TAGLINE =
-  "Your complete developer workspace, free for the first three months.";
+  "Optional professional tools for developers building on the Malawian App Store.";
 export const CORE_MESSAGE = "Build locally. Promote locally. Get discovered locally.";
-export const CORE_SUPPORT = "One annual plan for Malawian developers.";
+export const CORE_SUPPORT = "An optional monthly toolkit for Malawian developers.";
 
 export const PRO_BENEFITS = [
-  { title: "Publish", detail: "Publish unlimited eligible apps and websites." },
-  { title: "Promote", detail: "Advertise your products within the ecosystem." },
-  {
-    title: "Get Featured",
-    detail: "Priority consideration for Developer Spotlight and promotional opportunities.",
-  },
-  { title: "Analytics", detail: "Track product views, downloads and growth." },
-  { title: "MWK Payments", detail: "Support eligible local developer payments." },
-  { title: "Get Verified", detail: "Build trust with a Verified Developer badge." },
+  { title: "One published listing included", detail: "Developer Pro covers one active published app or product listing." },
+  { title: "Additional publishing", detail: "Additional active listings cost MK1,000 per listing per month." },
+  { title: "Advanced analytics", detail: "Track product views, installs and growth with detailed reports." },
+  { title: "Priority review", detail: "Eligible submissions enter the priority review queue; approval is never guaranteed." },
+  { title: "Developer tools", detail: "Access team collaboration, beta testing and advanced product management tools." },
+  { title: "Promotion opportunities", detail: "Access promotional tools and consideration for featured placements." },
 ] as const;
 
 export const PRO_CHECKLIST = [
-  "Publish unlimited eligible products",
-  "Promote your products",
-  "Analytics and Growth Dashboard",
-  "Priority Spotlight consideration",
-  "Local MWK payment support",
-  "Verified Developer badge",
+  "One active published listing included",
+  "Additional listings at MK1,000 per listing/month",
+  "Advanced analytics and growth reports",
+  "Priority review queue",
+  "Team collaboration and beta testing tools",
+  "Developer promotion opportunities",
 ] as const;
 
 export const WHY_PRO = [
-  {
-    title: "Local Audience",
-    detail: "Build your visibility within a platform designed around Malawi's digital ecosystem.",
-  },
-  {
-    title: "Kwacha",
-    detail: "Build and promote products with pricing and eligible payments designed around MWK.",
-  },
-  {
-    title: "Malawi Marketing",
-    detail:
-      "Access promotional tools and opportunities created specifically for Malawian developers.",
-  },
+  { title: "Local Audience", detail: "Build your visibility within a platform designed around Malawi's digital ecosystem." },
+  { title: "Kwacha", detail: "Manage publishing and eligible payments with pricing designed around MWK." },
+  { title: "Malawi Marketing", detail: "Access promotional tools and opportunities created for Malawian developers." },
 ] as const;
 
 export const WHY_PRO_CLOSING =
-  "You're not just publishing an app. You're building your presence in Malawi's technology ecosystem.";
+  "Use the tools you need, while keeping basic developer access free.";
 
 export const FOUNDING_HEADLINE = "Founding Developer Program";
 export const FOUNDING_LEAD =
@@ -77,7 +65,6 @@ export type FoundingProgram = {
   note: string;
 };
 
-/** Founding promotional credit, configurable by admins in platform settings. */
 export async function fetchFoundingProgram(): Promise<FoundingProgram> {
   const { data, error } = await supabase
     .from("platform_settings")

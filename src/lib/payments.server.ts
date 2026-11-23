@@ -14,6 +14,8 @@ export async function createPaychanguCheckout(input: {
   name: string;
   callbackUrl: string;
   returnUrl: string;
+  productName?: string;
+  description?: string;
 }) {
   const res = await fetch(`${API}/payment`, {
     method: "POST",
@@ -32,8 +34,8 @@ export async function createPaychanguCheckout(input: {
       callback_url: input.callbackUrl,
       return_url: input.returnUrl,
       customization: {
-        title: "Developer Mode",
-        description: "Malawian App Store annual subscription",
+        title: input.productName ?? "Malawian App Store",
+        description: input.description ?? "Malawian App Store payment",
       },
     }),
   });
@@ -81,49 +83,40 @@ export async function verifyPaychanguPayment(txRef: string) {
   };
 }
 
-/** Marks the session paid and extends Developer Pro by 30 days. Idempotent. */
+/** Verifies a PayChangu transaction, then atomically applies its entitlement. */
 export async function settlePayment(txRef: string) {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data: session } = await supabaseAdmin
+  const { data: session, error: readError } = await supabaseAdmin
     .from("payment_sessions")
-    .select("*")
+    .select("id,status,amount_mwk,currency")
     .eq("tx_ref", txRef)
     .maybeSingle();
+
+  if (readError) throw new Error("Could not read the payment session.");
   if (!session) return { ok: false, reason: "unknown" as const };
   if (session.status === "paid") return { ok: true, reason: "already" as const };
+  if (session.status !== "pending") return { ok: false, reason: "not_pending" as const };
 
-  const v = await verifyPaychanguPayment(txRef);
-  if (!v.paid || v.currency !== "MWK" || v.amount < session.amount_mwk) {
+  const verified = await verifyPaychanguPayment(txRef);
+  if (!verified.paid || verified.currency !== "MWK" || verified.amount < session.amount_mwk) {
     return { ok: false, reason: "unpaid" as const };
   }
 
-  const { data: claimed } = await supabaseAdmin
-    .from("payment_sessions")
-    .update({ status: "paid", paid_at: new Date().toISOString(), provider_reference: v.reference })
-    .eq("id", session.id)
-    .eq("status", "pending")
-    .select("id");
-  if (!claimed?.length) return { ok: true, reason: "already" as const };
+  const { data: settlement, error: settlementError } = await (supabaseAdmin as any).rpc(
+    "settle_mas_payment_session",
+    { _tx_ref: txRef, _provider_reference: verified.reference },
+  );
 
-  const { data: existing } = await supabaseAdmin
-    .from("subscriptions")
-    .select("id,current_period_end")
-    .eq("user_id", session.user_id)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  const now = Date.now();
-  const base = existing?.current_period_end
-    ? Math.max(now, Date.parse(existing.current_period_end))
-    : now;
-  const fields = {
-    status: "active",
-    plan: "pro",
-    amount_mwk: session.amount_mwk,
-    payment_reference: txRef,
-    current_period_end: new Date(base + (session.amount_mwk >= 12000 ? 365 : 30) * 864e5).toISOString(),
-  };
-  if (existing) await supabaseAdmin.from("subscriptions").update(fields).eq("id", existing.id);
-  else await supabaseAdmin.from("subscriptions").insert({ ...fields, user_id: session.user_id });
-  return { ok: true, reason: "paid" as const };
+  if (settlementError) {
+    console.error("[PayChangu] Verified payment could not be settled", {
+      txRef,
+      message: settlementError.message,
+    });
+    throw new Error("Payment was verified but the MAS entitlement could not be updated. It will be retried.");
+  }
+
+  if (settlement === "paid" || settlement === "already") {
+    return { ok: true, reason: settlement as "paid" | "already" };
+  }
+  return { ok: false, reason: settlement === "unknown" ? "unknown" as const : "not_pending" as const };
 }

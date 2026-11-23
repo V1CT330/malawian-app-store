@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-export const DEVELOPER_TERMS_VERSION = "2026-10-27";
+export const DEVELOPER_TERMS_VERSION = "2026-11-23";
 
 const TERMS = [
   {
@@ -25,7 +25,7 @@ const TERMS = [
   },
   {
     title: "3. Developer Pro, billing and cancellation",
-    body: "Developer Pro is currently priced at MK5,000 per month for the benefits described on the subscription page. It does not guarantee approval, downloads, rankings, sales or income. Before paying, review the checkout total and any payment-provider fees. Renewal and billing frequency must be as disclosed at checkout. You may cancel renewal through subscription controls; paid benefits should continue only through the paid period, unless applicable law or a payment correction requires otherwise. Refunds, failed payments and billing disputes are handled under the refund terms shown by MAS and applicable law. Basic browsing and installing publicly available products are not made paid merely because you are a developer.",
+    body: "Developer accounts are free. Publisher costs MK1,000 per published listing per month; each listing is billed separately. The publishing period begins when the listing goes live, not while it is a draft or waiting for review. Developer Pro is optional at MK5,000 per month and includes one active published listing. Additional active listings under Pro cost MK1,000 each per month. Pro adds advanced developer tools and does not remove per-listing storage costs, guarantee approval, downloads, rankings, sales or income. Before paying, review the checkout total and any payment-provider fees. There is no automatic renewal unless MAS clearly discloses it at checkout. Paid benefits continue only through the paid period, subject to applicable law and the refund terms shown by MAS. Basic browsing and installing publicly available products are free.",
   },
   {
     title: "4. Ownership and third-party rights",
