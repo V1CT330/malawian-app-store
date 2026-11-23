@@ -67,7 +67,7 @@ const FAQS = [
   },
   {
     q: "What does Developer Pro cost and include?",
-    a: SUBSCRIPTION_BENEFITS.join(". ") + ".",
+    a: "Developer Pro costs MK5,000 per month and includes one active published listing. Additional listings cost MK1,000 per listing per month. Developer accounts remain free. " + SUBSCRIPTION_BENEFITS.join(". ") + ".",
   },
   {
     q: "Do I need KYC to publish?",

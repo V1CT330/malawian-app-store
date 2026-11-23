@@ -14,6 +14,21 @@ export const startProCheckout = createServerFn({ method: "POST" })
     const { createPaychanguCheckout } = await import("@/lib/payments.server");
     const origin = new URL(getRequest().url).origin;
     const email = (context.claims as { email?: string }).email ?? "";
+    const { data: pendingSession, error: pendingSessionError } = await admin
+      .from("payment_sessions")
+      .select("checkout_url")
+      .eq("user_id", context.userId)
+      .eq("purpose", "publisher_listing")
+      .eq("listing_id", listing.id)
+      .eq("status", "pending")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (pendingSessionError) throw new Error("Could not check for an existing Publisher checkout.");
+    if (pendingSession?.checkout_url) return { checkoutUrl: pendingSession.checkout_url };
+    if (pendingSession) return { pendingCheckout: true };
+
     const txRef = `mas_${crypto.randomUUID().replace(/-/g, "")}`;
     const returnUrl = `${origin}/api/public/payments/return?tx_ref=${txRef}`;
 

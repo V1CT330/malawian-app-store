@@ -92,6 +92,7 @@ function PublishingPage() {
       }
       if ("included" in result && result.included) toast.success("Your Developer Pro plan covers this listing.");
       else if ("pendingPublication" in result && result.pendingPublication) toast.success("Payment received. Your 30-day publishing period starts when the listing goes live.");
+      else if ("pendingCheckout" in result && result.pendingCheckout) toast.message("A Publisher checkout is already being prepared. Refresh in a moment.");
       else toast.success("This listing already has active publishing coverage.");
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["subscription", userId] }),
