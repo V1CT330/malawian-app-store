@@ -86,12 +86,12 @@ function PublishingPage() {
   const checkout = useMutation({
     mutationFn: (listingId: string) => startCheckout({ data: { listingId } }),
     onSuccess: async (result) => {
-      if (result.checkoutUrl) {
+      if ("checkoutUrl" in result && result.checkoutUrl) {
         window.location.href = result.checkoutUrl;
         return;
       }
-      if (result.included) toast.success("Your Developer Pro plan covers this listing.");
-      else if (result.pendingPublication) toast.success("Payment received. Your 30-day publishing period starts when the listing goes live.");
+      if ("included" in result && result.included) toast.success("Your Developer Pro plan covers this listing.");
+      else if ("pendingPublication" in result && result.pendingPublication) toast.success("Payment received. Your 30-day publishing period starts when the listing goes live.");
       else toast.success("This listing already has active publishing coverage.");
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["subscription", userId] }),
