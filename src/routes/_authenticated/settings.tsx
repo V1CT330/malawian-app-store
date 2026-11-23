@@ -286,8 +286,7 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
   return (
     <AppShell>
       <main className="relative isolate mx-auto w-full max-w-4xl overflow-hidden px-3 py-5 sm:px-6 sm:py-7">
-        <div aria-hidden="true" className="pointer-events-none absolute -right-20 top-8 -z-10 h-56 w-2/3 rounded-[3rem] bg-sky-100/70 blur-3xl dark:bg-sky-950/30" />
-        <div aria-hidden="true" className="pointer-events-none absolute -left-24 top-[28rem] -z-10 h-48 w-1/2 rounded-[2.5rem] bg-blue-100/50 blur-3xl dark:bg-blue-950/20" />
+
         <header className="mb-4">
           {section !== "overview" && <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">{({ profile: "Personal information", appearance: "Appearance", workspace: "Workspace", account: "Account" } as const)[section]}</h1>}
           {section !== "overview" && <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">Manage this part of your MAS account.</p>}
@@ -296,50 +295,50 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
         <div className="mx-auto w-full max-w-4xl min-w-0 space-y-6">
             {section === "overview" && (
               <div className="space-y-7">
-                <section className="relative isolate flex min-h-[190px] items-center overflow-hidden rounded-[2rem] bg-gradient-to-r from-sky-100 via-blue-100 to-blue-500 px-5 py-7 shadow-sm dark:from-sky-950 dark:via-blue-950 dark:to-blue-800 sm:min-h-[220px] sm:px-9">
-                  <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-16 -z-10 h-64 w-64 rounded-full border-[28px] border-white/15" />
-                  <div aria-hidden="true" className="pointer-events-none absolute -right-2 bottom-[-5rem] -z-10 h-52 w-52 rounded-full bg-white/10 blur-sm" />
+                <section className="relative isolate flex min-h-[190px] items-center overflow-hidden rounded-[2rem] bg-gradient-to-r from-accent via-background to-accent px-5 py-7 border border-border sm:min-h-[220px] sm:px-9">
+                  <div aria-hidden="true" className="pointer-events-none absolute -right-10 -top-16 -z-10 h-64 w-64 rounded-full border-[28px] border-primary/10" />
+                  <div aria-hidden="true" className="pointer-events-none absolute -right-2 bottom-[-5rem] -z-10 h-52 w-52 rounded-full bg-primary/5 blur-sm" />
                   <div className="flex min-w-0 items-center gap-4 sm:gap-7">
-                    <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-4 border-white/90 bg-white/70 shadow-md sm:h-32 sm:w-32">
+                    <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-4 border-background bg-background shadow-sm sm:h-32 sm:w-32">
                       {avatar ? <img src={avatar} alt="Your profile" className="h-full w-full object-cover" /> : <div className="flex h-full w-full items-center justify-center text-3xl font-semibold text-blue-800">{initial}</div>}
-                      <button type="button" onClick={() => avatarInput.current?.click()} aria-label="Change profile photo" className="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full border-2 border-white bg-blue-600 text-white shadow-sm transition hover:bg-blue-700"><Camera className="h-4 w-4" /></button>
+                      <button type="button" onClick={() => avatarInput.current?.click()} aria-label="Change profile photo" className="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full border-2 border-background bg-primary text-primary-foreground shadow-sm transition hover:opacity-90"><Camera className="h-4 w-4" /></button>
                     </div>
-                    <div className="min-w-0 text-slate-950 dark:text-white">
+                    <div className="min-w-0 text-foreground">
                       <h1 className="break-words text-2xl font-bold tracking-tight sm:text-3xl">{profile?.display_name || profile?.developer_name || "Your MAS Account"}</h1>
-                      <p className="mt-1 break-all text-sm text-blue-950/80 dark:text-blue-100 sm:text-base">{account.data?.email ?? "Loading account email…"}</p>
-                      <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/65 px-4 py-2 text-sm font-semibold text-blue-800 shadow-sm dark:bg-white/15 dark:text-white"><Gem className="h-4 w-4 fill-current" />MAS Member</span>
+                      <p className="mt-1 break-all text-sm text-muted-foreground sm:text-base">{account.data?.email ?? "Loading account email…"}</p>
+                      <span className="mt-4 inline-flex items-center gap-2 rounded-full bg-background/80 px-4 py-2 text-sm font-semibold text-foreground dark:bg-background/80"><Gem className="h-4 w-4 fill-current" />MAS Member</span>
                     </div>
                   </div>
                 </section>
                 <input ref={avatarInput} type="file" accept="image/*" className="sr-only" aria-label="Choose profile photo" onChange={(event) => { const file = event.target.files?.[0]; if (file) uploadAvatar.mutate(file); event.currentTarget.value = ""; }} />
                 <header className="flex items-start gap-4 px-1">
-                  <span className="mt-1 flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-200"><Store className="h-7 w-7" /></span>
+                  <span className="mt-1 flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent text-accent-foreground"><Store className="h-7 w-7" /></span>
                   <div><h2 className="text-2xl font-bold tracking-tight sm:text-3xl">User Mode Settings</h2><p className="mt-1 text-base text-muted-foreground sm:text-lg">Manage your account and experience</p></div>
                 </header>
                 <div className="space-y-3">
-                  <button type="button" onClick={() => navigate({ to: "/settings/profile", replace: true })} className="group flex min-h-[112px] w-full items-center gap-4 rounded-[1.6rem] border border-white/80 bg-white/90 px-5 py-4 text-left shadow-[0_8px_28px_rgba(37,99,235,0.08)] transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_12px_32px_rgba(37,99,235,0.13)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-white/10 dark:bg-slate-900/90 dark:hover:bg-slate-900 sm:gap-6 sm:px-7">
-                    <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.3rem] bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-300"><UserRound className="h-10 w-10 fill-current" /></span>
-                    <span className="min-w-0 flex-1"><span className="block text-xl font-bold text-slate-950 dark:text-white">Profile</span><span className="mt-1 block text-sm text-slate-600 dark:text-slate-300 sm:text-base">View and edit your personal information</span></span>
+                  <button type="button" onClick={() => navigate({ to: "/settings/profile", replace: true })} className="group flex min-h-[112px] w-full items-center gap-4 rounded-[1.6rem] border border-border bg-card px-5 py-4 text-left shadow-none transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring   sm:gap-6 sm:px-7">
+                    <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.3rem] bg-accent text-primary"><UserRound className="h-10 w-10 fill-current" /></span>
+                    <span className="min-w-0 flex-1"><span className="block text-xl font-bold text-foreground">Profile</span><span className="mt-1 block text-sm text-muted-foreground sm:text-base">View and edit your personal information</span></span>
                   </button>
-                  <button type="button" onClick={() => navigate({ to: "/settings/appearance", replace: true })} className="group flex min-h-[112px] w-full items-center gap-4 rounded-[1.6rem] border border-white/80 bg-white/90 px-5 py-4 text-left shadow-[0_8px_28px_rgba(37,99,235,0.08)] transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_12px_32px_rgba(37,99,235,0.13)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-white/10 dark:bg-slate-900/90 dark:hover:bg-slate-900 sm:gap-6 sm:px-7">
-                    <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.3rem] bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300"><Palette className="h-10 w-10 fill-current" /></span>
-                    <span className="min-w-0 flex-1"><span className="block text-xl font-bold text-slate-950 dark:text-white">Appearance</span><span className="mt-1 block text-sm text-slate-600 dark:text-slate-300 sm:text-base">Customize theme, colours and display</span></span>
+                  <button type="button" onClick={() => navigate({ to: "/settings/appearance", replace: true })} className="group flex min-h-[112px] w-full items-center gap-4 rounded-[1.6rem] border border-border bg-card px-5 py-4 text-left shadow-none transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring   sm:gap-6 sm:px-7">
+                    <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.3rem] bg-accent text-primary"><Palette className="h-10 w-10 fill-current" /></span>
+                    <span className="min-w-0 flex-1"><span className="block text-xl font-bold text-foreground">Appearance</span><span className="mt-1 block text-sm text-muted-foreground sm:text-base">Customize theme, colours and display</span></span>
                   </button>
-                  <button type="button" disabled={setMode.isPending} onClick={() => settingsMode === "developer" ? navigate({ to: "/console", replace: true }) : toggleDeveloper(true)} className="group flex min-h-[112px] w-full items-center gap-4 rounded-[1.6rem] border border-white/80 bg-white/90 px-5 py-4 text-left shadow-[0_8px_28px_rgba(37,99,235,0.08)] transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_12px_32px_rgba(37,99,235,0.13)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:opacity-50 dark:border-white/10 dark:bg-slate-900/90 dark:hover:bg-slate-900 sm:gap-6 sm:px-7">
-                    <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.3rem] bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300"><Code2 className="h-10 w-10" /></span>
-                    <span className="min-w-0 flex-1"><span className="block text-xl font-bold text-slate-950 dark:text-white">Developer Mode</span><span className="mt-1 block text-sm text-slate-600 dark:text-slate-300 sm:text-base">Access developer tools and console</span></span>
-                    <span className="shrink-0 rounded-full bg-green-100 px-3 py-2 text-xs font-semibold text-green-800 dark:bg-green-950 dark:text-green-300">{settingsMode === "developer" ? "● Enabled" : "○ Off"}</span>
+                  <button type="button" disabled={setMode.isPending} onClick={() => settingsMode === "developer" ? navigate({ to: "/console", replace: true }) : toggleDeveloper(true)} className="group flex min-h-[112px] w-full items-center gap-4 rounded-[1.6rem] border border-border bg-card px-5 py-4 text-left shadow-none transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50   sm:gap-6 sm:px-7">
+                    <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.3rem] bg-accent text-primary"><Code2 className="h-10 w-10" /></span>
+                    <span className="min-w-0 flex-1"><span className="block text-xl font-bold text-foreground">Developer Mode</span><span className="mt-1 block text-sm text-muted-foreground sm:text-base">Access developer tools and console</span></span>
+                    <span className="shrink-0 rounded-full bg-accent px-3 py-2 text-xs font-semibold text-accent-foreground">{settingsMode === "developer" ? "● Enabled" : "○ Off"}</span>
                   </button>
-                  <button type="button" onClick={() => navigate({ to: "/console/social", replace: true })} className="group flex min-h-[112px] w-full items-center gap-4 rounded-[1.6rem] border border-white/80 bg-white/90 px-5 py-4 text-left shadow-[0_8px_28px_rgba(37,99,235,0.08)] transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_12px_32px_rgba(37,99,235,0.13)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-white/10 dark:bg-slate-900/90 dark:hover:bg-slate-900 sm:gap-6 sm:px-7">
-                    <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.3rem] bg-orange-100 text-orange-600 dark:bg-orange-950 dark:text-orange-300"><UsersRound className="h-10 w-10 fill-current" /></span>
-                    <span className="min-w-0 flex-1"><span className="block text-xl font-bold text-slate-950 dark:text-white">Social</span><span className="mt-1 block text-sm text-slate-600 dark:text-slate-300 sm:text-base">Join the MAS community</span></span>
+                  <button type="button" onClick={() => navigate({ to: "/console/social", replace: true })} className="group flex min-h-[112px] w-full items-center gap-4 rounded-[1.6rem] border border-border bg-card px-5 py-4 text-left shadow-none transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring   sm:gap-6 sm:px-7">
+                    <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.3rem] bg-accent text-primary"><UsersRound className="h-10 w-10 fill-current" /></span>
+                    <span className="min-w-0 flex-1"><span className="block text-xl font-bold text-foreground">Social</span><span className="mt-1 block text-sm text-muted-foreground sm:text-base">Join the MAS community</span></span>
                   </button>
-                  <button type="button" disabled={isSigningOut} onClick={() => void signOut()} className="group flex min-h-[112px] w-full items-center gap-4 rounded-[1.6rem] border border-white/80 bg-white/90 px-5 py-4 text-left text-destructive shadow-[0_8px_28px_rgba(37,99,235,0.08)] transition hover:-translate-y-0.5 hover:bg-white hover:shadow-[0_12px_32px_rgba(37,99,235,0.13)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 disabled:opacity-50 dark:border-white/10 dark:bg-slate-900/90 dark:hover:bg-slate-900 sm:gap-6 sm:px-7">
-                    <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.3rem] bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300"><LogOut className="h-10 w-10" /></span>
-                    <span className="min-w-0 flex-1"><span className="block text-xl font-bold">{isSigningOut ? "Signing out…" : "Sign Out"}</span><span className="mt-1 block text-sm text-slate-600 dark:text-slate-300 sm:text-base">Leave your account securely</span></span>
+                  <button type="button" disabled={isSigningOut} onClick={() => void signOut()} className="group flex min-h-[112px] w-full items-center gap-4 rounded-[1.6rem] border border-border bg-card px-5 py-4 text-left text-destructive shadow-none transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 disabled:opacity-50   sm:gap-6 sm:px-7">
+                    <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.3rem] bg-destructive/10 text-destructive"><LogOut className="h-10 w-10" /></span>
+                    <span className="min-w-0 flex-1"><span className="block text-xl font-bold">{isSigningOut ? "Signing out…" : "Sign Out"}</span><span className="mt-1 block text-sm text-muted-foreground sm:text-base">Leave your account securely</span></span>
                   </button>
                 </div>
-                <div className="flex min-h-[72px] items-center justify-center gap-3 rounded-[1.4rem] bg-blue-100/90 px-4 py-4 text-center text-sm text-blue-950 dark:bg-blue-950/70 dark:text-blue-100 sm:text-base"><Info className="h-6 w-6 shrink-0 fill-current text-blue-600 dark:text-blue-300" /><span>Enjoy a better experience with Malawian App Store! 🇲🇼</span></div>
+                <div className="flex min-h-[72px] items-center justify-center gap-3 rounded-[1.4rem] border border-border bg-accent/60 px-4 py-4 text-center text-sm text-accent-foreground sm:text-base"><Info className="h-6 w-6 shrink-0 fill-current text-primary" /><span>Enjoy a better experience with Malawian App Store! 🇲🇼</span></div>
               </div>
             )}
             {section === "profile" && (
