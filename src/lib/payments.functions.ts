@@ -103,13 +103,14 @@ export const startPublisherCheckout = createServerFn({ method: "POST" })
 
     const { data: publication, error: publicationError } = await admin
       .from("listing_publication_subscriptions")
-      .select("status,current_period_end")
+      .select("status,current_period_end,is_grace_period")
       .eq("listing_id", listing.id)
       .maybeSingle();
     if (publicationError) throw new Error("Could not check this listing's publishing status.");
 
     const publicationActive =
       publication?.status === "active" &&
+      !publication.is_grace_period &&
       Date.parse(publication.current_period_end ?? "") > Date.now();
     if (publicationActive) {
       return { alreadyActive: true, currentPeriodEnd: publication.current_period_end };

@@ -46,6 +46,7 @@ type PublicationEntitlement = {
   listing_id: string;
   status: string;
   current_period_end: string | null;
+  is_grace_period: boolean;
 };
 
 function PublishingPage() {
@@ -75,7 +76,7 @@ function PublishingPage() {
     queryFn: async () => {
       const { data, error } = await (supabase as any)
         .from("listing_publication_subscriptions")
-        .select("listing_id,status,current_period_end")
+        .select("listing_id,status,current_period_end,is_grace_period")
         .eq("developer_id", userId!);
       if (error) throw error;
       return (data ?? []) as PublicationEntitlement[];
@@ -141,7 +142,7 @@ function PublishingPage() {
                   <ul className="divide-y divide-border">
                     {rows.map((listing) => {
                       const publication = publicationRows.find((row) => row.listing_id === listing.id);
-                      const publicationActive = publication?.status === "active" && Date.parse(publication.current_period_end ?? "") > Date.now();
+                      const publicationActive = publication?.status === "active" && !publication.is_grace_period && Date.parse(publication.current_period_end ?? "") > Date.now();
                       const publicationPending = publication?.status === "paid_pending";
                       const proIncluded = proActive && includedListingId === listing.id;
                       const covered = publicationActive || proIncluded;
@@ -161,13 +162,17 @@ function PublishingPage() {
                           </div>
                           <div className="ml-[52px] mt-2 flex flex-wrap items-center justify-between gap-2">
                             <p className="text-xs text-muted-foreground">
-                              {proIncluded ? "Included with Developer Pro" : publicationActive
-                                ? `Publisher active until ${new Date(publication!.current_period_end!).toLocaleDateString()}`
-                                : publicationPending ? "Payment received · waiting for publication" : "Publishing coverage required"}
+                              {proIncluded ? "Included with Developer Pro" : publicationPending
+                                ? "Payment received · waiting for publication"
+                                : publication?.is_grace_period && Date.parse(publication.current_period_end ?? "") > Date.now()
+                                  ? `Transition grace until ${new Date(publication.current_period_end!).toLocaleDateString()}`
+                                  : publicationActive
+                                    ? `Publisher active until ${new Date(publication!.current_period_end!).toLocaleDateString()}`
+                                    : "Publishing coverage required"}
                             </p>
                             {canPay && (
                               <Button size="sm" variant="outline" disabled={checkout.isPending} onClick={() => checkout.mutate(listing.id)}>
-                                {checkout.isPending ? "Preparing checkout…" : useProSlot ? "Use included Pro listing" : publication?.status === "active" ? "Renew · MK1,000" : "Pay MK1,000/month"}
+                                {checkout.isPending ? "Preparing checkout…" : useProSlot ? "Use included Pro listing" : publication?.is_grace_period ? "Activate · MK1,000/month" : publication?.status === "active" ? "Renew · MK1,000" : "Pay MK1,000/month"}
                               </Button>
                             )}
                           </div>
