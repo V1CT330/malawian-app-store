@@ -209,7 +209,7 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
       // Reconcile with the server in the background rather than blocking navigation.
       void queryClient.invalidateQueries({ queryKey: ["profile", userId] });
       toast.success(next === "developer" ? "Developer workspace on" : "Back to the store");
-      navigate({ to: next === "developer" ? "/console" : "/" });
+      navigate({ to: next === "developer" ? "/console" : "/", replace: true });
     },
     onError: async (error: Error, variables) => {
       if (variables.next === "developer" && userId) {
@@ -244,15 +244,16 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
   async function signOut() {
     if (isSigningOut) return;
     setIsSigningOut(true);
-    const { error } = await supabase.auth.signOut();
-    if (error) {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      await queryClient.cancelQueries();
+      queryClient.clear();
+      await navigate({ to: "/auth", replace: true });
+    } catch (error) {
       setIsSigningOut(false);
-      toast.error(error.message || "Could not sign out. Please try again.");
-      return;
+      toast.error(error instanceof Error ? error.message : "Could not sign out. Please try again.");
     }
-    await queryClient.cancelQueries();
-    queryClient.clear();
-    navigate({ to: "/auth", replace: true });
   }
 
   if (setMode.isPending) {
@@ -371,7 +372,7 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
               <div className="divide-y divide-border">
                 <div className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center">
                   <div className="flex min-w-0 flex-1 items-start gap-3"><Store className="mt-0.5 h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300" /><div><p className="text-sm font-semibold">Developer Mode</p><p className="mt-1 text-sm text-muted-foreground">{settingsMode === "developer" ? "Open your Developer Console." : "Switch to the developer workspace."}</p></div></div>
-                  <Button className="rounded-full bg-sky-700 text-white hover:bg-sky-800" disabled={setMode.isPending} onClick={() => { if (settingsMode === "developer") navigate({ to: "/console" }); else toggleDeveloper(true); }}>{setMode.isPending ? "Switching…" : settingsMode === "developer" ? "Open Developer Mode" : "Enable Developer Mode"}</Button>
+                  <Button className="rounded-full bg-sky-700 text-white hover:bg-sky-800" disabled={setMode.isPending} onClick={() => { if (settingsMode === "developer") navigate({ to: "/console", replace: true }); else toggleDeveloper(true); }}>{setMode.isPending ? "Switching…" : settingsMode === "developer" ? "Open Developer Mode" : "Enable Developer Mode"}</Button>
                 </div>
                 <button type="button" onClick={() => navigate({ to: "/console/social", replace: true })} className="flex w-full items-center gap-3 py-4 text-left hover:text-sky-700 dark:hover:text-sky-300">
                   <MessageCircle className="h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300" />
