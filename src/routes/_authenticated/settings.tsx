@@ -56,6 +56,7 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
   const coverInput = useRef<HTMLInputElement>(null);
   const cover = useSignedUrl(profile?.cover_image_url);
   const [termsOpen, setTermsOpen] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [bio, setBio] = useState<string | null>(null);
 
@@ -236,8 +237,11 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
   }
 
   async function signOut() {
+    if (isSigningOut) return;
+    setIsSigningOut(true);
     const { error } = await supabase.auth.signOut();
     if (error) {
+      setIsSigningOut(false);
       toast.error(error.message || "Could not sign out. Please try again.");
       return;
     }
@@ -286,25 +290,25 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
         <div className="mx-auto w-full max-w-3xl min-w-0 space-y-4">
             {section === "overview" && (
               <div className="space-y-1">
-                <Link to="/settings/profile" className="group flex min-h-16 items-center gap-4 py-4 transition-colors hover:text-sky-700 dark:hover:text-sky-300">
+                <button type="button" onClick={() => navigate({ to: "/settings/profile", replace: true })} className="group flex min-h-16 w-full items-center gap-4 py-4 text-left transition-colors hover:text-sky-700 dark:hover:text-sky-300">
                   <Camera className="h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300" />
                   <span className="min-w-0 flex-1"><span className="block font-semibold">Profile</span><span className="mt-1 block text-sm text-muted-foreground">Photo, cover, name and bio</span></span>
-                </Link>
-                <Link to="/settings/appearance" className="group flex min-h-16 items-center gap-4 py-4 transition-colors hover:text-sky-700 dark:hover:text-sky-300">
+                </button>
+                <button type="button" onClick={() => navigate({ to: "/settings/appearance", replace: true })} className="group flex min-h-16 w-full items-center gap-4 py-4 text-left transition-colors hover:text-sky-700 dark:hover:text-sky-300">
                   <Palette className="h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300" />
                   <span className="min-w-0 flex-1"><span className="block font-semibold">Appearance</span><span className="mt-1 block text-sm text-muted-foreground">Theme and accent colour</span></span>
-                </Link>
-                <button type="button" disabled={setMode.isPending} onClick={() => toggleDeveloper(true)} className="group flex min-h-16 w-full items-center gap-4 py-4 text-left transition-colors hover:text-sky-700 disabled:opacity-50 dark:hover:text-sky-300">
+                </button>
+                <button type="button" disabled={setMode.isPending} onClick={() => settingsMode === "developer" ? navigate({ to: "/console", replace: true }) : toggleDeveloper(true)} className="group flex min-h-16 w-full items-center gap-4 py-4 text-left transition-colors hover:text-sky-700 disabled:opacity-50 dark:hover:text-sky-300">
                   <Store className="h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300" />
                   <span className="min-w-0 flex-1"><span className="block font-semibold">Developer Mode</span><span className="mt-1 block text-sm text-muted-foreground">{setMode.isPending ? "Switching workspace…" : settingsMode === "developer" ? "Open your Developer workspace" : "Switch to the developer workspace"}</span></span>
                 </button>
-                <Link to="/console/social" className="group flex min-h-16 items-center gap-4 py-4 transition-colors hover:text-sky-700 dark:hover:text-sky-300">
+                <button type="button" onClick={() => navigate({ to: "/console/social", replace: true })} className="group flex min-h-16 w-full items-center gap-4 py-4 text-left transition-colors hover:text-sky-700 dark:hover:text-sky-300">
                   <MessageCircle className="h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300" />
                   <span className="min-w-0 flex-1"><span className="block font-semibold">Social</span><span className="mt-1 block text-sm text-muted-foreground">Open MAS Social</span></span>
-                </Link>
-                <button type="button" onClick={() => void signOut()} className="group flex min-h-16 w-full items-center gap-4 py-4 text-left text-destructive transition-colors hover:bg-destructive/5">
+                </button>
+                <button type="button" disabled={isSigningOut} onClick={() => void signOut()} className="group flex min-h-16 w-full items-center gap-4 py-4 text-left text-destructive transition-colors hover:bg-destructive/5 disabled:opacity-50">
                   <LogOut className="h-5 w-5 shrink-0" />
-                  <span className="min-w-0 flex-1"><span className="block font-semibold">Sign out</span><span className="mt-1 block text-sm text-muted-foreground">Sign out of your MAS account</span></span>
+                  <span className="min-w-0 flex-1"><span className="block font-semibold">{isSigningOut ? "Signing out…" : "Sign out"}</span><span className="mt-1 block text-sm text-muted-foreground">Sign out of your MAS account</span></span>
                 </button>
               </div>
             )}
@@ -340,15 +344,15 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
                   <div className="flex min-w-0 flex-1 items-start gap-3"><Store className="mt-0.5 h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300" /><div><p className="text-sm font-semibold">Developer Mode</p><p className="mt-1 text-sm text-muted-foreground">{settingsMode === "developer" ? "Open your Developer Console." : "Switch to the developer workspace."}</p></div></div>
                   <Button className="rounded-full bg-sky-700 text-white hover:bg-sky-800" disabled={setMode.isPending} onClick={() => { if (settingsMode === "developer") navigate({ to: "/console" }); else toggleDeveloper(true); }}>{setMode.isPending ? "Switching…" : settingsMode === "developer" ? "Open Developer Mode" : "Enable Developer Mode"}</Button>
                 </div>
-                <Link to="/console/social" className="flex items-center gap-3 py-4 hover:text-sky-700 dark:hover:text-sky-300">
+                <button type="button" onClick={() => navigate({ to: "/console/social", replace: true })} className="flex w-full items-center gap-3 py-4 text-left hover:text-sky-700 dark:hover:text-sky-300">
                   <MessageCircle className="h-5 w-5 shrink-0 text-sky-700 dark:text-sky-300" />
                   <span className="min-w-0 flex-1"><p className="text-sm font-semibold">Social</p><p className="mt-1 text-sm text-muted-foreground">Open the MAS Social space.</p></span>
-                </Link>
+                </button>
               </div>
             </section>
             )}
             {section === "account" && (
-<section id="account" className="scroll-mt-24 rounded-3xl border border-border/70 bg-background/90 p-5 shadow-sm sm:p-7"><div className="mb-4"><h2 className="text-xl font-semibold tracking-tight">Account</h2><p className="mt-1 text-sm text-muted-foreground">Your sign-in details and account access.</p></div><div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div className="min-w-0"><p className="text-sm font-medium">Signed-in email</p><p className="mt-1 break-all text-sm text-muted-foreground">{account.data?.email ?? "Loading account email…"}</p></div><Button variant="outline" className="w-full rounded-full border-destructive/40 text-destructive hover:bg-destructive/5 hover:text-destructive sm:w-auto" onClick={signOut}><LogOut className="mr-2 h-4 w-4" />Sign out</Button></div></section>
+<section id="account" className="scroll-mt-24 rounded-3xl border border-border/70 bg-background/90 p-5 shadow-sm sm:p-7"><div className="mb-4"><h2 className="text-xl font-semibold tracking-tight">Account</h2><p className="mt-1 text-sm text-muted-foreground">Your sign-in details and account access.</p></div><div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div className="min-w-0"><p className="text-sm font-medium">Signed-in email</p><p className="mt-1 break-all text-sm text-muted-foreground">{account.data?.email ?? "Loading account email…"}</p></div><Button variant="outline" className="w-full rounded-full border-destructive/40 text-destructive hover:bg-destructive/5 hover:text-destructive sm:w-auto" disabled={isSigningOut} onClick={signOut}><LogOut className="mr-2 h-4 w-4" />Sign out</Button></div></section>
             )}
           </div>
       </main>
