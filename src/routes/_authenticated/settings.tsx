@@ -289,7 +289,7 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
         <div aria-hidden="true" className="pointer-events-none absolute -left-24 top-[28rem] -z-10 h-48 w-1/2 rounded-[2.5rem] bg-blue-100/50 blur-3xl dark:bg-blue-950/20" />
         <header className="mb-4">
           {section !== "overview" && <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">{({ profile: "Personal information", appearance: "Appearance", workspace: "Workspace", account: "Account" } as const)[section]}</h1>}
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{section === "overview" ? "Manage your profile, appearance and MAS spaces." : "Manage this part of your MAS account."}</p>
+          {section !== "overview" && <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">Manage this part of your MAS account.</p>}
           {section !== "overview" && <Link to="/settings" className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-sky-700 hover:underline dark:text-sky-300"><ChevronRight className="h-4 w-4 rotate-180" />Back to Settings</Link>}
         </header>
         <div className="mx-auto w-full max-w-4xl min-w-0 space-y-6">
