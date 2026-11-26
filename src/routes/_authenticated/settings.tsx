@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Link, createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   BadgeCheck,
   Camera,
@@ -53,6 +53,8 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
   const { userId, profile } = useProfile();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const activeSection = pathname === "/settings/profile" ? "profile" : pathname === "/settings/appearance" ? "appearance" : section;
   const mode = useMode();
   const isAdmin = useIsAdmin();
   const { dark, setTheme, accent, setAccent } = useTheme();
@@ -288,12 +290,12 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
       <main className="relative isolate mx-auto w-full max-w-4xl overflow-hidden px-3 py-5 sm:px-6 sm:py-7">
 
         <header className="mb-4">
-          {section !== "overview" && <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">{({ profile: "Personal information", appearance: "Appearance", workspace: "Workspace", account: "Account" } as const)[section]}</h1>}
-          {section !== "overview" && <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">Manage this part of your MAS account.</p>}
-          {section !== "overview" && <Link to="/settings" className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"><ChevronRight className="h-4 w-4 rotate-180" />Back to Settings</Link>}
+          {activeSection !== "overview" && <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">{({ profile: "Personal information", appearance: "Appearance", workspace: "Workspace", account: "Account" } as const)[activeSection]}</h1>}
+          {activeSection !== "overview" && <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">Manage this part of your MAS account.</p>}
+          {activeSection !== "overview" && <Link to="/settings" className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"><ChevronRight className="h-4 w-4 rotate-180" />Back to Settings</Link>}
         </header>
         <div className="mx-auto w-full max-w-4xl min-w-0 space-y-6">
-            {section === "overview" && (
+            {activeSection === "overview" && (
               <div className="space-y-7">
                 <section className="relative isolate flex min-h-[176px] items-center overflow-hidden rounded-[1.5rem] border border-blue-200/70 bg-gradient-to-r from-sky-50 via-blue-100 to-blue-500 px-4 py-6 dark:border-blue-900/60 dark:from-sky-950 dark:via-blue-950 dark:to-blue-800 sm:min-h-[190px] sm:px-7">
                   <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 w-[38%] opacity-45" style={{ backgroundImage: "radial-gradient(ellipse at 78% 100%, rgba(255,255,255,.48) 0 19%, transparent 19.5%), repeating-conic-gradient(from 270deg at 78% 100%, rgba(255,255,255,.30) 0deg 1.2deg, transparent 1.2deg 7deg)", clipPath: "ellipse(88% 96% at 78% 100%)" }} />
@@ -344,7 +346,7 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
                 </div>
               </div>
             )}
-            {section === "profile" && (
+            {activeSection === "profile" && (
 <section id="profile" className="scroll-mt-24 rounded-2xl border border-border/70 bg-background/90 p-4 sm:p-5">
               <div className="mb-4"><h2 className="text-xl font-semibold tracking-tight">Personal information</h2><p className="mt-1 text-sm text-muted-foreground">Manage the information shown on your MAS profile.</p></div>
               <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
@@ -361,14 +363,14 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
               </div>
             </section>
             )}
-            {section === "appearance" && (
+            {activeSection === "appearance" && (
 <section id="appearance" className="scroll-mt-24 rounded-3xl border border-border/70 bg-background/90 p-5 shadow-sm sm:p-7">
               <div className="mb-5"><h2 className="text-xl font-semibold tracking-tight">Appearance</h2><p className="mt-1 text-sm text-muted-foreground">Choose how MAS looks on this device.</p></div>
               <div className="flex items-center justify-between gap-4 rounded-2xl bg-muted/40 p-4"><div className="flex items-start gap-3"><Moon className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" /><div><p className="text-sm font-medium">Dark theme</p><p className="mt-1 text-sm text-muted-foreground">Use a darker interface in low light.</p></div></div><Switch aria-label="Toggle dark theme" checked={dark} onCheckedChange={setTheme} /></div>
               <div className="mt-5 flex items-start gap-3"><Palette className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" /><div className="min-w-0 flex-1"><p className="text-sm font-medium">Accent color</p><p className="mt-1 text-sm leading-5 text-muted-foreground">Customize the highlight color across the store and Developer Mode. Your choice is saved on this device.</p><div className="mt-4 flex flex-wrap gap-2">{ACCENT_PRESETS.map((preset) => <button key={preset.value} type="button" onClick={() => setAccent(preset.value)} aria-label={`Use ${preset.name} accent color`} aria-pressed={accent.toLowerCase() === preset.value.toLowerCase()} title={preset.name} className={`flex h-9 items-center gap-2 rounded-full border px-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${accent.toLowerCase() === preset.value.toLowerCase() ? "border-primary bg-accent" : "border-border hover:bg-muted/60"}`}><span className="h-4 w-4 rounded-full border border-black/10" style={{ backgroundColor: preset.value }} />{preset.name}</button>)}</div><div className="mt-4 flex flex-wrap items-center gap-3"><label className="flex items-center gap-3 rounded-xl border border-border px-3 py-2 text-sm"><span className="text-muted-foreground">Custom color</span><input aria-label="Choose custom accent color" type="color" value={/^#[0-9a-f]{6}$/i.test(accent) ? accent : "#168447"} onChange={(event) => setAccent(event.target.value)} className="h-8 w-10 cursor-pointer border-0 bg-transparent p-0" /></label><span className="font-mono text-xs uppercase text-muted-foreground">{accent}</span></div></div></div>
             </section>
             )}
-            {section === "workspace" && (
+            {activeSection === "workspace" && (
             <section id="workspace" className="rounded-2xl border border-border/70 bg-background/90 p-4 sm:p-5">
               <div className="mb-4"><h2 className="text-xl font-semibold tracking-tight">Workspace</h2><p className="mt-1 text-sm text-muted-foreground">Choose where you want to work in MAS.</p></div>
               <div className="divide-y divide-border">
@@ -383,7 +385,7 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
               </div>
             </section>
             )}
-            {section === "account" && (
+            {activeSection === "account" && (
 <section id="account" className="scroll-mt-24 rounded-3xl border border-border/70 bg-background/90 p-5 shadow-sm sm:p-7"><div className="mb-4"><h2 className="text-xl font-semibold tracking-tight">Account</h2><p className="mt-1 text-sm text-muted-foreground">Your sign-in details and account access.</p></div><div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div className="min-w-0"><p className="text-sm font-medium">Signed-in email</p><p className="mt-1 break-all text-sm text-muted-foreground">{account.data?.email ?? "Loading account email…"}</p></div><Button variant="outline" className="w-full rounded-full border-destructive/40 text-destructive hover:bg-destructive/5 hover:text-destructive sm:w-auto" disabled={isSigningOut} onClick={signOut}><LogOut className="mr-2 h-4 w-4" />Sign out</Button></div></section>
             )}
           </div>
