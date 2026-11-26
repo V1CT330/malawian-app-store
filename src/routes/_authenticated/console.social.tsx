@@ -30,7 +30,6 @@ import {
 import { toast } from "sonner";
 
 import { AppIcon } from "@/components/ListingCard";
-import logo from "@/assets/logo-mark.png";
 import { ConsoleShell } from "@/components/console/ConsoleShell";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useProfile, useSignedUrl, useSocialUnreadCount } from "@/hooks/useSession";
@@ -791,7 +790,6 @@ function SocialPage() {
         {!isComposerOpen && <>
         <div className="flex items-center justify-between gap-2 bg-background px-4 py-3.5 sm:px-6">
           <div className="flex min-w-0 items-center gap-3">
-             <img src={logo} alt="Malawian App Store" width={32} height={32} className="h-8 w-8 shrink-0 [filter:brightness(0)_saturate(100%)_invert(24%)_sepia(91%)_saturate(2550%)_hue-rotate(202deg)_brightness(96%)_contrast(102%)]" />
              <div className="min-w-0">
                <h1 className="text-xl font-semibold tracking-tight text-[#1877F2] sm:text-2xl">Social</h1>
                <p className="mt-0.5 hidden text-xs text-muted-foreground sm:block">Connect, share, and discover the MAS community.</p>
