@@ -722,8 +722,8 @@ function SocialPage() {
               <Check className="h-4 w-4" /> Accept
             </button>
           ) : (
-            <button type="button" disabled={sendConnection.isPending} onClick={() => sendConnection.mutate(person.id)} className="flex items-center gap-1 border border-border px-3 py-2 text-xs font-medium hover:bg-secondary disabled:opacity-50">
-              <UserPlus className="h-4 w-4" /> Add
+            <button type="button" disabled={sendConnection.isPending} onClick={() => sendConnection.mutate(person.id)} className="flex items-center gap-1 rounded-full border border-border px-4 py-2 text-xs font-medium transition-colors hover:bg-secondary disabled:opacity-50">
+              <UserPlus className="h-4 w-4" /> Add Friend
             </button>
           )}
         </article>
