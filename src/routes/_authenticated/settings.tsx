@@ -169,8 +169,27 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
   const previousWorkspaceRef = useRef({ mode, isDeveloper: profile?.is_developer ?? false });
 
   const setMode = useMutation({
-    onMutate: () => {
+    onMutate: (variables: { next: "developer" | "user"; acceptTerms?: boolean }) => {
       previousWorkspaceRef.current = { mode, isDeveloper: profile?.is_developer ?? false };
+      // Optimistically switch the cached mode and navigate immediately. The
+      // route guard reads this same cache, so no stale user-mode redirect occurs.
+      queryClient.setQueryData(["profile", userId], (current: typeof profile) =>
+        current
+          ? {
+              ...current,
+              mode: variables.next,
+              is_developer: variables.next === "developer" ? true : current.is_developer,
+              ...(variables.acceptTerms
+                ? {
+                    developer_terms_accepted_at: new Date().toISOString(),
+                    developer_terms_version: DEVELOPER_TERMS_VERSION,
+                  }
+                : {}),
+            }
+          : current,
+      );
+      setTermsOpen(false);
+      void navigate({ to: variables.next === "developer" ? "/console" : "/", replace: true });
     },
     mutationFn: async ({
       next,
@@ -185,36 +204,31 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
         .update({
           mode: next,
           is_developer: next === "developer" ? true : (profile?.is_developer ?? false),
-          ...(acceptTerms ? { developer_terms_accepted_at: new Date().toISOString(), developer_terms_version: DEVELOPER_TERMS_VERSION } : {}),
+          ...(acceptTerms
+            ? {
+                developer_terms_accepted_at: new Date().toISOString(),
+                developer_terms_version: DEVELOPER_TERMS_VERSION,
+              }
+            : {}),
         })
         .eq("id", userId);
       if (error) throw error;
-      if (next === "developer") await beginDeveloperTrial();
+
+      // Trial provisioning must not delay entry into the Developer Console.
+      if (next === "developer") {
+        void beginDeveloperTrial().catch((error: unknown) => {
+          console.error("Developer trial provisioning failed:", error);
+          toast.error("Developer Mode is active, but trial setup needs attention.");
+        });
+      }
       return next;
     },
-    onSuccess: (next, variables) => {
-      setTermsOpen(false);
-      // Update the cached source of truth immediately so the destination route
-      // sees the new mode without waiting for a profile refetch.
-      queryClient.setQueryData(["profile", userId], (current: typeof profile) =>
-        current
-          ? {
-              ...current,
-              mode: next,
-              is_developer: next === "developer" ? true : current.is_developer,
-              ...(variables.acceptTerms
-                ? { developer_terms_accepted_at: new Date().toISOString(), developer_terms_version: DEVELOPER_TERMS_VERSION }
-                : {}),
-            }
-          : current,
-      );
-      // Reconcile with the server in the background rather than blocking navigation.
+    onSuccess: (next) => {
       void queryClient.invalidateQueries({ queryKey: ["profile", userId] });
       toast.success(next === "developer" ? "Developer workspace on" : "Back to the store");
-      navigate({ to: next === "developer" ? "/console" : "/", replace: true });
     },
     onError: async (error: Error, variables) => {
-      if (variables.next === "developer" && userId) {
+      if (userId) {
         const previous = previousWorkspaceRef.current;
         const { error: rollbackError } = await supabase
           .from("profiles")
@@ -223,9 +237,14 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
         queryClient.setQueryData(["profile", userId], (current: typeof profile) =>
           current ? { ...current, mode: previous.mode, is_developer: previous.isDeveloper } : current,
         );
-        if (rollbackError) console.error("Could not roll back failed Developer Mode activation:", rollbackError.message);
+        if (rollbackError) {
+          console.error("Could not roll back failed workspace switch:", rollbackError.message);
+        }
+        if (variables.next === "developer") {
+          void navigate({ to: "/settings", replace: true });
+        }
       }
-      toast.error(error.message);
+      toast.error(error.message || "Could not switch workspace.");
     },
   });
 
@@ -256,29 +275,6 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
       setIsSigningOut(false);
       toast.error(error instanceof Error ? error.message : "Could not sign out. Please try again.");
     }
-  }
-
-  if (setMode.isPending) {
-    return (
-      <main
-        className="flex min-h-screen items-center justify-center bg-background px-6"
-        aria-live="polite"
-        aria-busy="true"
-      >
-        <div className="flex flex-col items-center gap-4 text-center">
-          <span
-            aria-hidden="true"
-            className="h-7 w-7 animate-spin rounded-full border-2 border-primary border-t-transparent"
-          />
-          <div>
-            <p className="font-semibold">Switching workspace</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Your workspace is being updated. This may take a moment.
-            </p>
-          </div>
-        </div>
-      </main>
-    );
   }
 
   const initial = (profile?.display_name || profile?.developer_name || account.data?.email || "U")
