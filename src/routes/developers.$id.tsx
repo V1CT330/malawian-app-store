@@ -95,8 +95,7 @@ function DeveloperPage() {
                 </h1>
                 {p?.kyc_status === "approved" && (
                   <span className="inline-flex shrink-0 items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-primary">
-                    <BadgeCheck className="h-3.5 w-3.5" />
-                    Verified
+                    <BadgeCheck className="h-3.5 w-3.5" aria-label="Verified developer" />
                   </span>
                 )}
               </div>
