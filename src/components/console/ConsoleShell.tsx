@@ -169,7 +169,7 @@ export function ConsoleShell({
 
   return (
     <div className={cn("console-square flex min-h-screen bg-muted/20", !isSocialRoute && "developer-mode-shell")}>
-      <aside className="sticky top-0 hidden h-screen w-[264px] shrink-0 flex-col border-r border-sidebar-border bg-background px-4 py-5 lg:flex">
+      <aside className={cn("sticky top-0 hidden h-screen w-[264px] shrink-0 flex-col border-r border-sidebar-border bg-background px-4 py-5 lg:flex", isSocialRoute && "lg:hidden")}>
         <Link to="/console" className="mb-6 flex items-center gap-2.5 rounded-2xl px-2 py-1.5">
           <img src={logo} alt="" width={32} height={32} className="h-8 w-8" />
           <span className="font-display text-sm font-bold leading-tight">
@@ -197,7 +197,7 @@ export function ConsoleShell({
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        {!hideTopBar && <header className="sticky top-0 z-50 shrink-0 bg-background">
+        {!hideTopBar && !isSocialRoute && <header className="sticky top-0 z-50 shrink-0 bg-background">
           <div className="mx-auto flex w-full max-w-6xl items-center gap-1.5 px-2.5 py-2.5 sm:gap-2 sm:px-6 sm:py-3">
             <Sheet open={drawer} onOpenChange={setDrawer}>
               <SheetTrigger asChild>
@@ -322,7 +322,7 @@ export function ConsoleShell({
           </div>
         </header>}
 
-        <main className={cn("min-w-0 flex-1 pb-20", fullWidth ? "max-w-none overflow-x-clip px-0" : "mx-auto max-w-6xl px-4 sm:px-6", hideTopBar ? "pt-0" : "pt-6")}>
+        <main className={cn("min-w-0 flex-1 pb-20", fullWidth ? "max-w-none overflow-x-clip px-0" : "mx-auto max-w-6xl px-4 sm:px-6", hideTopBar || isSocialRoute ? "pt-0" : "pt-6")}>
           {breadcrumbs && breadcrumbs.length > 0 && (
             <ol className="mb-3 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
               {breadcrumbs.map((c, i) => (
