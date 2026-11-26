@@ -31,7 +31,7 @@ function DeveloperPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("public_profiles")
-        .select("id,display_name,developer_name,kyc_status,bio,cover_image_url,website_url,github_url,portfolio_url,facebook_url,x_url,linkedin_url,instagram_url,youtube_url")
+        .select("id,display_name,developer_name,avatar_url,kyc_status,bio,cover_image_url,website_url,github_url,portfolio_url,facebook_url,x_url,linkedin_url,instagram_url,youtube_url")
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
@@ -69,6 +69,7 @@ function DeveloperPage() {
 
   const p = profile.data as Record<string, string | boolean | null> | null | undefined;
   const cover = useSignedUrl(typeof p?.cover_image_url === "string" ? p.cover_image_url : null);
+  const studioLogo = useSignedUrl(typeof p?.avatar_url === "string" ? p.avatar_url : null);
 
   return (
     <AppShell>
@@ -77,12 +78,20 @@ function DeveloperPage() {
       ) : (
         <header className="surface-card overflow-hidden">
           {cover && <div className="h-32 w-full bg-muted sm:h-44"><img src={cover} alt="Profile cover" className="h-full w-full object-cover" /></div>}
-          <div className="p-5">
-          <h1 className="flex items-center gap-2 font-display text-2xl font-bold">
-            {(p?.developer_name as string) || (p?.display_name as string) || "Developer"}
-            {p?.kyc_status === "approved" && <BadgeCheck className="h-5 w-5 text-primary" />}
-          </h1>
-          {p?.bio && <p className="mt-2 text-sm text-muted-foreground">{p.bio as string}</p>}
+          <div className="flex items-start gap-4 p-5">
+            {studioLogo ? (
+              <img src={studioLogo} alt={`${(p?.developer_name as string) || (p?.display_name as string) || "Developer"} studio logo`} className="h-16 w-16 shrink-0 rounded-2xl border border-border bg-background object-cover sm:h-20 sm:w-20" />
+            ) : (
+              <div aria-hidden="true" className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-border bg-muted font-display text-2xl font-bold text-muted-foreground sm:h-20 sm:w-20">
+                {((p?.developer_name as string) || (p?.display_name as string) || "D").slice(0, 1).toUpperCase()}
+              </div>
+            )}
+            <div className="min-w-0 flex-1">
+              <h1 className="flex flex-wrap items-center gap-2 font-display text-2xl font-bold">
+                {(p?.developer_name as string) || (p?.display_name as string) || "Developer"}
+                {p?.kyc_status === "approved" && <BadgeCheck className="h-5 w-5 text-primary" />}
+              </h1>
+              {p?.bio && <p className="mt-2 text-sm text-muted-foreground">{p.bio as string}</p>}
           <div className="mt-3 flex flex-wrap gap-3 text-sm">
             {SOCIAL_FIELDS.map((f) =>
               p?.[f.key] ? (
@@ -98,6 +107,7 @@ function DeveloperPage() {
               ) : null,
             )}
           </div>
+            </div>
           </div>
         </header>
       )}
