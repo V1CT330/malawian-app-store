@@ -299,19 +299,19 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
               <div className="space-y-7">
                 <section className="relative isolate flex min-h-[176px] items-center overflow-hidden rounded-[1.5rem] border border-blue-200/70 bg-gradient-to-r from-sky-50 via-blue-100 to-blue-500 px-4 py-6 dark:border-blue-900/60 dark:from-sky-950 dark:via-blue-950 dark:to-blue-800 sm:min-h-[190px] sm:px-7">
                   <div aria-hidden="true" className="pointer-events-none absolute inset-y-0 right-0 w-[38%] opacity-45" style={{ backgroundImage: "radial-gradient(ellipse at 78% 100%, rgba(255,255,255,.48) 0 19%, transparent 19.5%), repeating-conic-gradient(from 270deg at 78% 100%, rgba(255,255,255,.30) 0deg 1.2deg, transparent 1.2deg 7deg)", clipPath: "ellipse(88% 96% at 78% 100%)" }} />
-                  <div className="flex min-w-0 items-center gap-4 sm:gap-7">
+                  <div className="flex min-w-0 flex-col items-start gap-4 sm:flex-row sm:items-center sm:gap-7">
                     <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border-4 border-white/90 bg-white/70 shadow-sm sm:h-32 sm:w-32">
                       {avatar ? <img src={avatar} alt="Your profile" className="h-full w-full object-cover" /> : <div className="flex h-full w-full items-center justify-center text-3xl font-semibold text-primary">{initial}</div>}
-                      <button type="button" onClick={() => avatarInput.current?.click()} aria-label="Change profile photo" className="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full border-2 border-background bg-primary text-primary-foreground shadow-sm transition hover:opacity-90"><Camera className="h-4 w-4" /></button>
+                      
                     </div>
                     <div className="min-w-0 text-foreground">
-                      <h1 className="break-words text-2xl font-bold tracking-tight sm:text-3xl">{profile?.display_name || profile?.developer_name || "Your MAS Account"}{profile?.kyc_status === "approved" && <BadgeCheck aria-label="Verified profile" className="ml-2 inline h-6 w-6 fill-blue-600 text-white align-middle" />}</h1>
+                      <h1 className="whitespace-nowrap text-[clamp(1.05rem,5.2vw,1.875rem)] font-bold leading-tight tracking-tight">{profile?.display_name || profile?.developer_name || "Your MAS Account"}{profile?.kyc_status === "approved" && <BadgeCheck aria-label="Verified profile" className="ml-1 inline h-5 w-5 fill-blue-600 text-white align-middle sm:ml-2 sm:h-6 sm:w-6" />}</h1>
                       <p className="mt-1 break-all text-sm text-muted-foreground sm:text-base">{account.data?.email ?? "Loading account email…"}</p>
                       <span className="mt-3 inline-flex items-center gap-2 rounded-full border border-blue-200/70 bg-blue-100/80 px-3 py-1.5 text-sm font-semibold text-blue-800 dark:border-blue-900 dark:bg-blue-950/70 dark:text-blue-200"><Gem className="h-4 w-4 fill-current" />MAS Member</span>
                     </div>
                   </div>
                 </section>
-                <input ref={avatarInput} type="file" accept="image/*" className="sr-only" aria-label="Choose profile photo" onChange={(event) => { const file = event.target.files?.[0]; if (file) uploadAvatar.mutate(file); event.currentTarget.value = ""; }} />
+                
                 <header className="flex items-start gap-3 px-1">
                   <span className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-200"><Settings className="h-6 w-6" /></span>
                   <div><h2 className="text-2xl font-bold tracking-tight sm:text-3xl">User Mode Settings</h2><p className="mt-1 text-sm text-muted-foreground sm:text-base">Manage your account and experience</p></div>
@@ -330,7 +330,7 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
                   <button type="button" disabled={setMode.isPending} onClick={() => settingsMode === "developer" ? navigate({ to: "/console", replace: true }) : toggleDeveloper(true)} className="group flex min-h-[84px] w-full items-center gap-3 rounded-2xl border border-green-100/80 bg-card/95 px-4 py-3 text-left shadow-sm shadow-blue-950/[0.03] transition-colors hover:bg-accent/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50 sm:min-h-[92px] sm:gap-4 sm:px-5">
                     <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300"><Code2 className="h-7 w-7" /></span>
                     <span className="min-w-0 flex-1"><span className="block text-base font-semibold text-foreground">Developer Mode</span><span className="mt-0.5 block text-xs text-muted-foreground sm:text-sm">Access developer tools and console</span></span>
-                    <span className={`shrink-0 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-semibold ${settingsMode === "developer" ? "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300" : "bg-muted text-muted-foreground"}`}><span className={`h-1.5 w-1.5 rounded-full ${settingsMode === "developer" ? "bg-green-600" : "bg-muted-foreground"}`} />{settingsMode === "developer" ? "Enabled" : "Off"}</span>
+                    {settingsMode === "developer" && <span className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-1.5 text-[11px] font-semibold text-green-800 dark:bg-green-950 dark:text-green-300"><span className="h-1.5 w-1.5 rounded-full bg-green-600" />Enabled</span>}
                     <ChevronRight aria-hidden="true" className="h-5 w-5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
                   </button>
                   <button type="button" onClick={() => navigate({ to: "/console/social", replace: true })} className="group flex min-h-[84px] w-full items-center gap-3 rounded-2xl border border-orange-100/80 bg-card/95 px-4 py-3 text-left shadow-sm shadow-blue-950/[0.03] transition-colors hover:bg-accent/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:min-h-[92px] sm:gap-4 sm:px-5">
