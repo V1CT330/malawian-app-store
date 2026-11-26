@@ -169,7 +169,7 @@ export function ConsoleShell({
 
   return (
     <div className={cn("console-square flex min-h-screen bg-muted/20", !isSocialRoute && "developer-mode-shell")}>
-      <aside className={cn("sticky top-0 hidden h-screen w-[264px] shrink-0 flex-col border-r border-sidebar-border bg-background px-4 py-5 lg:flex", isSocialRoute && "lg:hidden")}>
+      <aside className={cn("sticky top-0 hidden h-screen w-[264px] shrink-0 flex-col border-r border-sidebar-border bg-background px-4 py-5", !isSocialRoute && "lg:flex")}>
         <Link to="/console" className="mb-6 flex items-center gap-2.5 rounded-2xl px-2 py-1.5">
           <img src={logo} alt="" width={32} height={32} className="h-8 w-8" />
           <span className="font-display text-sm font-bold leading-tight">
