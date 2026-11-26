@@ -31,7 +31,7 @@ function DeveloperPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("public_profiles")
-        .select("id,display_name,developer_name,kyc_status,bio,cover_image_url,website_url,github_url,portfolio_url,facebook_url,x_url,linkedin_url,instagram_url,youtube_url")
+        .select("id,display_name,developer_name,avatar_url,kyc_status,bio,cover_image_url,website_url,github_url,portfolio_url,facebook_url,x_url,linkedin_url,instagram_url,youtube_url")
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
@@ -68,6 +68,7 @@ function DeveloperPage() {
   });
 
   const p = profile.data as Record<string, string | boolean | null> | null | undefined;
+  const avatar = useSignedUrl(typeof p?.avatar_url === "string" ? p.avatar_url : null);
   const cover = useSignedUrl(typeof p?.cover_image_url === "string" ? p.cover_image_url : null);
 
   return (
@@ -78,11 +79,29 @@ function DeveloperPage() {
         <header className="surface-card overflow-hidden">
           {cover && <div className="h-32 w-full bg-muted sm:h-44"><img src={cover} alt="Profile cover" className="h-full w-full object-cover" /></div>}
           <div className="p-5">
-            <h1 className="flex flex-wrap items-center gap-2 font-display text-2xl font-bold">
-              {(p?.developer_name as string) || (p?.display_name as string) || "Developer"}
-              {p?.kyc_status === "approved" && <BadgeCheck className="h-5 w-5 text-primary" />}
-            </h1>
-            {p?.bio && <p className="mt-2 text-sm text-muted-foreground">{p.bio as string}</p>}
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-secondary">
+                {avatar ? (
+                  <img src={avatar} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <span className="font-display text-xl font-semibold text-muted-foreground">
+                    {((p?.developer_name as string) || (p?.display_name as string) || "D").trim().charAt(0).toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <div className="flex min-w-0 items-center gap-2">
+                <h1 className="min-w-0 truncate whitespace-nowrap font-display text-xl font-bold sm:text-2xl">
+                  {(p?.developer_name as string) || (p?.display_name as string) || "Developer"}
+                </h1>
+                {p?.kyc_status === "approved" && (
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-none border border-primary/40 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-primary">
+                    <BadgeCheck className="h-3.5 w-3.5" />
+                    Verified
+                  </span>
+                )}
+              </div>
+            </div>
+            {p?.bio && <p className="mt-3 text-sm text-muted-foreground">{p.bio as string}</p>}
             <div className="mt-3 flex flex-wrap gap-3 text-sm">
               {SOCIAL_FIELDS.map((f) =>
                 p?.[f.key] ? (
