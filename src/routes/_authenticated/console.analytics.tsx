@@ -84,26 +84,45 @@ function isoDate(date: Date) {
 function rangeFor(key: RangeKey, customStart: string, customEnd: string) {
   const end = new Date();
   end.setHours(23, 59, 59, 999);
-  let start = new Date(end);
   const isCustom = key === "custom";
-  if (key === "7d") start = new Date(end.getTime() - 6 * DAY);
-  else if (key === "30d") start = new Date(end.getTime() - 29 * DAY);
-  else if (key === "90d") start = new Date(end.getTime() - 89 * DAY);
-  else {
-    start = customStart ? new Date(`${customStart}T00:00:00`) : new Date(end.getTime() - 29 * DAY);
+  let start = new Date(end);
+  start.setHours(0, 0, 0, 0);
+
+  if (!isCustom) {
+    const days = key === "7d" ? 7 : key === "90d" ? 90 : 30;
+    start.setDate(start.getDate() - (days - 1));
+  } else {
+    if (customStart) {
+      const selectedStart = new Date(`${customStart}T00:00:00`);
+      if (!Number.isNaN(selectedStart.getTime())) start = selectedStart;
+    } else {
+      start.setDate(start.getDate() - 29);
+    }
     if (customEnd) {
       const selectedEnd = new Date(`${customEnd}T23:59:59.999`);
       if (!Number.isNaN(selectedEnd.getTime())) end.setTime(selectedEnd.getTime());
     }
   }
-  if (Number.isNaN(start.getTime())) start = new Date(end.getTime() - 29 * DAY);
-  if (start > end) start.setTime(end.getTime() - 29 * DAY);
-  const rawDuration = Math.floor((end.getTime() - start.getTime()) / DAY) + 1;
+
+  if (Number.isNaN(start.getTime()) || start > end) {
+    start = new Date(end);
+    start.setHours(0, 0, 0, 0);
+    start.setDate(start.getDate() - 29);
+  }
+
+  const calendarDay = (value: Date) => Date.UTC(value.getFullYear(), value.getMonth(), value.getDate());
+  const rawDuration = Math.floor((calendarDay(end) - calendarDay(start)) / DAY) + 1;
   const duration = Math.min(365, Math.max(1, rawDuration));
-  // Fixed ranges are rolling windows; custom ranges must retain midnight on the selected first day.
-  if (!isCustom || rawDuration > 365) start.setTime(end.getTime() - (duration - 1) * DAY);
+  if (!isCustom || rawDuration > 365) {
+    start = new Date(end);
+    start.setHours(0, 0, 0, 0);
+    start.setDate(start.getDate() - (duration - 1));
+  }
+
   const previousEnd = new Date(start.getTime() - 1);
-  const previousStart = new Date(previousEnd.getTime() - duration * DAY + 1);
+  const previousStart = new Date(start);
+  previousStart.setDate(previousStart.getDate() - duration);
+  previousStart.setHours(0, 0, 0, 0);
   return { start, end, previousStart, previousEnd, duration };
 }
 
@@ -158,21 +177,26 @@ async function fetchEvents(
 function makeTrend(installs: Event[], views: Event[], start: Date, end: Date, duration: number) {
   const useDaily = duration <= 90;
   const buckets: { key: string; label: string; installs: number; views: number }[] = [];
-  const count = useDaily ? duration : Math.min(12, Math.ceil(duration / 30));
+  const count = useDaily
+    ? duration
+    : (end.getFullYear() - start.getFullYear()) * 12 + end.getMonth() - start.getMonth() + 1;
   const formatter = new Intl.DateTimeFormat("en", useDaily
     ? { month: "short", day: "numeric" }
     : { month: "short", year: "2-digit" });
 
   for (let i = 0; i < count; i += 1) {
-    const from = new Date(start);
-    const to = new Date(start);
+    let from: Date;
+    let to: Date;
     if (useDaily) {
+      from = new Date(start);
       from.setDate(start.getDate() + i);
-      to.setTime(from.getTime() + DAY - 1);
-    } else {
-      from.setMonth(start.getMonth() + i);
-      to.setMonth(from.getMonth() + 1, 0);
+      from.setHours(0, 0, 0, 0);
+      to = new Date(from);
       to.setHours(23, 59, 59, 999);
+    } else {
+      const monthStart = new Date(start.getFullYear(), start.getMonth() + i, 1);
+      from = i === 0 ? new Date(start) : monthStart;
+      to = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0, 23, 59, 59, 999);
     }
     if (from > end) break;
     const bucketEnd = to > end ? end : to;
