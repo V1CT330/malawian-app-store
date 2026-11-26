@@ -39,8 +39,8 @@ export function AppShell({
   const isSettingsPage = pathname === "/settings" || pathname.startsWith("/settings/");
   const isUserSettingsPage = isSettingsPage && mode !== "developer";
   const hideGlobalHeader = isSettingsPage || pathname === "/notifications" || pathname.startsWith("/developers/") || pathname.startsWith("/apps/");
-  const showGlobalSearch = pathname === "/" || pathname === "/library";
-  // Keep the shopper navigation fixed; developer links must not replace it.
+  // Search belongs exclusively to the public App Store home, never Library or Developer Mode.
+  const showGlobalSearch = pathname === "/" && mode !== "developer";
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
