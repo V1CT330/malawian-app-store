@@ -80,16 +80,20 @@ function DeveloperPage() {
           {cover && <div className="h-32 w-full bg-muted sm:h-44"><img src={cover} alt="Profile cover" className="h-full w-full object-cover" /></div>}
           <div className="flex items-start gap-4 p-5">
             {studioLogo ? (
-              <img src={studioLogo} alt={`${(p?.developer_name as string) || (p?.display_name as string) || "Developer"} studio logo`} className="h-16 w-16 shrink-0 rounded-2xl border border-border bg-background object-cover sm:h-20 sm:w-20" />
+              <img src={studioLogo} alt={`${(p?.developer_name as string) || (p?.display_name as string) || "Developer"} studio logo`} className="h-16 w-16 shrink-0 rounded-full border border-border bg-background object-cover sm:h-20 sm:w-20" />
             ) : (
-              <div aria-hidden="true" className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-border bg-muted font-display text-2xl font-bold text-muted-foreground sm:h-20 sm:w-20">
+              <div aria-hidden="true" className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-border bg-muted font-display text-2xl font-bold text-muted-foreground sm:h-20 sm:w-20">
                 {((p?.developer_name as string) || (p?.display_name as string) || "D").slice(0, 1).toUpperCase()}
               </div>
             )}
             <div className="min-w-0 flex-1">
-              <h1 className="flex flex-wrap items-center gap-2 font-display text-2xl font-bold">
-                {(p?.developer_name as string) || (p?.display_name as string) || "Developer"}
-                {p?.kyc_status === "approved" && <BadgeCheck className="h-5 w-5 text-primary" />}
+              <h1 className="flex min-w-0 flex-nowrap items-center gap-2 font-display text-2xl font-bold">
+                <span className="truncate whitespace-nowrap">{(p?.developer_name as string) || (p?.display_name as string) || "Developer"}</span>
+                {p?.kyc_status === "approved" && (
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-sm border border-primary/40 px-2 py-1 text-xs font-semibold leading-none text-primary">
+                    <BadgeCheck className="h-4 w-4" /> Verified
+                  </span>
+                )}
               </h1>
               {p?.bio && <p className="mt-2 text-sm text-muted-foreground">{p.bio as string}</p>}
           <div className="mt-3 flex flex-wrap gap-3 text-sm">
