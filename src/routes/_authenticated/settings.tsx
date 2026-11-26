@@ -6,7 +6,6 @@ import {
   ChevronRight,
   Code2,
   Gem,
-  Info,
   LogOut,
   Moon,
   Palette,
@@ -343,7 +342,6 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
                     <ChevronRight aria-hidden="true" className="h-5 w-5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
                   </button>
                 </div>
-                <div className="flex min-h-[64px] items-center justify-center gap-3 rounded-2xl border border-blue-100 bg-blue-50/90 px-4 py-3 text-center text-sm text-blue-950 dark:border-blue-900 dark:bg-blue-950/50 dark:text-blue-100"><Info className="h-5 w-5 shrink-0 fill-current text-blue-600 dark:text-blue-300" /><span>Enjoy a better experience with Malawian App Store! 🇲🇼</span></div>
               </div>
             )}
             {section === "profile" && (
