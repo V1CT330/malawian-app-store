@@ -165,14 +165,21 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
   });
 
   const beginDeveloperTrial = useServerFn(startDeveloperTrial);
-  // Retain the previous workspace only for rollback if developer activation fails.
-  const previousWorkspaceRef = useRef({ mode, isDeveloper: profile?.is_developer ?? false });
+  const beginDeveloperTrial = useServerFn(startDeveloperTrial);
 
   const setMode = useMutation({
-    onMutate: (variables: { next: "developer" | "user"; acceptTerms?: boolean }) => {
-      previousWorkspaceRef.current = { mode, isDeveloper: profile?.is_developer ?? false };
-      // Optimistically switch the cached mode and navigate immediately. The
-      // route guard reads this same cache, so no stale user-mode redirect occurs.
+    onMutate: async (variables: { next: "developer" | "user"; acceptTerms?: boolean }) => {
+      if (!userId) throw new Error("Sign in required");
+
+      // Stop an older profile request from overwriting the optimistic mode
+      // and triggering useRequireDeveloper's redirect back to Settings.
+      await queryClient.cancelQueries({ queryKey: ["profile", userId] });
+      const previousProfile = queryClient.getQueryData<typeof profile>(["profile", userId]) ?? profile;
+      const previousWorkspace = {
+        mode: previousProfile?.mode === "developer" ? "developer" : "user",
+        isDeveloper: previousProfile?.is_developer ?? false,
+      };
+
       queryClient.setQueryData(["profile", userId], (current: typeof profile) =>
         current
           ? {
@@ -190,6 +197,7 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
       );
       setTermsOpen(false);
       void navigate({ to: variables.next === "developer" ? "/console" : "/", replace: true });
+      return { previousProfile, previousWorkspace };
     },
     mutationFn: async ({
       next,
@@ -198,7 +206,6 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
       next: "developer" | "user";
       acceptTerms?: boolean;
     }) => {
-      if (!userId) throw new Error("Sign in required");
       const { error } = await supabase
         .from("profiles")
         .update({
@@ -211,7 +218,7 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
               }
             : {}),
         })
-        .eq("id", userId);
+        .eq("id", userId!);
       if (error) throw error;
 
       // Trial provisioning must not delay entry into the Developer Console.
@@ -227,19 +234,9 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
       void queryClient.invalidateQueries({ queryKey: ["profile", userId] });
       toast.success(next === "developer" ? "Developer workspace on" : "Back to the store");
     },
-    onError: async (error: Error, variables) => {
-      if (userId) {
-        const previous = previousWorkspaceRef.current;
-        const { error: rollbackError } = await supabase
-          .from("profiles")
-          .update({ mode: previous.mode, is_developer: previous.isDeveloper })
-          .eq("id", userId);
-        queryClient.setQueryData(["profile", userId], (current: typeof profile) =>
-          current ? { ...current, mode: previous.mode, is_developer: previous.isDeveloper } : current,
-        );
-        if (rollbackError) {
-          console.error("Could not roll back failed workspace switch:", rollbackError.message);
-        }
+    onError: (error: Error, variables, context) => {
+      if (userId && context?.previousProfile) {
+        queryClient.setQueryData(["profile", userId], context.previousProfile);
         if (variables.next === "developer") {
           void navigate({ to: "/settings", replace: true });
         }
