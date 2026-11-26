@@ -38,7 +38,7 @@ export function AppShell({
   const unread = useUnreadCount("user");
   const isSettingsPage = pathname === "/settings" || pathname.startsWith("/settings/");
   const isUserSettingsPage = isSettingsPage && mode !== "developer";
-  const hideGlobalHeader = isSettingsPage || pathname.startsWith("/console") || pathname === "/notifications" || pathname.startsWith("/developers/") || pathname.startsWith("/apps/");
+  const hideGlobalHeader = mode === "developer" || isSettingsPage || pathname.startsWith("/console") || pathname === "/notifications" || pathname.startsWith("/developers/") || pathname.startsWith("/apps/");
   // Search belongs exclusively to the public App Store home, never Library or Developer Mode.
   const showGlobalSearch = pathname === "/" && mode !== "developer";
 
