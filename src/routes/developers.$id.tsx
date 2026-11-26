@@ -80,7 +80,7 @@ function DeveloperPage() {
           {cover && <div className="h-32 w-full bg-muted sm:h-44"><img src={cover} alt="Profile cover" className="h-full w-full object-cover" /></div>}
           <div className="p-5">
             <div className="flex min-w-0 items-center gap-3">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-secondary">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-primary/60 bg-secondary shadow-sm">
                 {avatar ? (
                   <img src={avatar} alt="" className="h-full w-full object-cover" />
                 ) : (
