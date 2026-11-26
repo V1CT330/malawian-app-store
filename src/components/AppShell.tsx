@@ -38,7 +38,9 @@ export function AppShell({
   const unread = useUnreadCount("user");
   const isSettingsPage = pathname === "/settings" || pathname.startsWith("/settings/");
   const isUserSettingsPage = isSettingsPage && mode !== "developer";
-  const hideGlobalHeader = isSettingsPage || pathname === "/notifications";
+  // Developer profile pages provide their own studio identity header; avoid stacking the store header above it.
+  const isDeveloperProfilePage = pathname.startsWith("/developers/");
+  const hideGlobalHeader = isSettingsPage || pathname === "/notifications" || isDeveloperProfilePage;
   const showGlobalSearch = pathname === "/" || pathname === "/library";
   // Keep the shopper navigation fixed; developer links must not replace it.
 
