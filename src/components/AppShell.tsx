@@ -38,7 +38,7 @@ export function AppShell({
   const unread = useUnreadCount("user");
   const isSettingsPage = pathname === "/settings" || pathname.startsWith("/settings/");
   const isUserSettingsPage = isSettingsPage && mode !== "developer";
-  const hideGlobalHeader = isSettingsPage || pathname === "/notifications";
+  const hideGlobalHeader = isSettingsPage || pathname === "/notifications" || pathname.startsWith("/developers/");
   const showGlobalSearch = pathname === "/" || pathname === "/library";
   // Keep the shopper navigation fixed; developer links must not replace it.
 
