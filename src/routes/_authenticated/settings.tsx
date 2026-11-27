@@ -165,7 +165,6 @@ function SettingsPage({ section = "overview" }: { section?: "overview" | "profil
   });
 
   const beginDeveloperTrial = useServerFn(startDeveloperTrial);
-  const beginDeveloperTrial = useServerFn(startDeveloperTrial);
 
   const setMode = useMutation({
     onMutate: async (variables: { next: "developer" | "user"; acceptTerms?: boolean }) => {
