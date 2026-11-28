@@ -1,74 +1,70 @@
 # Malawian App Store
 
-Build a web app called Malawian App Store
+Malawian App Store (MAS) is a digital marketplace for discovering and publishing apps and websites. It is intended to connect users with locally published digital products and give developers tools to manage their listings.
 
-It's For
+## Product areas
 
-‎Apps
+- **App and website discovery:** Browse published digital products.
+- **Developer accounts:** Switch between user and developer experiences.
+- **Developer verification:** Identity verification and developer trust indicators.
+- **Publishing:** Submit and update app or website listings.
+- **Developer dashboard:** Manage listings and review activity.
+- **Reviews:** Collect and display feedback on published products.
+- **Account tools:** Authentication, profile settings, and notifications.
 
-‎Websites
+Feature availability depends on the current application implementation and backend configuration. This README does not imply that every planned feature or external integration is live.
 
-‎
+## Technology
 
-‎
+The web application uses:
 
-‎Developer - User (on/off)🔂
+- React and TypeScript
+- TanStack Start and TanStack Router
+- Vite
+- Supabase client libraries
+- Tailwind CSS
 
-‎
+## Getting started
 
-‎KYC- Verification bedge
+### Requirements
 
-‎
+- Node.js
+- npm
 
-‎App/Website uploading system
+### Install dependencies
 
-‎Updating system
+```bash
+npm install
+```
 
-‎
+### Run locally
 
-‎Dashboard/Analysis panel
+```bash
+npm run dev
+```
 
-‎
+### Build
 
-‎App/web Review
+```bash
+npm run build
+```
 
-‎
+### Lint
 
-‎Storage
+```bash
+npm run lint
+```
 
-‎
+## Configuration and security
 
-‎Google authentication
+Configure the required public application and Supabase settings using the project's deployment environment. Never expose service-role keys, payment secrets, identity-provider secrets, or webhook signing secrets in browser code.
 
-‎
-
-‎phone number verification- WhatsApp
-
-‎
-
-‎Settings
-
-‎
-
-‎AI agent
-
-‎
-
-‎5000/monthly subscription
-
-‎
-
-‎Socia Media pages
-
-‎
+Backend authorization and database access must be enforced server-side and through correctly configured Supabase Row Level Security policies.
 
 ## Development
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Keep the web application separate from the native Android MAS repository. Preserve existing authentication, publishing, review, and developer-verification flows when making changes.
 
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
-```
+## Repository
+
+- GitHub: [V1CT330/malawian-app-store](https://github.com/V1CT330/malawian-app-store)
